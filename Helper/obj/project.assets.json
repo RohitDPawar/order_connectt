@@ -2926,11 +2926,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\_May 2025\\Order Connect\\02-05-2025\\COM\\Helper\\Helper.csproj",
+      "projectUniqueName": "C:\\Users\\TechneAi-Rohit Pawar\\Desktop\\Order_Connect\\Helper\\Helper.csproj",
       "projectName": "Helper",
-      "projectPath": "D:\\_May 2025\\Order Connect\\02-05-2025\\COM\\Helper\\Helper.csproj",
+      "projectPath": "C:\\Users\\TechneAi-Rohit Pawar\\Desktop\\Order_Connect\\Helper\\Helper.csproj",
       "packagesPath": "C:\\Users\\TechneAi-Rohit Pawar\\.nuget\\packages\\",
-      "outputPath": "D:\\_May 2025\\Order Connect\\02-05-2025\\COM\\Helper\\obj\\",
+      "outputPath": "C:\\Users\\TechneAi-Rohit Pawar\\Desktop\\Order_Connect\\Helper\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
