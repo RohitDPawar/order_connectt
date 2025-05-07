@@ -1,0 +1,400 @@
+@{
+    @* using this variables to load front pages assets *@
+    bool isFront = ViewData["isFront"] is bool isFrontValue ? isFrontValue : false;
+    ViewData["main"] = isFront ? "front-" : "";
+    ViewData["frontVar"] = isFront ? "Front" : "";
+    @* Compact/Fluid class *@
+    ViewData["contentType"] = ViewData["container"] is string container && container == "container-xxl" ? "layout-compact" : "layout-wide";
+}
+
+@inject IHttpContextAccessor httpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en"
+      class='light-style @(ViewData["navbarType"] is string navbarType ? navbarType : "") @(ViewData["menuFixed"] is string menuFixed ? menuFixed : "") @(ViewData["menuCollapsed"] is string menuCollapsed ? menuCollapsed : "") @(ViewData["contentType"] is string contentType ? contentType : "") @(ViewData["footerFixed"] is string footerFixed ? footerFixed : "") @(ViewData["customizerHidden"] is string customizerHidden ? customizerHidden : "")'
+      dir="ltr" data-theme="theme-default" data-assets-path='@((httpContextAccessor.HttpContext?.Request.PathBase ?? "") + "/")'
+      data-template='@(isFront ? "front-page" : (Convert.ToBoolean(TempData.Peek("menuHorizontal")?.ToString()) ? "horizontal-menu-template" : "vertical-menu-template"))'>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+    @{
+        string title = ViewData["title"] as string ?? "";
+        string appName = TempData.Peek("appName") as string ?? "";
+        string productPage = TempData.Peek("productPage") as string ?? "";
+    }
+
+    <style>
+
+        input[type="search"]::-webkit-search-cancel-button {
+            display: none !important;
+        }
+
+        .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_length {
+            margin-bottom: 10px !important; /* Add space below */
+        }
+
+    </style>
+    <title>@title | @appName - Asp.Net Core MVC Admin Template</title>
+    <meta name="description" content="" />
+
+    <!-- Canonical SEO -->
+    <link rel="canonical" href='@productPage'>
+
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.9/dist/sweetalert2.min.css" rel="stylesheet" />
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.9/dist/sweetalert2.all.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/img/favicon/favicon.ico" />
+
+
+    <!-- Core Styles -->
+    @await Html.PartialAsync("Sections/_Styles" + ViewData["frontVar"])
+
+
+    <!-- Vendor Styles -->
+    @RenderSection("VendorStyles", required: false)
+    <link rel="stylesheet" href="~/vendor/libs/animate-css/animate.css" />
+    <link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.css" />
+    <script src="~/vendor/libs/sweetalert2/sweetalert2.js"></script>
+    <script src="~/js/extended-ui-sweetalert2.js"></script>
+
+    <!-- Page Styles -->
+    @RenderSection("PageStyles", required: false)
+    @await Html.PartialAsync("PopupModals/_Modal")
+
+    <!-- Include Scripts for customizer, helper, analytics, config -->
+    @await Html.PartialAsync("Sections/_ScriptsIncludes" + ViewData["frontVar"])
+</head>
+
+<body>
+    <!-- Layout Content -->
+    @RenderBody()
+    <!--/ Layout Content -->
+    <!-- Core Scripts -->
+    @await Html.PartialAsync("Sections/_Scripts" + ViewData["frontVar"])
+
+    <!-- Vendor Scripts -->
+    @RenderSection("VendorScripts", required: false)
+
+    <script src="~/js/CommonDetailsShow.js"></script>
+    <script src='~/js/@ViewData["main"]main.js'> </script>
+    <script type="text/javascript">
+
+    //THIS FUNCTION USED FOR GET USER LOGIN NAME
+        function GetUserName() {
+            $.ajax({
+                url: '@Url.Action("GetUserName", "Dashboard")',
+                type: 'GET',
+                success: function (data) {
+                    if (data && data.userName) {
+                        $("#user-name").text(data.userName);
+                    }
+                },
+                error: function () {
+                    //alert("An error occurred while fetching the user details.");
+                }
+            });
+        }
+
+        // ALLOW ONLY CHARACTORS
+        $(document).on('keypress', '.onlycharacter', function (event) {
+            // not accept space as first charactor
+            if (this.value.length === 0 && event.which === 32) event.preventDefault();
+            var regex = new RegExp("^[a-zA-Z]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+
+        // ALLOW ONLY CHARACTERS AND SINGLE SPACE BETWEEN WORDS
+        $(document).on('keypress', '.onlycharacterandspace', function (event) {
+            // Do not accept space as the first character
+            if (this.value.length === 0 && event.which === 32) event.preventDefault();
+
+            var regex = new RegExp("^[a-zA-Z ]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+            // Prevent any non-alphabetic characters except space
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent multiple consecutive spaces
+            if (event.which === 32 && this.value.slice(-1) === ' ') {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        // THIS FUNCTION IS USED TO ACCEPT ONLY CHARACTOR AND DASH
+        $(document).on('keypress', '.onlyCharacterAndDash', function (event) {
+            var regex = new RegExp("^[a-zA-Z ,.'()_-]+$");
+
+            // Get the key pressed
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+            // Check if the key is allowed
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Additional checks to prevent multiple consecutive spaces, commas, dots, apostrophes, hyphens, etc.
+            var lastChar = this.value.slice(-1);
+
+            // Prevent consecutive spaces
+            if (event.which === 32 && lastChar === ' ') {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive commas
+            if (event.which === 44 && lastChar === ',') {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive dots
+            if (event.which === 46 && lastChar === '.') {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive apostrophes
+            if (event.which === 39 && lastChar === "'") {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive hyphens
+            if (event.which === 45 && lastChar === '-') {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive parentheses
+            if ((event.which === 40 && lastChar === '(') || (event.which === 41 && lastChar === ')')) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Prevent consecutive underscores
+            if (event.which === 95 && lastChar === '_') {
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+
+
+        // ALLOW ONLY NUMBERS AND TWO DECIMAL POINT
+        $(document).on('input keypress', '.numbers', function (evt) {
+
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode != 46) {
+                if (charCode < 48 || charCode > 57) {
+                    evt.preventDefault();
+                    return false;
+                }
+            }
+            //CHECK FOR MULTPLE PERIOD
+            if (charCode == 46) {
+                if (this.value.indexOf('.') === -1) {
+                    return true;
+                } else {
+                    return false;
+                    evt.preventDefault();
+                }
+            }
+            //CHECK STRING AFTER PERIOD
+            if (this.value.indexOf('.') > 0) {
+                var str = this.value;
+                var n = str.indexOf('.');
+                var res = str.substring(n + 1, str.length);
+                if (res.length > 2) {
+                    evt.preventDefault();
+                    this.value = this.value.substr(0, (this.value.length - 1));
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        /*################## This Function Use For Only 0-9 Digits ####################*/
+        $(document).on('keypress', '.numberOnly', function (event) {
+            var regex = new RegExp("^[0-9]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        // ALLOW SPECIAL CHARACTORS
+        $(document).on('keypress', '.specialcharacter', function (event) {
+            // not accept space as first charactor
+            if (this.value.length === 0 && event.which === 32) event.preventDefault();
+            var regex = new RegExp("^[a-zA-Z. ]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        /*################## This Function Use For 0-9 and A-Z and a-z Character ####################*/
+        $(document).on('keypress', '.numbercharacter', function (event) {
+            // not accept space as first charactor
+            if (this.value.length === 0 && event.which === 32) event.preventDefault();
+
+            var regex = new RegExp("^[a-zA-Z0-9 ]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+        /*################## This Function Use For 0-9 and A-Z and a-z Special Symbol Character ####################*/
+        $(document).on('keypress', '.narration', function (event) {
+            // not accept space as first charactor
+            if (this.value.length === 0 && event.which === 32) event.preventDefault();
+            var regex = new RegExp("^[#/?,()%$!a-zA-Z0-9. ]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+        });
+
+                // THIS IS USED FOR NET WT / ANY WEIGHT USED
+        document.querySelectorAll('.onlyNumberAndDot').forEach(input => {
+            input.addEventListener('input', function () {
+                // Allow only up to 10 digits before the dot and up to 3 digits after the dot
+                const validValue = this.value.match(/^\d{0,10}(\.\d{0,3})?$/);
+
+                // If invalid input is detected or a dot is at the first index, reset to the last valid value
+                if (!validValue || this.value.startsWith('.')) {
+                    this.value = this.value.slice(0, -1); // Keep the valid portion
+                }
+            });
+
+            // Prevent entering invalid characters in real time
+            input.addEventListener('keypress', function (event) {
+                const char = String.fromCharCode(event.keyCode || event.which);
+                const currentValue = this.value;
+
+                // Allow only digits and a single dot, and block a dot as the first character
+                if (!/[\d.]/.test(char) || (char === '.' && (currentValue.includes('.') || currentValue === ''))) {
+                    event.preventDefault(); // Block invalid input
+                }
+            });
+        });
+
+
+        //######################### THIS IS USED FOR FILTER FROM DATE PASTE DATE DISABLED ##############################
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const dd = String(today.getDate()).padStart(2, '0');
+
+        const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+        // Set the min attribute of the date input
+        document.getElementById('filterOrderDateFrom').setAttribute('max', formattedToday);
+            document.getElementById('filterOrderDateTo').setAttribute('max', formattedToday);
+
+
+        //############################################### THIS IS USED FOR FROM DATE AND TO DATE RANGE
+        const fromDate = document.getElementById("filterOrderDateFrom");
+        const toDate = document.getElementById("filterOrderDateTo");
+
+        // Add event listeners for onchange
+        fromDate.addEventListener("change", () => {
+            if (toDate.value && fromDate.value > toDate.value) {
+                ShowWarningMessage("From Date must be less than or equal to Order Date.");
+                fromDate.value = ""; // Reset the From Date
+            }
+        });
+
+        toDate.addEventListener("change", () => {
+            if (fromDate.value && fromDate.value > toDate.value) {
+                    ShowWarningMessage("From Date must be less than or equal to Order Date.");
+                toDate.value = ""; // Reset the To Date
+            }
+        });
+
+        //#######################################################################################
+
+            /*################## This Function Use For Only 0-9 Digits ####################*/
+            $(document).on('keypress', '.SpaceNotAllowed', function (event) {
+                    var regexp = /^\S*$/;
+                var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+                    if (!regexp.test(key)) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            // ################## THIS IS USED FOR ENTER CHARACTER AND CONVERT TO CAPITAL LETTER
+        $(document).on('keypress', '.PrefixSeries', function (event) {
+            // Prevent space as the first character
+            if (this.value.length === 0 && event.which === 32) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Allow only alphabetic characters
+            var regex = new RegExp("^[a-zA-Z]+$");
+            var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+            if (!regex.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Restrict to a maximum length of 4 characters
+            if (this.value.length >= 4) {
+                event.preventDefault();
+                return false;
+            }
+
+            // Convert input to uppercase and append
+            event.preventDefault();
+            this.value += key.toUpperCase();
+        });
+
+
+            function ShowWarningMessage(message){
+              Swal.fire({
+                            //title: 'Good job!',
+                            text: message,
+                            icon: 'warning',
+                            customClass: {
+                                confirmButton: 'btn btn-primary waves-effect waves-light'
+                            },
+                            buttonsStyling: false
+                        });
+        }
+
+    </script>
+
+    <!-- Page Scripts-->
+    @RenderSection("PageScripts", required: false)
+
+</body>
+
+</html>

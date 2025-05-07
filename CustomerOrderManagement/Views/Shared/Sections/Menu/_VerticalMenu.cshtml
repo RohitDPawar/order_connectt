@@ -1,0 +1,199 @@
+@{
+    TempData.Keep();
+    string? currentPage = ViewContext.HttpContext.Request.Path;
+}
+
+<!-- Menu -->
+@* ! Do this simple *@
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+    @* ! Hide app brand if navbar-full *@
+    <div class='app-brand demo @((@ViewData["navbarFull"] != null && Convert.ToBoolean(@ViewData["navbarFull"])) ? "d-xl-none" : "")'>
+        <a asp-controller="Dashboards" asp-action="Index" class="app-brand-link d-flex align-items-center">
+            <!-- Logo -->
+            <span class="app-brand-logo demo me-2">
+                <img src="~/img/icons/brands/brand_logo_com3.png" class="img-fluid" style="max-width:190px !important" />
+            </span>
+
+        </a>
+
+        <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+            <i class="menu-toggle-icon d-xl-block align-middle"></i>
+        </a>
+    </div>
+
+    <div class="menu-inner-shadow"></div>
+
+    @* ! Full version menu-items *@
+    <ul class="menu-inner py-1">
+
+
+        <!-- Dashboards -->
+        <li class='menu-item@(currentPage.EndsWith("/") || currentPage.StartsWith("/Dashboard/BackOfficeDashboard") || currentPage.StartsWith("/Dashboard/SalePersonDashboard") || currentPage.StartsWith("/Dashboard/VendorDashboard")? " active" : "")'>
+            <a href="@Url.Action("Dashboard", "Dashboard")" class="menu-link">
+                <img src="~/svg/icons/dashboard_com.svg" />&nbsp;
+                <div data-i18n="Dashboard">Dashboard</div>
+            </a>
+        </li>
+
+        @if (TempData.Peek("Role").ToString() == "1")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/TenantMaster/Index") ? "active" : "")'>
+                <a href="@Url.Action("Index", "TenantMaster")" class="menu-link">
+                    <i class='menu-icon tf-icons ri-luggage-cart-fill'></i>
+                    <div data-i18n="Tenant Master">Tenant Master</div>
+                </a>
+            </li>
+        }
+
+        @if (TempData.Peek("Role").ToString() == "2")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/UserMapping/Index") ? "active" : "")'>
+                <a href="@Url.Action("Index", "UserMapping")" class="menu-link">
+                    <img src="~/svg/icons/uesr_mapping.svg" />&nbsp;
+                    <div data-i18n="User Mapping">User Mapping</div>
+                </a>
+            </li>
+        }
+        <!-- Masters Menu Start -->
+        @if (TempData.Peek("Role").ToString() == "3" || TempData.Peek("Role").ToString() == "2")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/Master") ||
+                      currentPage == "/ItemMaster/Index" ||
+                      currentPage == "/CategoryMaster/Index" ||
+                      currentPage == "/ProductGroupMaster/Index" ||
+                      currentPage == "/PurityMaster/Index" ||
+                      currentPage == "/StoneColorMaster/Index" ||
+                      currentPage == "/CountryMaster/Index" ||
+                      currentPage == "/StateMaster/Index" ||
+                      currentPage == "/CityMaster/Index" ||
+                      currentPage == "/BranchMaster/Index" ||
+                      currentPage == "/CustomerMaster/Index" ||
+                      currentPage == "/VendorMaster/Index" ||
+                      currentPage == "/SubvendorMaster/Index" ? "active open" : "")'>
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class='menu-icon tf-icons ri-graduation-cap-line'></i>
+                    <div data-i18n="Master's">Master's</div>
+                </a>
+                <ul class="menu-sub">
+                    <li class='menu-item @(currentPage == "/ItemMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "ItemMaster")" class="menu-link">
+                            <div data-i18n="Item Master">Item Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/CategoryMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "CategoryMaster")" class="menu-link">
+                            <div data-i18n="Category Master">Category Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/ProductGroupMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "ProductGroupMaster")" class="menu-link">
+                            <div data-i18n="Product Group Master">Product Group Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/PurityMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "PurityMaster")" class="menu-link">
+                            <div data-i18n="Purity Master">Purity Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/StoneColorMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "StoneColorMaster")" class="menu-link">
+                            <div data-i18n="Stone Color Master">Stone Color Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/CountryMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "CountryMaster")" class="menu-link">
+                            <div data-i18n="Country Master">Country Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/StateMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "StateMaster")" class="menu-link">
+                            <div data-i18n="State Master">State Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/CityMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "CityMaster")" class="menu-link">
+                            <div data-i18n="City Master">City Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/BranchMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "BranchMaster")" class="menu-link">
+                            <div data-i18n="Branch Master">Branch Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/CustomerMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "CustomerMaster")" class="menu-link">
+                            <div data-i18n="Customer Master">Customer Master</div>
+                        </a>
+                    </li>
+                    <li class='menu-item @(currentPage == "/VendorMaster/Index" ? "active" : "")'>
+                        <a href="@Url.Action("Index", "VendorMaster")" class="menu-link">
+                            <div data-i18n="Vendor Master">Vendor Master</div>
+                        </a>
+                    </li>
+
+                    @if (TempData.Peek("Role").ToString() == "5" || TempData.Peek("Role").ToString() == "3" || TempData.Peek("Role").ToString() == "2")
+                    {
+                        <li class='menu-item @(currentPage == "/SubvendorMaster/Index" ? "active" : "")'>
+                            <a href="@Url.Action("Index", "SubvendorMaster")" class="menu-link">
+                                <div data-i18n="Sub Vendor Master">Sub Vendor Master</div>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+
+        }
+        @if (TempData.Peek("Role").ToString() == "5")
+        {
+            <li class='menu-item @(currentPage == "/SubvendorMaster/Index" ? "active" : "")'>
+                <a href="@Url.Action("Index", "SubvendorMaster")" class="menu-link">
+                    <img src="~/svg/icons/sub_vendor.svg" />&nbsp;
+                    <div data-i18n="Sub Vendor Master">Sub Vendor Master</div>
+                </a>
+            </li>
+        }
+        @*  USED TO SHOW ROLE WISE MEMUS *@
+        @if (TempData.Peek("Role").ToString() == "3" || TempData.Peek("Role").ToString() == "4" || TempData.Peek("Role").ToString() == "2")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/OrderMaster") ? "active" : "")'>
+                <a href="@Url.Action("Index", "OrderMaster")" class="menu-link">
+                   <img src="~/svg/icons/create_order_icon.svg" />&nbsp;
+                    <div data-i18n="Create Order">Create Order</div>
+                </a>
+            </li>
+        }
+
+        @if (TempData.Peek("Role").ToString() != "5")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/Dashboard/OrderDetails") ? "active" : "")'>
+                <a href="@Url.Action("OrderDetails", "Dashboard")" class="menu-link">
+                    <img src="~/svg/icons/order_details.svg" />&nbsp;
+                    <div data-i18n="Order Details">Order Details</div>
+                </a>
+            </li>
+        }
+
+        @if (TempData.Peek("Role").ToString() != "1" && TempData.Peek("Role").ToString() != "5" && TempData.Peek("Role").ToString() != "4")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/Dashboard/OrdersStatus") ? "active" : "")'>
+                <a href="@Url.Action("OrdersStatus", "Dashboard")" class="menu-link">
+                    <img src="~/svg/icons/order_management.svg" />&nbsp;
+                    <div data-i18n="Order Management">Order Management</div>
+                </a>
+            </li>
+        }
+
+        @if (TempData.Peek("Role").ToString() != "4")
+        {
+            <li class='menu-item @(currentPage.StartsWith("/Dashboard/VendorOrderStatus") ? "active" : "")'>
+                <a href="@Url.Action("VendorOrderStatus", "Dashboard")" class="menu-link">
+                    <img src="~/svg/icons/vendor_orders.svg" />&nbsp;
+                    <div data-i18n="Vendor Orders">Vendor Orders</div>
+                </a>
+            </li>
+        }
+
+    </ul>
+</aside>
+<!-- / Menu -->

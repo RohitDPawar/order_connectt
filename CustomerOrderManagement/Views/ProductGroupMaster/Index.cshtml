@@ -1,0 +1,820 @@
+@{
+    int srno = 1;
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Title on the left -->
+                                <h3 class="mb-0">Product Group Master</h3>
+                                <!-- Buttons on the right -->
+                                <div class="d-flex gap-2">
+                                    <!-- Bulk Upload Button with Icon -->
+                                    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#ImportProductGroupModalId" id="Btn_ImportOrderData">
+                                        <i class="ri-upload-cloud-line ri-18px me-2"></i> Import
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="Btn_ExportToExcelProductId">Export File</button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProdcutGroupMasterModal" id="Btn_AddProductGroupId" onclick="ClearAllValue()">
+                                        <i class="align-bottom me-1"></i> Add Product
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second Row: Search Textbox and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputProduct" maxlength="50" />
+                                <button type="button" class="btn btn-primary" id="Btn_SearchProductId">Search</button>
+                                <button type="button" class="btn btn-secondary" id="Btn_ResetSearchProduct">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditProdcutGroupMasterModal" id="Btn_EditProductGroupId" style="display:none"></button>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="ProductGroupTableId">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllProductHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Tenant Name</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Product Group Name</th>
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addProdcutGroupMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Product Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveAddProductGroup", "ProductGroupMaster"))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="TenantName" id="Select_TenantNameId" required>
+                            @foreach (var item in ViewBag.GetAllTenants)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Product Group Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control twoWordsOnly" name="ProductGroupName" id="Txt_ProductGroupNameId" required autocomplete="off" minlength="3" maxlength="50" />
+                        <span id="WarnAddDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="Btn_SubmitId">
+                                <i class="align-bottom me-1"></i> Submit
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Product -->
+<div class="modal fade" id="EditProdcutGroupMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Product Group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @using (Html.BeginForm("SaveEditProductGroup", "ProductGroupMaster"))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="TenantName" id="Select_UpdateTenantNameId" disabled>
+
+                            @foreach (var item in ViewBag.GetAllTenants)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Product Group Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlycharacterandspace" name="ProductGroupName" id="Txt_UpdateProductGroupNameId" disabled autocomplete="off" maxlength="50" />
+                        <span id="WarnUpdateDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_UpdateRemarkId" maxlength="200"  />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-center align-items-center px-3">
+
+                        <div class="d-flex justify-content-end gap-2 px-3">
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="Btn_UpdateId">
+                                    <i class="align-bottom me-1"></i> Update
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for import file -->
+<div class="modal fade" id="ImportProductGroupModalId" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUploadfileLabel">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row px-3 mt-3 gap-2">
+                    <!-- Wrap this section with a form to send data -->
+                    @using (Html.BeginForm("UploadProductGroup", "ProductGroupMaster", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm" }))
+                    {
+                        <label class="form-label">Select File<span style="color:red;font-weight:500">*</span></label>
+                        <div class="d-flex">
+                            <input type="file" class="form-control" name="file" id="file_Id" required accept=".xlsx" />
+                        </div>
+                        <span id="WarnbrowseId" style="color:red; display:none;">Please upload only .xlsx file extension</span>
+
+                        <div id="loadingSpinner" style="display: none; text-align: center;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>Uploading file...</div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-end px-3 m-3 gap-2">
+                            <button type="button" class="btn btn-outline-primary d-flex align-items-center" id="samplesheetbtn">
+                                <i class="align-bottom me-1"></i> Download Format
+                            </button>
+                            <button type="submit" class="btn btn-primary d-grid" id="uploadBtn">
+                                <i class="align-bottom me-1"></i> Upload
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModalProductgroup" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="ProductgroupHistorytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Tenant Name</th>
+                                <th>Product Group Name</th>
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                               @*  <th>Created At</th>
+                                <th>Created By</th> *@
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+        // Handle the form submission using AJAX
+        $("#uploadForm").submit(function (e) {
+            e.preventDefault(); // Prevent default form submission
+            var fileInput = $('#file_Id')[0];
+            var file = fileInput.files[0]; // Get the first file from the input
+
+            // Check if a file was selected
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            // Validate the file type (allow only .csv, .xls, .xlsx)
+            var allowedExtensions = /(\.csv|\.xls|\.xlsx)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                $('#WarnbrowseId').show(); // Show warning message
+                return; // Stop form submission if the file type is not valid
+            } else {
+                $('#WarnbrowseId').hide();
+            }
+            var formData = new FormData(this); // Create FormData object from the form
+            showSpinner();
+            $.ajax({
+                url: '@Url.Action("UploadProductGroup", "ProductGroupMaster")', // Your controller action URL
+                type: 'POST',
+                data: formData,
+                processData: false, // Don't process the data
+                contentType: false, // Don't set content type header
+                success: function (response) {
+                    if (response.success) {
+                        // Decode Base64 to binary string
+                        var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                        var byteArray = new Uint8Array(byteCharacters.length);
+
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                        }
+
+                        // Create a blob from the byte array
+                        var blob = new Blob([byteArray], { type: response.fileType });
+
+                        // Create a link element for downloading
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.fileName; // Set the download file name
+                        link.click(); // Trigger the download
+
+                        $('#file_Id').val(''); // Clear the file input (if it exists)
+                        hideSpinner(); // Hide the spinner when there's an error
+                        // Close the modal (if present)
+                        $('#importFileModal2').modal('hide');
+                        ShowErrorMsg("File Imported Succesfully....", "1")
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000); // 3000 milliseconds = 3 seconds
+                    } else {
+                        $('#file_Id').val('');
+                        if (response.flag === '1') {
+                            $('#file_Id').val(''); // Clear the file input (if it exists)
+                            hideSpinner(); // Hide the spinner when there's an error
+                            // Close the modal (if present)
+                            $('#importFileModal2').modal('hide');
+                            ShowErrorMsg("File Imported Succesfully....", "1")
+                            setTimeout(function () {
+                                location.reload();
+                            }, 500); // 3000 milliseconds = 3 seconds
+
+                        } else {
+                            ShowErrorMsg(response.message,"0")
+                        }
+                        hideSpinner();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    //alert("Error uploading file. Please try again.");
+                    ShowErrorMsg("Error uploading file. Please try again.....", "0")
+                    hideSpinner(); // Hide the spinner when there's an error
+                }
+            });
+
+        });
+
+        // Show spinner and disable the upload button when upload starts
+        function showSpinner() {
+            $('#loadingSpinner').show(); // Display the spinner
+            $('#uploadBtn').prop('disabled', true); // Disable the upload button
+        };
+
+        // Hide spinner and enable the upload button after the upload is complete
+        function hideSpinner() {
+            $('#loadingSpinner').hide(); // Hide the spinner
+            $('#uploadBtn').prop('disabled', false); // Enable the upload button
+        };
+
+        $('#samplesheetbtn').on('click', function () {
+            // Make AJAX call to download the sample sheet
+            $.ajax({
+                url: '/ProductGroupMaster/DownloadSampleSheet',  // The URL to your controller action
+                type: 'GET',
+                success: function (response) {
+                    // Construct the full URL using the current site's base URL and the relative path
+                    var fileUrl = window.location.origin + response.fileUrl;
+
+                    // Create a link to trigger the download
+                    var link = document.createElement('a');
+                    link.href = fileUrl;  // Use the full URL of the file
+                    link.download = 'Product_Group_Import_Format.xlsx';  // Specify the filename for the download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error downloading the sample sheet:', error);
+                    alert('There was an error downloading the file. Please try again later.');
+                }
+            });
+        });
+
+    });
+
+    //################################################################################################################################################
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message, Flag) {
+        if (Flag == "1") {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        else {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+
+
+    }
+
+    function loadPageData(page, rowsToShow) {
+        GetProductData(page, $('#ShowRowid').val());
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#ProductGroupTableId");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+    var selectedRowIds = [];
+    var SearchText;
+
+    $(document).ready(function () {
+
+        GetProductData(1, $('#ShowRowid').val());
+
+        $(".Checkbox_SelectAllHeader").on("change", function () {
+            var isChecked = $(this).prop('checked');
+            var table = $(this).closest('table');
+
+            table.find(".RowCheckbox").prop('checked', isChecked);
+
+            if (isChecked) {
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId && !selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                });
+            } else {
+
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId) {
+                        selectedRowIds = selectedRowIds.filter(function (id) {
+                            return id !== rowId;
+                        });
+                    }
+                });
+            }
+        });
+
+        $(document).on("change", ".RowCheckbox", function () {
+            var isChecked = $(this).prop('checked');
+            var rowId = $(this).data('id');
+            var table = $(this).closest('table');
+
+            if (isChecked) {
+                if (!selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                }
+            } else {
+                var index = selectedRowIds.indexOf(rowId);
+                if (index !== -1) {
+                    selectedRowIds.splice(index, 1);
+                }
+            }
+
+            updateSelectAllCheckboxState()
+
+
+        });
+
+        $('#Txt_ProductGroupNameId,#Txt_RemarkId,#Txt_UpdateProductGroupNameId,#Txt_UpdateRemarkId').on('input', function () {
+            // Get the current value of the input
+            let inputValue = $(this).val();
+
+            // If the first two characters are spaces, remove them
+            if (inputValue.startsWith('  ')) {
+                $(this).val(inputValue.substring(2));
+            }
+            // Optionally, if the first character is a space, remove just the first one
+            else if (inputValue.startsWith(' ')) {
+                $(this).val(inputValue.substring(1));
+            }
+        });
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]', "1");
+        }
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["MessageWarning"]' !== "") {
+            ShowErrorMsg('@TempData["MessageWarning"]', "0");
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+        TempData.Remove("MessageWarning");  // Remove specific key "Message" from TempData
+    }
+
+            function sendSelectedRowIds() {
+                // Check if there are any selected row IDs
+                var searchValue = SearchText;
+                var rowIdsString = selectedRowIds.join(',');
+                // Make an AJAX request to send the data to the controller action
+                $.ajax({
+                    type: "POST",
+                    url: "/ProductGroupMaster/ExportdataExcelProductGroup",
+                    data: {
+                        selectedRowIds: rowIdsString,
+                        searchValue: searchValue
+                    },
+                    success: function (response) {
+
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click();
+                        } else {
+                            ShowErrorMsg(response.message, "0")
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error (failure)
+                        console.error('Error occurred while sending data to the server:', error);
+
+                        // Optionally, display an error message
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+
+            }
+
+        $('#Btn_SearchProductId').on('click', function () {
+            SearchText = $('#Txt_SearchInputProduct').val();
+            GetProductData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchProduct").on("click", function () {
+            location.reload();
+        });
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelProductId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+
+    });
+
+    function EditProductGroupId(id, Flag) {
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+
+        $.ajax({
+            type: "POST",
+            url: "/ProductGroupMaster/EditProductGroup",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var ProductGroupData = res["ProductGroupData"];
+                var Flag = res["Flag"]
+                //console.log(Flag)
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+
+                // Update form fields with the fetched data
+                $('#RecordId').val(ProductGroupData[0]["id"]);
+                $('#Select_UpdateTenantNameId').val(ProductGroupData[0]["tenant_id"]);
+                $('#Txt_UpdateProductGroupNameId').val(ProductGroupData[0]["product_group_name"]);
+                $('#Txt_UpdateRemarkId').val(ProductGroupData[0]["remark"]);
+
+                // Set Active/Inactive radio buttons
+                if (ProductGroupData[0]["is_active"] == "1") {
+                    $("#Radio_UpdateActive").prop("checked", true);
+                } else {
+                    $("#Radio_UpdateDeactive").prop("checked", true);
+                }
+
+                // Trigger the modal to show
+                $("#Btn_EditProductGroupId").click();
+            },
+            error: function (response) {
+                console.error("Error fetching product group data", response);
+                //alert("An error occurred while fetching product group data.");
+            }
+        });
+    }
+
+    $('#Txt_ProductGroupNameId, #Txt_UpdateProductGroupNameId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+        const value = $(this).val();
+
+        $.ajax({
+            type: "POST",
+            url: "/ProductGroupMaster/CheckDuplicateRecord",
+            data: {
+                ColName: "product_group_name",
+                value: value
+            },
+            success: function (data) {
+                if (data > 0) {
+                    // Clear the field that triggered the event
+                    $('#' + inputFieldId).val("");
+
+                    // Show warning for the respective field
+                    if (inputFieldId === "Txt_ProductGroupNameId") {
+                        $("#WarnAddDataId").css({ "display": "block", "color": "red" }).text("Product Group Name Already Exists...");
+                    } else if (inputFieldId === "Txt_UpdateProductGroupNameId") {
+                        $("#WarnUpdateDataId").css({ "display": "block", "color": "red" }).text("Product Group Name Already Exists...");
+                    }
+                } else {
+                    $("#WarnAddDataId").css({ "display": "none" });
+                    $("#WarnUpdateDataId").css({ "display": "none" });
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    });
+
+    function ClearAllValue() {
+        $("#RadioIsActive").prop("checked", true);
+        $("#Txt_ProductGroupNameId").val("");
+        $("#Txt_RemarkId").val("");
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+    }
+
+    function TableBindItemData(res, paginationt) {
+
+        $("#ProductGroupTableId tbody").empty();
+
+        var table = $("#ProductGroupTableId");
+
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+
+        let srno;
+        if (paginationt && paginationt.length > 0) {
+            const totalRows = paginationt[0].TotalRows;
+            const totalPages = paginationt[0].TotalPages;
+            const pageNumber = paginationt[0].PageNumber;
+            const pageSize = paginationt[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } else {
+            console.error('PaginationInfo is not available or is in an incorrect format. Response:', paginationt);
+        }
+
+        if (Array.isArray(res)) {
+            res.forEach(product => {
+                const productId = product.id.toString();
+
+                const isChecked = selectedRowIds.some(id => {
+                    return id.toString() === productId;
+                });
+
+                const data = `
+                                <tr id="${product.id}">
+                                <td>
+                                    <div class="form-check">
+                                                <input class="form-check-input RowCheckbox" type="checkbox" data-id="${product.id}" id="ProductRowCheckBoxId_${product.id}" ${isChecked ? 'checked' : ''}>
+                                    </div>
+                                </td>
+                                <td>${srno}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <div class="edit">
+                                                <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditProductGroupId(${product.id}, 'Show')" id="Btn_EditProductGroupId">
+                                                <i class="fa fa-edit"></i>
+                                            </span>
+                                        </div>
+                                            <div class="history">
+                                                                <span class="btn btn-sm btn-warning" style="margin:1px; cursor:pointer;" title="History" data-bs-toggle="modal" data-bs-target="#HistoryModalProductgroup" id="Btn_productgroupHistoryId" onclick="ShowHistory(${product.id})">
+                                                        <i class="fas fa-history"></i>
+                                                    </span>
+                                                </div>
+                                    </div>
+                                </td>
+                                    <td>${product.tenant_name || ''}</td>
+                                    <td>${product.product_group_name || ''}</td>
+                                    <td>${product.is_active === 1 ? "Active" : "Deactive"}</td>
+                            </tr>
+                        `;
+
+                $("#ProductGroupTableId tbody").append(data);
+                srno++;
+            });
+        } else {
+            $("#ProductGroupTableId tbody").html(`
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No Data Available</td>
+                        </tr>
+                    `);
+        }
+
+
+        updateSelectAllCheckboxState();
+    }
+
+    function GetProductData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/ProductGroupMaster/GetProductGroupData",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+
+                const productGroupData = response.ProductGroupData;
+                const paginationInfo = response.PaginationInfo;
+
+
+                TableBindItemData(productGroupData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                // // Only log the error if it's not a 'No Data Available' situation
+                // if (xhr.status !== 404 && xhr.status !== 204) {
+                //     console.error("Error fetching item data", xhr.responseText);
+                // }
+
+                // Clear the table body and display a "No Data Available" message if no data is fetched
+                $("#ProductGroupTableId tbody").empty();
+                $("#ProductGroupTableId tbody").html(`
+                                        <tr>
+                                            <td colspan="9" style="text-align: center;">No Data Available</td>
+                                        </tr>
+                                    `);
+                generatePagination(1, $('#ShowRowid').val());
+            }
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+
+        $.ajax({
+            type: "POST",
+            url: "/ProductGroupMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+
+                $("#ProductgroupHistorytable-id tbody").empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.tenant_name || '') + '</td>';
+                        row += '<td>' + (item.product_group_name || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        // row += '<td>' + (item.created_at || '') + '</td>';
+                        // row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at ? item.updated_at.replace('T', ' ') : '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        $("#ProductgroupHistorytable-id tbody").append(row); // This is correct
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    historyTableBody.append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+</script>

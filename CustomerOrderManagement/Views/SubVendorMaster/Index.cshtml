@@ -1,0 +1,882 @@
+@if (ViewBag.Authority == "")
+{
+    <h3>You Do Not Have Authority To Add Sub Vendor</h3>
+}
+else
+{
+    int srno = 1;
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="listjs-table" id="customerList">
+                        <div class="row g-4 mb-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                    <!-- Title -->
+                                    <h3 class="mb-0">Sub Vendor Master</h3>
+
+                                    <!-- Buttons -->
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#ImportSubVendorModalId" id="Btn_ImportSubVendorData">
+                                            <i class="ri-upload-cloud-line ri-18px me-2"></i> Import
+                                        </button>
+                                        <button type="button" class="btn btn-danger" id="Btn_ExportToExcelSubVendorId">Export File</button>
+
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSubVendorMasterModal" id="Btn_AddSubVendor" onclick="ClearAllValue()">
+                                            <i class="align-bottom me-1"></i> Add Sub Vendor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Second Row: Search Textbox and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputSubVendorName" maxlength="50" />
+                                <button type="button" class="btn btn-primary" id="Btn_SearchSubVendorNameId">Search</button>
+                                <button type="button" class="btn btn-secondary" id="Btn_ResetSearchSubVendorId">Reset</button>
+                            </div>
+                            <!-- Hidden Edit Button -->
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#EditSubVendorMasterModal" id="Btn_EditSubVendor" style="display:none"></button>
+                        </div>
+                        <div class="table-responsive table-card mt-3 mb-1">
+                            <table class="table align-middle table-nowrap" id="SubVendorMasterTable_Id">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sort fw-bold">
+                                            <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllSubVendorHeader" />
+                                        </th>
+                                        <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                        <th class="sort fw-bold" data-sort="action">Action</th>
+                                        <th class="sort fw-bold" data-sort="state_id">Vendor</th>
+                                        <th class="sort fw-bold" data-sort="state_id">Sub Vendor</th>
+                                        <th class="sort fw-bold" data-sort="name">Mobile No</th>
+                                        <th class="sort fw-bold" data-sort="name">Email</th>
+                                        <th class="sort fw-bold" data-sort="name">Residential Address</th>
+                                        <th class="sort fw-bold" data-sort="status">Status</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody class="form-check-all">
+                                </tbody>
+                            </table>
+                        </div>
+                        @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                        @await Html.PartialAsync("Sections/Menu/_pagination")
+                    </div>
+                </div><!-- end card -->
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end col -->
+    </div>
+
+    <!-- Modal for Adding Product -->
+    <div class="modal fade" id="addSubVendorMasterModal" tabindex="-1" aria-labelledby="addSubVendorMasterModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addSubVendorMasterModalLabel">Add Sub Vendor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ClearAllValue()"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modal Form for adding a new product group -->
+                    @using (Html.BeginForm("SaveAddSubVendor", "SubVendorMaster"))
+                    {
+                        @* <div class="row px-3">
+                <label class="form-label">Tenant ID <span style="color:red;font-weight:800">*</span></label>
+                <select name="TenantID" id="Select_TenantID" class="form-control" required>
+                @foreach (var item in ViewBag.TenantID)
+                {
+                <option value="@item["id"]">@item["tenant_name"]</option>
+                }
+                </select>
+                </div>
+                <div class="row px-3">
+                <label class="form-label">Vendor Name <span style="color:red;font-weight:800">*</span></label>
+                <select name="KaragirID" id="Select_KaragirID" class="form-control" required>
+                <option value="">-- Please Select Karagir Id--</option>
+                @foreach (var item in ViewBag.KaragirID)
+                {
+                <option value="@item["id"]">@item["vendor_name"]</option>
+                }
+                </select>
+                </div> *@
+                        <div class="row px-3">
+                            <label class="form-label">Sub Vendor Name<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control onlyCharacterAndDash" name="SubVendorName" id="Txt_SubVendorNameId" required maxlength="50" />
+                            <span id="WarnADDSubVendorNameId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control numberOnly" name="Mobileno" id="Txt_MobileNumberId" maxlength="10" minlength="10" required />
+                            <span id="WarnMobileId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Email ID<span style="color:red;font-weight:800">*</span></label>
+                            <input type="email" class="form-control" name="EmailID" id="Txt_EmailId" maxlength="50" required />
+                            <span id="WarnEmailId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Residential Address<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control " name="RessidentialAddress" id="Txt_RessidentialAddressId" required maxlength="100" />
+                            <span id="WarnRessidentialAddressId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Remark</label>
+                            <input type="text" class="form-control onlyCharacterAndDash" name="remark" id="Txt_RemarkId" maxlength="200" />
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                            <div class="row pt-2">
+                                <div class="col-md-3">
+                                    <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked />
+                                    <label> Active</label>&nbsp;
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                    <label> Deactive</label>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="d-flex justify-content-end gap-2 px-3">
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="Btn_SubmitId">
+                                    <i class="align-bottom me-1"></i> ADD
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Editing Product -->
+    <div class="modal fade" id="EditSubVendorMasterModal" tabindex="-1" aria-labelledby="editSubVendorModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSubVendorModalLabel">Edit SubVendor Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ClearAllValue()"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Modal Form for editing -->
+                    @using (Html.BeginForm("SaveEditSubVendor", "SubVendorMaster"))
+                    {
+                        <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                        @* <div class="row px-3">
+                <label class="form-label">Tenant ID <span style="color:red;font-weight:800">*</span></label>
+                <select name="TenantID" id="Update_TenantID" class="form-control" required>
+                @foreach (var item in ViewBag.TenantID)
+                {
+                <option value="@item["id"]">@item["tenant_name"]</option>
+                }
+                </select>
+                </div>
+                <div class="row px-3">
+                <label class="form-label">Vendor Name <span style="color:red;font-weight:800">*</span></label>
+                <select name="KaragirID" id="Update_KaragirID" class="form-control" required>
+                <option value="">-- Please Select Karagir Id--</option>
+                @foreach (var item in ViewBag.KaragirID)
+                {
+                <option value="@item["id"]">@item["vendor_name"]</option>
+                }
+                </select>
+                </div> *@
+                        <div class="row px-3">
+                            <label class="form-label">Sub Vendor Name<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control onlyCharacterAndDash" name="SubVendorName" id="UpdateTxt_SubVendorNameId" required maxlength="50" />
+                            <span id="WarnUpdateSubVendorNameId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control numberOnly" name="Mobileno" id="UpdateTxt_MobileNumberId" maxlength="10" minlength="10" required />
+                            <span id="WarnMobileIdUpdate" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Email ID<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control " name="EmailID" id="UpdateTxt_EmailId" maxlength="50" required />
+                            <span id="WarnEmailId" style="display:none"></span>
+                        </div>
+
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Residential Address<span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control " name="RessidentialAddress" id="UpdateTxt_RessidentialAddressId" required maxlength="100" />
+                            <span id="WarnRessidentialAddressId" style="display:none"></span>
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Remark</label>
+                            <input type="text" class="form-control onlyCharacterAndDash" name="remark" id="UpdateTxt_RemarkId" maxlength="200" />
+                        </div>
+                        <div class="row px-3 mt-3">
+                            <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                            <div class="row pt-2">
+                                <div class="col-md-3">
+                                    <input type="radio" class="form-check-input" id="UpdateRadioIsActive" name="IsActive" value="1" checked />
+                                    <label> Active</label>&nbsp;
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="radio" class="form-check-input" id="UpdateRadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                    <label> Deactive</label>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="d-flex justify-content-center align-items-center px-3">
+
+                            <div class="d-flex justify-content-end gap-2 px-3">
+                                <div>
+                                    <button type="submit" class="btn btn-primary" id="Btn_UpdateId">
+                                        <i class="align-bottom me-1"></i> Update
+                                    </button>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for import file -->
+    <div class="modal fade" id="ImportSubVendorModalId" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUploadfileLabel">Upload File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row px-3 mt-3 gap-2">
+                        <!-- Wrap this section with a form to send data -->
+                        @using (Html.BeginForm("UploadSubVendorMaster", "SubVendorMaster", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm" }))
+                        {
+                            <label class="form-label">Select File<span style="color:red;font-weight:500">*</span></label>
+                            <div class="d-flex">
+                                <input type="file" class="form-control" name="file" id="file_Id" required accept=".xlsx" />
+                            </div>
+                            <span id="WarnbrowseId" style="color:red; display:none;">Please upload only .xlsx file extension</span>
+
+                            <div id="loadingSpinner" style="display: none; text-align: center;">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div>Uploading file...</div>
+                            </div>
+                            <div class="d-flex justify-content-end align-items-end px-3 m-3 gap-2">
+                                <button type="button" class="btn btn-outline-primary d-flex align-items-center" id="samplesheetbtn">
+                                    <i class="align-bottom me-1"></i> Download Format
+                                </button>
+                                <button type="submit" class="btn btn-primary d-grid" id="uploadBtn">
+                                    <i class="align-bottom me-1"></i> Upload
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for History Details -->
+    <div class="modal fade" id="HistoryModalsubvendor" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">History Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="SubVendorHistorytable-id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Vendor</th>
+                                    <th>Sub Vendor</th>
+                                    <th>Mobile No</th>
+                                   @*  <th>Email</th>
+                                    <th>Residential Address</th> *@
+                                    <th>Status</th>
+                                    <th>Ip Address</th>
+                                   @*  <th>Created At</th>
+                                    <th>Created By</th> *@
+                                    <th>Updated At</th>
+                                    <th>Updated By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowWarning(message) {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+
+        }
+
+        $(document).ready(function () {
+
+            // Handle the form submission using AJAX
+            $("#uploadForm").submit(function (e) {
+                e.preventDefault(); // Prevent default form submission
+                var fileInput = $('#file_Id')[0];
+                var file = fileInput.files[0]; // Get the first file from the input
+
+                // Check if a file was selected
+                if (!file) {
+                    alert("Please select a file.");
+                    return;
+                }
+
+                // Validate the file type (allow only .csv, .xls, .xlsx)
+                var allowedExtensions = /(\.csv|\.xls|\.xlsx)$/i;
+                if (!allowedExtensions.exec(file.name)) {
+                    $('#WarnbrowseId').show(); // Show warning message
+                    return; // Stop form submission if the file type is not valid
+                } else {
+                    $('#WarnbrowseId').hide();
+                }
+                var formData = new FormData(this); // Create FormData object from the form
+                showSpinner();
+                $.ajax({
+                    url: '@Url.Action("UploadSubVendorMaster", "SubVendorMaster")', // Your controller action URL
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // Don't process the data
+                    contentType: false, // Don't set content type header
+                    success: function (response) {
+                        console.log(response);
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click(); // Trigger the download
+
+                            $('#file_Id').val(''); // Clear the file input (if it exists)
+                            hideSpinner(); // Hide the spinner when there's an error
+                            // Close the modal (if present)
+                            $('#importFileModal2').modal('hide');
+                            ShowErrorMsg("File Imported Succesfully....", "1")
+                            setTimeout(function () {
+                                location.reload();
+                            }, 3000); // 3000 milliseconds = 3 seconds
+                        } else {
+                            $('#file_Id').val('');
+                            if (response.flag === '1') {
+                                $('#file_Id').val(''); // Clear the file input (if it exists)
+                                hideSpinner(); // Hide the spinner when there's an error
+                                // Close the modal (if present)
+                                $('#importFileModal2').modal('hide');
+                                ShowErrorMsg("File Imported Succesfully....", "1")
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 500); // 3000 milliseconds = 3 seconds
+
+                            } else {
+                                ShowWarning(response.message)
+                            }
+                            hideSpinner();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        //alert("Error uploading file. Please try again.");
+                        ShowWarning("Error uploading file. Please try again.....")
+                        hideSpinner(); // Hide the spinner when there's an error
+                    }
+                });
+
+            });
+
+            // Show spinner and disable the upload button when upload starts
+            function showSpinner() {
+                $('#loadingSpinner').show(); // Display the spinner
+                $('#uploadBtn').prop('disabled', true); // Disable the upload button
+            };
+
+            // Hide spinner and enable the upload button after the upload is complete
+            function hideSpinner() {
+                $('#loadingSpinner').hide(); // Hide the spinner
+                $('#uploadBtn').prop('disabled', false); // Enable the upload button
+            };
+
+            $('#samplesheetbtn').on('click', function () {
+                // Make AJAX call to download the sample sheet
+                $.ajax({
+                    url: '/SubVendorMaster/DownloadSampleSheet',  // The URL to your controller action
+                    type: 'GET',
+                    success: function (response) {
+                        // Construct the full URL using the current site's base URL and the relative path
+                        var fileUrl = window.location.origin + response.fileUrl;
+
+                        // Create a link to trigger the download
+                        var link = document.createElement('a');
+                        link.href = fileUrl;  // Use the full URL of the file
+                        link.download = 'SubVendor_Import_Format.xlsx';  // Specify the filename for the download
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error downloading the sample sheet:', error);
+                        alert('There was an error downloading the file. Please try again later.');
+                    }
+                });
+            });
+
+        });
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+            Swal.fire({
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+
+        function loadPageData(page, rowsToShow) {
+            GetSubVendorData(page, $('#ShowRowid').val());
+
+
+        }
+        // Function to update the Select All checkbox state based on individual checkbox selections
+        function updateSelectAllCheckboxState() {
+            var table = $("#SubVendorMasterTable_Id");
+            var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+            table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+        }
+
+
+        var selectedRowIds = [];
+        var SearchText;
+
+        $(document).ready(function () {
+
+            GetSubVendorData(1, $('#ShowRowid').val());
+
+            $(".Checkbox_SelectAllHeader").on("change", function () {
+                var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+                var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+                // Select or deselect all row checkboxes based on the header checkbox state
+                table.find(".RowCheckbox").prop('checked', isChecked);
+
+                // Update the selectedRowIds array based on the "Select All" checkbox
+                if (isChecked) {
+                    // Add all row IDs to the selectedRowIds array for the specific table
+                    table.find(".RowCheckbox").each(function () {
+                        var rowId = $(this).data('id');
+                        if (rowId && !selectedRowIds.includes(rowId)) {
+                            selectedRowIds.push(rowId);
+                        }
+                    });
+                } else {
+
+                    table.find(".RowCheckbox").each(function () {
+                        var rowId = $(this).data('id');
+                        if (rowId) {
+                            // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                            selectedRowIds = selectedRowIds.filter(function (id) {
+                                return id !== rowId;
+                            });
+                        }
+                    });
+                }
+            });
+
+            $(document).on("change", ".RowCheckbox", function () {
+                var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+                var rowId = $(this).data('id');  // Get the row ID from data attribute
+                var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+                // Add or remove the row ID from the selectedRowIds array based on checkbox state
+                if (isChecked) {
+                    if (!selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                } else {
+                    var index = selectedRowIds.indexOf(rowId);
+                    if (index !== -1) {
+                        selectedRowIds.splice(index, 1);
+                    }
+                }
+
+                // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+                updateSelectAllCheckboxState()
+
+
+            });
+
+            // Check for TempData Message
+            if ('@TempData["Message"]' !== "") {
+                ShowErrorMsg('@TempData["Message"]');
+            }
+
+            // Clean up TempData
+        @{
+            TempData.Remove("Message");
+        }
+
+                            // Check for selectedRowIds initialization (ensure it's defined globally)
+                            var selectedRowIds = [];  // This should be populated elsewhere in your code
+
+            function sendSelectedRowIds() {
+                var searchValue = SearchText;
+                var rowIdsString = selectedRowIds.join(',');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/SubVendorMaster/ExportdataExcelSubvendor",
+                    data: {
+                        selectedRowIds: rowIdsString,
+                        searchValue: searchValue
+                    },
+                    success: function (response) {
+
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click();
+                        } else {
+                            ShowErrorMsg(response.message)
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error occurred while sending data to the server:', error);
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+            }
+
+            $('#Btn_SearchSubVendorNameId').on('click', function () {
+                SearchText = $('#Txt_SearchInputSubVendorName').val();
+                GetSubVendorData(1, $('#ShowRowid').val());
+            });
+
+            $("#Btn_ResetSearchSubVendorId").on("click", function () {
+                location.reload();
+            });
+
+            // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+            $("#Btn_ExportToExcelSubVendorId").click(function () {
+                sendSelectedRowIds();
+            });
+        });
+
+        // Edit SubVendor function
+        function EditSubVendorId(id) {
+            $.ajax({
+                type: "POST",
+                url: "/SubVendormaster/EditSubVendor",
+                data: {
+                    ID: id,
+                    Flag: "Show"
+                },
+                success: function (data) {
+                    var res = JSON.parse(data);
+                    var SubVendorData = res["SubVendorData"];
+                    var Flag = res["Flag"];
+
+                    document.getElementById('RecordId').value = SubVendorData[0]["id"];
+                    document.getElementById('UpdateTxt_SubVendorNameId').value = SubVendorData[0]["sub_vendor_name"];
+                    document.getElementById('UpdateTxt_MobileNumberId').value = SubVendorData[0]["mobile_no"];
+                    document.getElementById('UpdateTxt_EmailId').value = SubVendorData[0]["email_id"];
+                    document.getElementById('UpdateTxt_RessidentialAddressId').value = SubVendorData[0]["residential_address"];
+                    document.getElementById('UpdateTxt_RemarkId').value = SubVendorData[0]["remark"];
+
+                    if (SubVendorData[0]["is_active"] == "1") {
+                        $("#UpdateRadioIsActive").prop("checked", true);
+                    } else {
+                        $("#UpdateRadioIsDeactive").prop("checked", true);
+                    }
+
+                    $("#Btn_EditSubVendor").click();
+                },
+                error: function (response) {
+                    console.log("Error occurred while editing SubVendor");
+                }
+            });
+        }
+
+        // Check for SubVendor Name duplication
+        // $('#Txt_SubVendorNameId, #UpdateTxt_SubVendorNameId').on("change paste", function () {
+
+        //     const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+        //     const value = $(this).val();
+        //     console.log(value);
+
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "/SubVendorMaster/CheckDuplicateRecord",
+        //         data: {
+        //             ColName: "sub_vendor_name",
+        //             Username: value
+        //         },
+        //         success: function (data) {
+        //             if (data > 0) {
+        //                 $('#' + inputFieldId).val(""); // Clear the field if duplicate found
+        //                 if (inputFieldId === "Txt_SubVendorNameId") {
+        //                     $("#WarnADDSubVendorNameId").css({ "display": "block", "color": "red" }).text("Sub_Vendor Name Already Exists...");
+        //                 } else {
+        //                     $("#WarnUpdateSubVendorNameId").css({ "display": "block", "color": "red" }).text("Sub_Vendor Name Already Exists...");
+        //                 }
+        //             } else {
+        //                 $("#WarnADDSubVendorNameId").css("display", "none");
+        //                 $("#WarnUpdateSubVendorNameId").css("display", "none");
+        //             }
+        //         },
+        //         error: function (response) {
+        //             console.error("Error during AJAX request:", response);
+        //         }
+        //     });
+        // });
+
+        $('#Txt_MobileNumberId, #UpdateTxt_MobileNumberId').on("change paste", function () {
+
+            const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+            const value = $(this).val();
+            console.log(value);
+
+            $.ajax({
+                type: "POST",
+                url: "/SubVendorMaster/CheckDuplicateRecord",
+                data: {
+                    ColName: "mobile_no",
+                    Username: value
+                },
+                success: function (data) {
+                    if (data > 0) {
+                        $('#' + inputFieldId).val(""); // Clear the field if duplicate found
+                        if (inputFieldId === "Txt_MobileNumberId") {
+                            $("#WarnMobileId").css({ "display": "block", "color": "red" }).text("Mobile No  Already Exists...");
+                        } else {
+                            $("#WarnMobileIdUpdate").css({ "display": "block", "color": "red" }).text("Mobile No  Already Exists...");
+                        }
+                    } else {
+                        $("#WarnMobileId").css("display", "none");
+                        $("#WarnMobileIdUpdate").css("display", "none");
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        });
+
+        // Clear all values function
+        function ClearAllValue() {
+            $("#Select_KaragirID").val("");
+            $("#Txt_SubVendorNameId").val("");
+            $("#Txt_MobileNumberId").val("");
+            $("#Txt_EmailId").val("");
+            $("#Txt_RessidentialAddressId").val("");
+            $("#Txt_RemarkId").val("");
+            $("#WarnADDSubVendorNameId").css({ "display": "none" });
+            $("#WarnUpdateSubVendorNameId").css({ "display": "none" });
+            $("#WarnMobileId").css({ "display": "none" });
+            $("#WarnMobileIdUpdate").css({ "display": "none" });
+        }
+
+        function GetSubVendorData(pageNumber, pageSize) {
+            const data = {
+                PageNumber: pageNumber,
+                PageSize: pageSize,
+                SearchText: SearchText // Replace with the actual search text or global variable
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/SubVendorMaster/GetSubVendorData", // Replace with your backend endpoint
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    const subVendorData = response.SubVendorData;
+                    const paginationInfo = response.PaginationInfo;
+
+                    // Bind data to the table
+                    BindSubVendorTableData(subVendorData, paginationInfo);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching sub-vendor data:", xhr.responseText);
+
+                    $("#SubVendorMasterTable_Id tbody").empty();
+                    $("#SubVendorMasterTable_Id tbody").html(`
+                                <tr>
+                                    <td colspan="9" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+                    generatePagination(1, $('#ShowRowid').val()); // Handle pagination for empty data
+                }
+            });
+        }
+
+        function BindSubVendorTableData(res, paginationInfo) {
+            $("#SubVendorMasterTable_Id tbody").empty(); // Clear existing rows
+
+            let srno;
+            if (paginationInfo && paginationInfo.length > 0) {
+                const totalRows = paginationInfo[0].TotalRows;
+                const totalPages = paginationInfo[0].TotalPages;
+                const pageNumber = paginationInfo[0].PageNumber;
+                const pageSize = paginationInfo[0].PageSize;
+                srno = (pageNumber - 1) * pageSize + 1;
+
+                generatePagination(totalPages, pageNumber); // Generate pagination dynamically
+            } else {
+                console.error("PaginationInfo is missing or incorrect.");
+            }
+
+            if (Array.isArray(res) && res.length > 0) {
+                res.forEach(item => {
+                    const subVendorId = item.id.toString();
+
+                    const isChecked = selectedRowIds.some(id => id.toString() === subVendorId);
+
+                    const data = `
+                                <tr id="${item.id}">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input RowCheckbox" type="checkbox" data-id="${item.id}" id="SubVendorRowCheckBoxId_${item.id}" ${isChecked ? 'checked' : ''}>
+                                        </div>
+                                    </td>
+                                    <td>${srno}</td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <div class="edit">
+                                                <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditSubVendorId(${item.id})">
+                                                    <i class="fa fa-edit"></i>
+                                                </span>
+                                            </div>
+                                                    <div class="history">
+                                                                <span class="btn btn-sm btn-warning" style="margin:1px; cursor:pointer;" title="History" data-bs-toggle="modal" data-bs-target="#HistoryModalsubvendor" id="Btn_subvendorHistoryId" onclick="ShowHistory(${item.id})">
+                                                        <i class="fas fa-history"></i>
+                                                    </span>
+                                                </div>
+                                        </div>
+                                    </td>
+                                    <td>${item.vendor_name || ''}</td>
+                                    <td>${item.sub_vendor_name || ''}</td>
+                                    <td>${item.mobile_no || ''}</td>
+                                    <td>${item.email_id || ''}</td>
+                                    <td>${item.residential_address || ''}</td>
+                                    <td>${item.is_active === 1 ? "Active" : "Deactive"}</td>
+                                </tr>
+                            `;
+
+                    $("#SubVendorMasterTable_Id tbody").append(data);
+
+                    srno++;
+                });
+            } else {
+                $("#SubVendorMasterTable_Id tbody").html(`
+                            <tr>
+                                <td colspan="9" style="text-align: center;">No Data Available</td>
+                            </tr>
+                        `);
+            }
+
+            updateSelectAllCheckboxState(); // Update the "Select All" checkbox state
+        }
+
+        // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+        function ShowHistory(id) {
+
+            $.ajax({
+                type: "POST",
+                url: "/SubVendorMaster/GetHistoryData",
+                data: { id: id },
+                success: function (data) {
+                    var res = JSON.parse(data);
+                    var HistoryData = res["HistoryData"];
+
+                    $("#SubVendorHistorytable-id tbody").empty();
+
+
+                    if (HistoryData.length > 0) {
+
+                        HistoryData.forEach(function (item) {
+                            var row = '<tr>';
+                            row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                            row += '<td>' + (item.vendor_name || '') + '</td>';
+                            row += '<td>' + (item.sub_vendor_name || '') + '</td>';
+                            row += '<td>' + (item.mobile_no || '') + '</td>';
+                            // row += '<td>' + (item.email_id || '') + '</td>';
+                            // row += '<td>' + (item.residential_address || '') + '</td>';
+                            row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                            row += '<td>' + (item.ip_address || '') + '</td>';
+                            // row += '<td>' + (item.created_at || '') + '</td>';
+                            // row += '<td>' + (item.created_by || '') + '</td>';
+                            row += '<td>' + (item.updated_at ? item.updated_at.replace('T', ' ') : '') + '</td>';
+                            row += '<td>' + (item.updated_by || '') + '</td>';
+                            row += '</tr>';
+
+                            $("#SubVendorHistorytable-id tbody").append(row); // This is correct
+                        });
+                    } else {
+                        // If no data, show a message (optional)
+                        $("#SubVendorHistorytable-id tbody").append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        }
+
+    </script>
+}

@@ -1,0 +1,108 @@
+@{
+    Layout = "_BlankLayout";
+    ViewData["Title"] = "Multi Steps Sign-up - Pages";
+}
+
+@section VendorStyles {
+    <!-- Vendor -->
+    <link rel="stylesheet" href="~/vendor/libs/bs-stepper/bs-stepper.css" />
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.css" />
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/cleavejs/cleave.js"></script>
+    <script src="~/vendor/libs/cleavejs/cleave-phone.js"></script>
+    <script src="~/vendor/libs/bs-stepper/bs-stepper.js"></script>
+    <script src="~/vendor/libs/select2/select2.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+}
+
+@section PageStyles {
+    <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css">
+}
+
+@section PageScripts {
+    <script src="~/js/pages-auth-multisteps.js"></script>
+}
+@* ************** Content ************** *@
+
+<h1>LOGIN DETAILS NOT FOUND</h1>
+
+<div class="authentication-wrapper authentication-cover">
+    <!-- Logo -->
+    <a href="/" class="auth-cover-brand d-flex align-items-center gap-3">
+        <span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
+        <span class="app-brand-text demo text-heading fw-semibold">OMS</span>
+    </a>
+    <!-- /Logo -->
+    <div class="authentication-inner row m-0">
+        <!-- Left Text -->
+        <div class="d-none d-lg-flex col-lg-3 align-items-center justify-content-end p-5 pe-0">
+            <img alt="register-multi-steps-illustration" src="~/img/illustrations/registration-multistep-illustration.png" class="scaleX-n1-rtl w-px-300 h-auto mh-100 img-fluid">
+        </div>
+
+        <div class="d-flex col-lg-9 align-items-center justify-content-center authentication-bg p-5">
+            <div class="w-px-700 mt-lg-0">
+                @using (Html.BeginForm("SaveUserDetails", "Login"))
+                {
+
+                    <div id="multiStepsValidation" class="wizard-numbered shadow-none">
+                        <div class="border-bottom-0">
+                            <div class="step" data-target="#accountDetailsValidation" style="display:none">
+                                <button type="button" class="step-trigger">
+                                    <span class="bs-stepper-circle"><i class="ri-check-line"></i></span>
+                                    <span class="bs-stepper-label">
+                                        <span class="bs-stepper-number">01</span>
+                                        <span class="d-flex flex-column ms-1">
+                                            <span class="bs-stepper-title">Account</span>
+                                            <span class="bs-stepper-subtitle">Account Details</span>
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bs-stepper-content">
+                            <!-- Account Details -->
+                            <div id="accountDetailsValidation" class="content">
+                                <div class="content-header mb-5">
+                                    <div class="content-header mb-5">
+                                        
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="content-header mb-5">
+                                            <h4 class="mb-0" style="color:#8c57ff">Hey there!</h4><span>It looks like you're new here—go ahead and sign up to get started!</span>
+                                            <br />
+                                            <br />
+                                            @Html.ActionLink("Register", "RegisterUser", "Login", null, new { @class = "btn btn-primary btn-next" })
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Personal Info -->
+                            <div id="personalInfoValidation" class="content">
+                            </div>
+                            <!-- Billing Links -->
+                            <div id="billingLinksValidation" class="content">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    window.Helpers.initCustomOptionCheck();
+</script>

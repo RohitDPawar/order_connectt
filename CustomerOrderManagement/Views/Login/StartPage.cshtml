@@ -1,0 +1,102 @@
+@{
+    Layout = "_BlankLayout";
+    ViewData["Title"] = "Welcome Page - Pages";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+    <link rel="stylesheet" href="~/vendor/libs/animate-css/animate.css" />
+    <link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+    <script src="~/vendor/libs/sweetalert2/sweetalert2.js"></script>
+}
+
+@section PageStyles {
+    <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css">
+}
+
+@section PageScripts {
+    <script src="~/js/pages-auth.js"></script>
+    <script src="~/js/extended-ui-sweetalert2.js"></script>
+}
+@* ************** Content ************** *@
+
+
+<div class="position-relative">
+    <div class="authentication-wrapper authentication-basic container-p-y">
+        <div class="authentication-inner py-6 mx-4">
+            @using (Html.BeginForm("OTPSendOnNumber", "Login"))
+            {
+                <!-- Login -->
+                <div class="card p-7">
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center mt-5">
+                        <a href="/" class="app-brand-link gap-3">
+                            <span class="app-brand-logo demo">  <img src="~/img/icons/brands/brand_logo_com3.png" class="img-fluid" style="max-width:210px !important" /></span>
+                            @* <span class="app-brand-text demo text-heading fw-semibold">@TempData.Peek("appName")</span> *@
+                            @* <span class="app-brand-text demo text-heading fw-semibold">OMS</span> *@
+                        </a>
+                    </div>
+                    <!-- /Logo -->
+
+                    <div class="card-body mt-1">
+                        <h5 class="mb-1">Welcome to Order Connect! 👋🏻</h5>
+                        <p class="mb-5">Please sign-in to your account and to create order</p>
+
+                        <form id="formAuthentication" class="mb-5" action="~/" method="GET">
+                            <div class="form-floating form-floating-outline mb-5">
+                                <input type="text" class="form-control numberOnly" id="MobileNumberId" name="MobileNumber" placeholder="Phone Number" autofocus minlength="10" maxlength="10" required>
+                                <label for="mobile">Mobile Number</label>
+                            </div>
+
+                            <div class="mb-5">
+                                <button class="btn btn-primary d-grid w-100" type="submit">Continue</button>
+                            </div>
+                            <div class="d-flex justify-content-center mt-5">
+                                <span class="fs-6 small">Powered by <b>TECHNEAI PVT LTD</b></span>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <!-- /Login -->
+                <img src="~/img/illustrations/tree-3.png" alt="auth-tree" class="authentication-image-object-left d-none d-lg-block">
+                <img src="~/img/illustrations/auth-basic-mask-light.png" class="authentication-image d-none d-lg-block scaleX-n1-rtl" height="172" alt="triangle-bg" data-app-light-img="illustrations/auth-basic-mask-light.png" data-app-dark-img="illustrations/auth-basic-mask-dark.png">
+                <img src="~/img/illustrations/tree.png" alt="auth-tree" class="authentication-image-object-right d-none d-lg-block">
+            }
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"> </script>
+<script>
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+    $('document').ready(function ()
+    {
+      
+      // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+          if ('@TempData["Warning"]' !== "") {
+              ShowErrorMsg('@TempData["Warning"]');
+              @TempData.Remove("Warning");
+          }
+    });
+
+</script>

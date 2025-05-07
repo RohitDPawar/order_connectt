@@ -1,0 +1,440 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+<style>
+    .myCardTitle {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 100%; /* or specify a max-width, if needed */
+        display: block;
+    }
+
+</style>
+
+@if (TempData["Message"] != null)
+{
+    <script>
+        // Safely pass TempData["Message"] to JavaScript
+        ShowErrorMsg('@TempData["Message"]');
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+        //alert(message)
+        Swal.fire({
+        //title: 'Good job!',
+        text: message,
+        icon: 'success',
+        customClass: {
+        confirmButton: 'btn btn-primary waves-effect waves-light'
+        },
+        buttonsStyling: false
+        });
+        }
+    </script>
+    TempData["Message"] = null;
+}
+
+<div class="row gy-4 mb-2">
+    <!-- New Order Card -->
+    <a href="#" class="col-12 col-md-6 col-lg-3 mb-4" onclick="AllDashboardButtonDataGet('1','1',$('#ShowRowid').val())">
+        <div class="card shadow-sm rounded-3 h-100">
+            <div class="card-body d-flex align-items-center p-2">
+                <!-- Icon on the left -->
+                <div class="rounded-circle me-2 d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; background-color: #D1BCFF;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 17.25H13.5M7.5 13.5H16.5M7.5 9.75H16.5M8.25 3.75H5.25V21.75H18.75V3.75H15.75M8.25 2.25H15.75L14.8125 5.25H9.1875L8.25 2.25Z" stroke="black" stroke-width="1" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <!-- Content on the right -->
+                <div class="text-center">
+                    <h3 class="fw-bold mb-1" style="font-size: 1.5rem;">@ViewBag.NewOrderCount</h3>
+                    <h6 class="card-title mb-0 text-truncate" style="font-size: 0.9rem;" title="Orders">New Orders</h6>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <a href="#" class="col-12 col-md-6 col-lg-3 mb-4" onclick="AllDashboardButtonDataGet('2','1',$('#ShowRowid').val())">
+        <div class="card shadow-sm rounded-3 h-100">
+            <div class="card-body d-flex align-items-center p-2">
+                <!-- Icon on the left -->
+                <div class="rounded-circle me-2 d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; background-color: #D1BCFF;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 20.75H1.25V1.25H14.75V9.5M3.5 5.75H12.5M3.5 8.75H9.5M10.25 14.75L11.75 16.25M11.75 16.25L13.25 17.75M11.75 16.25L13.25 14.75M11.75 16.25L10.25 17.75M16.25 16.25C16.25 17.4435 15.7759 18.5881 14.932 19.432C14.0881 20.2759 12.9435 20.75 11.75 20.75C10.5565 20.75 9.41193 20.2759 8.56802 19.432C7.72411 18.5881 7.25 17.4435 7.25 16.25C7.25 15.0565 7.72411 13.9119 8.56802 13.068C9.41193 12.2241 10.5565 11.75 11.75 11.75C12.9435 11.75 14.0881 12.2241 14.932 13.068C15.7759 13.9119 16.25 15.0565 16.25 16.25Z" stroke="black" stroke-width="1" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <!-- Content on the right -->
+                <div class="text-center" style="max-width: 60%; overflow: hidden;">
+                    <h3 class="fw-bold mb-1" style="font-size: 1.5rem;">@ViewBag.BackOfficeRejectedCount</h3>
+                    <h6 class="card-title mb-0 text-truncate" style="font-size: 0.9rem;" title="Rejected By HO">Rejected By Back Office</h6>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+    <a href="#" class="col-12 col-md-6 col-lg-3 mb-4" onclick="AllDashboardButtonDataGet('3','1',$('#ShowRowid').val())">
+        <div class="card shadow-sm rounded-3 h-100">
+            <div class="card-body d-flex align-items-center p-2">
+                <!-- Icon on the left -->
+                <div class="rounded-circle me-2 d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; background-color: #D1BCFF;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 17.25H13.5M7.5 13.5H16.5M7.5 9.75H16.5M8.25 3.75H5.25V21.75H18.75V3.75H15.75M8.25 2.25H15.75L14.8125 5.25H9.1875L8.25 2.25Z" stroke="black" stroke-width="1" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <!-- Content on the right -->
+                <div class="text-center">
+                    <h3 class="fw-bold mb-1" style="font-size: 1.5rem;">@ViewBag.OrderReadyCount</h3>
+                    <h6 class="card-title mb-0 text-truncate" style="font-size: 0.9rem;" title="Rejected By HO">Ready Orders</h6>
+                </div>
+            </div>
+        </div>
+    </a>
+
+    <a href="#" class="col-12 col-md-6 col-lg-3 mb-4" onclick="AllDashboardButtonDataGet('4','1',$('#ShowRowid').val())">
+        <div class="card shadow-sm rounded-3 h-100">
+            <div class="card-body d-flex align-items-center p-2">
+                <!-- Icon on the left -->
+                <div class="rounded-circle me-2 d-flex justify-content-center align-items-center" style="width: 70px; height: 70px; background-color: #D1BCFF;">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.5 17.25H13.5M7.5 13.5H16.5M7.5 9.75H16.5M8.25 3.75H5.25V21.75H18.75V3.75H15.75M8.25 2.25H15.75L14.8125 5.25H9.1875L8.25 2.25Z" stroke="black" stroke-width="1" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <!-- Content on the right -->
+                <div class="text-center">
+                    <h3 class="fw-bold mb-1" style="font-size: 1.5rem;">@ViewBag.OrderSendCount</h3>
+                    <h6 class="card-title mb-0 text-truncate" style="font-size: 0.9rem;" title="Complete Order">Complete Orders</h6>
+                </div>
+            </div>
+        </div>
+    </a>
+
+
+</div>
+@* ************** Third Row (Space Added) ************** *@
+
+
+<div class="row gy-6 mb-4">
+    <div class="col-lg-12">
+        <!-- Card for the table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-4 mb-3">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Title on the left -->
+                            <h4 id="TableHeaderNameId">New Orders</h4>
+
+                            <!-- Wrapper for right-side buttons -->
+                            <div class="d-flex justify-content-end align-items-center">
+                                <!-- Filter Button -->
+                                <button class="btn btn-primary me-2" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                    <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" />
+                                    <img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" />
+                                    Filter
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="SalePersonOrderDataId">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sort" data-sort="Sr No">Sr No</th>
+                                @if (ViewBag.OrderEditStatus == "1")
+                                {
+                                    <th class="sort" data-sort="Action">Action</th>
+                                }
+                                <th class="sort" data-sort="JobCard">Job Card</th>
+                                <th class="sort" data-sort="Status">Status</th>
+                                <th class="sort" data-sort="Order No">Order Number</th>
+                                <th class="sort" data-sort="Order No">Customer Name</th>
+                                <th class="sort" data-sort="Item Name">Item Name</th>
+                                <th class="sort" data-sort="Category">Category Name</th>
+                                <th class="sort" data-sort="Gross Wt">Gross Weight</th>
+                                <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                <th class="sort" data-sort="Purity">Purity</th>
+                                <th class="sort" data-sort="Product Group">Product Group Name</th>
+                                <th class="sort" data-sort="Branch Name">Branch Name</th>
+                                <th class="sort" data-sort="Order Date">Order Date</th>
+                                <th class="sort" data-sort="Order Delivery Date">Order Delivery Date</th>
+                            </tr>
+                        </thead>
+                        <tbody class="form-check-all">
+                        </tbody>
+                    </table>
+                </div>
+                @await Html.PartialAsync("Sections/Menu/_pagination")
+            </div>
+        </div>
+    </div>
+</div><!-- end row -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="f:\com project\com\customerordermanagement\wwwroot\js\commondetailsshow.js"></script>
+<script>
+
+    function loadPageData(page, rowsToShow) {
+        AllDashboardButtonDataGet(currentflag,page, $('#ShowRowid').val());
+    }
+
+    var currentflag = '';
+
+    function applyFilter() {
+
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        AllDashboardButtonDataGet(currentflag,1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        AllDashboardButtonDataGet(currentflag,1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    function AllDashboardButtonDataGet(Flag, pageNumber, pageSize)
+    {
+        if(Flag == "1")
+        {
+          $("#TableHeaderNameId").text("New Orders")
+        }
+        if(Flag == "2"){
+          $("#TableHeaderNameId").text("Rejected by Back Office")
+        }
+        if(Flag == "3"){
+          $("#TableHeaderNameId").text("Ready Orders")
+        }
+        if(Flag == "4"){
+          $("#TableHeaderNameId").text("Complete Orders")
+        }
+        currentflag = Flag;
+        const data = {
+            Flag: Flag,
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetSalesPersonPriorityOrders",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                var res = JSON.parse(data);
+                var OrderData = res["OrderData"];
+                // Clear the tbody of the table
+                $("#SalePersonOrderDataId tbody").empty();
+                OrderDataAppendTable(res)
+
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    function OrderDataAppendTable(res)
+    {
+        var Flag = @ViewBag.OrderEditStatus;
+        $("#SalePersonOrderDataId tbody").empty();
+
+        const paginationInfo = res.PaginationInfo;
+
+        let srno;
+
+        if (res && paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        }
+        if (res && res.OrderData && Array.isArray(res.OrderData))
+        {
+          //console.log(res)
+            for (let i = 0; i < res["OrderData"].length; i++) {
+                let orderStatus = res["OrderData"][i]["order_status"];
+                let statusHtml = '';
+
+                // const item = response["ItemAddedData"][i];
+                let data = '<tr class="total_tr"><td>' + srno + '</td>';
+
+                if (Flag == "1")
+                {
+                    if(res["OrderData"][i]["order_status"] == "0" || res["OrderData"][i]["order_status"] == "1")
+                    {
+                       data += '<td><a href="/OrderMaster/EditOrder?OrderItemId='+ res["OrderData"][i]["order_item_id"] +'" class="text-primary cursor-pointer"><span id="Btn_EditCityId" class="text-primary cursor-pointer"><i class="fa fa-edit"></i></span></a></td>';
+                    }
+                    else{
+                      data += '<td><a href="javascript:void(0);" class="text-primary cursor-pointer"><span id="Btn_EditCityId" class="cursor-pointer" onclick="return false" style="color:gray"><i class="fa fa-edit"></i</span></a></td>';
+                    }
+
+                }
+
+                data += '<td><a onclick="ShowJobCardDetails('+ res["OrderData"][i]["order_item_id"] +')" class="text-primary cursor-pointer" title="View Order"><span class="text-primary cursor-pointer"><i class="fa fa-eye"></i></span></a></td>'
+                    + '<td>' + res["OrderData"][i]["STATUS"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["order_series_no"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["customer_name"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["item_name"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["category_name"] + '</td>'
+                    + '<td>' + (parseFloat(res["OrderData"][i]["gross_wt"])?.toFixed(3) || '') + '</td>'
+                    + '<td>' + (parseFloat(res["OrderData"][i]["net_wt"])?.toFixed(3) || '') + '</td>'
+                    + '<td>' + (parseFloat(res["OrderData"][i]["purity_name"])?.toFixed(2) || '') + '</td>'
+                    + '<td>' + res["OrderData"][i]["product_group_name"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["branch_name"] + '</td>'
+                    + '<td>' + res["OrderData"][i]["order_date"].split('T')[0] + '</td>'
+                    + '<td>' + res["OrderData"][i]["order_delivery_date"].split('T')[0] + '</td>'
+                    + '</tr>';
+
+                $("#SalePersonOrderDataId tbody").append(data);
+
+                srno++;
+            }
+        } else {
+            // If no data is available, display a "No Data Available" row
+            $("#SalePersonOrderDataId tbody").empty();
+            $("#SalePersonOrderDataId tbody").html(`
+                                        <tr>
+                                            <td colspan="12" style="text-align: center;">No Data Available</td>
+                                        </tr>
+                                    `);
+            generatePagination(1, 1);
+        }
+    }
+
+    function EditOrderDetailsItemId(orderNo, OrderDetailsId) {
+        alert("Order No : " + orderNo + " Count " + OrderDetailsId)
+    }
+
+    $(document).ready(function () {
+
+        AllDashboardButtonDataGet(currentflag, 1, $('#ShowRowid').val());
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+    });
+
+    //THIS FUNCTION USED FOR DOWNLOAD JOBCARD PDF
+    function DownloadJobCardFile() {
+      $.ajax({
+        type: "POST",
+        url: "/OrderMaster/ShareJobCardDetailsDownload",
+        data: { ItemDetailsId: $("#OrderDetailsId").val() },
+        success: function (response) {
+          if (response && response.fileUrl) {
+          // ✅ Create a temporary link and click it to download the file
+            const link = document.createElement('a');
+
+            // Force HTTPS in the URL if it's HTTP
+            link.href = response.fileUrl.replace("http:", "https:");
+
+            link.download = ''; // Optional: let browser infer the filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('Could not generate the file.');
+          }
+        },
+        error: function (error) {
+          console.error('Error fetching order details:', error);
+          alert('An error occurred while fetching order details.');
+        }
+      });
+    }
+
+</script>
+

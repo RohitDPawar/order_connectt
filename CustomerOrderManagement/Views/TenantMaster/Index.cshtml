@@ -1,0 +1,1079 @@
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/animate-css/animate.css" />
+    <link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.css" />
+}
+@section VendorScripts {
+    <script src="~/vendor/libs/sweetalert2/sweetalert2.js"></script>
+}
+@section PageScripts {
+    <script src="~/js/extended-ui-sweetalert2.js"></script>
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <!-- Title -->
+                                <h3 class="mb-0">Tenant Master</h3>
+
+                                <!-- Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-danger" id="Btn_ExportToExcelTenantId">Export File</button>
+
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTenantMasterModal" id="Btn_AddTenant" onclick="ClearAllValue()">
+                                        <i class="align-bottom me-1"></i> Add Tenant
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Second Row: Search Textbox and Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="text" class="form-control searchpage" name="search" placeholder="Search..." id="Txt_SearchInputTenantName" maxlength="50" />
+                            <button type="button" class="btn btn-primary" id="Btn_SearchTenatId">Search</button>
+                            <button type="button" class="btn btn-secondary resetpage" id="Btn_ResetSearchTenantId">Reset</button>
+                        </div>
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditTenantMasterModal" id="Btn_EditTenant" style="display:none"></button>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="TenantMasterTable_Id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">SR No.</th>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllTenantHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="Action">Action</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Tenant Name</th>
+
+                                    <th class="sort fw-bold" data-sort="name">Mobile No</th>
+                                    <th class="sort fw-bold" data-sort="name">Email ID</th>
+                                    <th class="sort fw-bold" data-sort="name">Contact Person Name</th>
+                                    <th class="sort fw-bold" data-sort="name">Address</th>
+                                    @* <th class="sort" data-sort="name">Area Description</th>
+                                    <th class="sort" data-sort="name">Pincode</th> *@
+                                    <th class="sort fw-bold" data-sort="name">Country</th>
+                                    <th class="sort fw-bold" data-sort="name">State</th>
+                                    <th class="sort fw-bold" data-sort="name">City</th>
+                                    <th class="sort fw-bold" data-sort="name">GST No</th>
+                                    <th class="sort fw-bold" data-sort="name">Order Sequence</th>
+                                    <th class="sort fw-bold" data-sort="name">Pan Card No</th>
+                                    @*  <th class="sort" data-sort="name">Subscription_valid_till</th> *@
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addTenantMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add Tenant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ClearAllValue()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddTenant", "TenantMaster", new { id = "Form_Add_Tenant" }))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name <span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="TenantName" id="Txt_TenantNameId" required maxlength="50" />
+                        <span id="WarnADDTenantNameId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Email ID <span style="color:red;font-weight:800">*</span></label>
+                        <input type="email" class="form-control" name="EmailID" id="Txt_EmailId" required maxlength="50" />
+                        <span id="WarnEmailId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Mobileno" id="Txt_MobileNumberId" required minlength="10" maxlength="10" />
+                        <span id="WarnMobileId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Contact Person Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="ContactPersonName" id="Txt_ContactPersonNameId" required maxlength="50" />
+                        <span id="WarnContactPersonNameId" style="display:none; color:red;">Minimum 2 characters required</span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Address<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="RessidentialAddress" id="Txt_RessidentialAddressId" required maxlength="100" />
+                        <span id="WarnRessidentialAddressId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Area<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="area" id="Txt_AreaId" maxlength="50" required />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pin Code<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="pincode" id="Txt_pincodeId" maxlength="6" minlength="6" required />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Country<span style="color:red;font-weight:800">*</span></label>
+                        <select name="CountryID" id="Select_CountryID" class="form-control" required>
+                            <option value="">-- Please Select Country Id--</option>
+                            @foreach (var country in ViewBag.CountryID)
+                            {
+                                <option value="@country["id"]">@country["country_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">State<span style="color:red;font-weight:800">*</span></label>
+                        <select name="StateID" id="Select_StateID" class="form-control" required>
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">City<span style="color:red;font-weight:800">*</span></label>
+                        <select name="CityID" id="Select_CityID" class="form-control" required>
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pan Card No<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="pancardno" id="Txt_pancardId" required minlength="10" maxlength="10" />
+                        <span id="WarnPanId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">GST No<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numbercharacter" name="gstno" id="Txt_gstId" minlength="15" maxlength="15" required />
+                        <span id="WarnGSTId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Subscription Valid Till<span style="color:red;font-weight:800">*</span></label>
+                        <input type="date" class="form-control " name="subscription" id="Txt_subscriptionId" required />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Order Sequence<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control PrefixSeries" name="Prefix" id="Txt_PrefixId" required maxlength="4" />
+                        <span id="WarnPrefixId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control " name="remark" id="Txt_remakId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="Btn_SubmitId">
+                                <i class="align-bottom me-1"></i> Add
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Editing Product -->
+<div class="modal fade" id="EditTenantMasterModal" tabindex="-1" aria-labelledby="editVendorModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editVendorModalLabel">View Tenant Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick=ClearAllValue()></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for editing -->
+                @using (Html.BeginForm("SaveEditTenant", "TenantMaster", new { id = "Form_Edit_Tenant" }))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name <span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlycharacter" name="TenantName" id="UpdateTxt_TenantNameId" required maxlength="50" disabled/>
+                        <span id="WarnUpdateTenantNameId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Email ID<span style="color:red;font-weight:800">*</span></label>
+                        <input type="email" class="form-control " name="EmailID" id="UpdateTxt_EmailId" required maxlength="50" disabled />
+                        <span id="WarnEmailId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Mobileno" id="UpdateTxt_MobileNumberId" required minlength="10" maxlength="10" disabled />
+                        <span id="WarnMobileId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Contact Person Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="ContactPersonName" id="UpdateTxt_ContactPersonNameId" required minlength="2" maxlength="50" disabled />
+                        <span id="WarnContactPersonNameId" style="display:none; color:red;">Minimum 2 characters required</span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Address<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="RessidentialAddress" id="UpdateTxt_RessidentialAddressId" required maxlength="100" disabled />
+                        <span id="WarnRessidentialAddressId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Area<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="area" id="UpdateTxt_AreaId" maxlength="50" disabled />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pin Code<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="pincode" id="UpdateTxt_pincodeId" maxlength="6" minlength="6" disabled />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Country ID<span style="color:red;font-weight:800">*</span></label>
+                        <select name="country" id="UpdateTxt_countryId" class="form-control" disabled>
+                            <option value="">-- Please Select Country Id--</option>
+                            @foreach (var country in ViewBag.CountryID)
+                            {
+                                <option value="@country["id"]">@country["country_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">State ID<span style="color:red;font-weight:800">*</span></label>
+                        <select name="StateID" id="UpdateTxt_StateId" class="form-control" disabled>
+                            <option value="">-- Please Select State Id--</option>
+                            @foreach (var state in ViewBag.StateID)
+                            {
+                                <option value="@state["id"]">@state["state_name"]</option>
+                            }
+                        </select>
+
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">City ID<span style="color:red;font-weight:800">*</span></label>
+                        <select name="CityID" id="UpdateTxt_cityId" class="form-control" disabled>
+                            <option value="">-- Please Select City Id--</option>
+                            @foreach (var city in ViewBag.CityID)
+                            {
+                                <option value="@city["id"]">@city["city_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pan Card No<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="pancardno" id="UpdateTxt_pancardId" disabled />
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">GST No<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numbercharacter" name="gstno" id="UpdateTxt_gstId" disabled />
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Subscription Valid Till <span style="color:red;font-weight:800">*</span></label>
+                        <input type="date" class="form-control " name="subscription" id="UpdateTxt_subscriptionId" disabled />
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Order Sequence<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="PrefixUpdate" id="Txt_PrefixUpdateId" required minlength="1" maxlength="4" disabled />
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control " name="remak" id="UpdateTxt_remarkId" maxlength="200" disabled />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status  <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="UpdateRadioIsActive" name="IsActive" value="1" checked disabled />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="UpdateRadioIsDeactive" name="IsActive" value="0" disabled>&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2  px-3">
+                        <div>
+                            @* <button type="submit" class="btn btn-primary d-grid" id="Btn_UpdateId">
+                                <i class="align-bottom me-1"></i> Update
+                            </button> *@
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModaltenant" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="TenantHistorytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Tenant Name</th>
+                                <th>Mobile No</th>
+                                <th>Email ID</th>
+                                <th>Contact Person Name</th>
+                                <th>Address</th>
+                                <th>Country</th>
+                                <th>State</th>
+                                <th>City</th>
+                                <th>GST No</th>
+                                <th>Order Sequence</th>
+                                <th>Pan Card No</th>
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                                <th>Created At</th>
+                                <th>Created By</th>
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.5.9/dist/sweetalert2.all.min.js"></script>
+
+<!-- Include SheetJS (XLSX) library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+<script>
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'success',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+    function loadPageData(page, rowsToShow) {
+        GetTenantData(page, $('#ShowRowid').val());
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#TenantMasterTable_Id");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+
+    var selectedRowIds = [];
+    var SearchText;
+
+
+    $(document).ready(function () {
+
+        GetTenantData(1, $('#ShowRowid').val());
+
+        $(".Checkbox_SelectAllHeader").on("change", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Select or deselect all row checkboxes based on the header checkbox state
+            table.find(".RowCheckbox").prop('checked', isChecked);
+
+            // Update the selectedRowIds array based on the "Select All" checkbox
+            if (isChecked) {
+                // Add all row IDs to the selectedRowIds array for the specific table
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId && !selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                });
+            } else {
+
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId) {
+                        // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                        selectedRowIds = selectedRowIds.filter(function (id) {
+                            return id !== rowId;
+                        });
+                    }
+                });
+            }
+        });
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]');
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+    }
+
+            //END
+            // For Form 1
+            $('#Form_Add_Tenant').on('submit', function (event) {
+                // Disable the submit button to prevent multiple clicks
+                event.preventDefault();  // Prevent the form from being submitted immediately
+
+                var submitButton = $('#Btn_SubmitId');
+
+                // Disable the submit button to prevent multiple submissions
+                submitButton.prop('disabled', true);
+                submitButton.html('<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Submitting...');
+
+
+            });
+
+        // For Form 2
+        $('#Form_Edit_Tenant').on('submit', function (event) {
+            // Disable the submit button to prevent multiple clicks
+            $('#Btn_UpdateId').prop('disabled', true);
+
+            // Optionally show a loading indicator to the user
+            $('#Btn_UpdateId').html('<i class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></i> Submitting...');
+        });
+    });
+
+
+    $(document).ready(function () {
+
+        $('.numberOnly').on('input', function (e) {
+            var value = $(this).val();
+
+            // Remove all non-numeric characters
+            value = value.replace(/\D/g, '');
+
+            // Restrict the length to 10 digits
+            if (value.length > 10) {
+                value = value.slice(0, 10); // Trim input to 10 characters
+            }
+
+            $(this).val(value); // Set the cleaned value back to the input field
+        });
+
+
+        $('Form_Add_Tenant').submit(function (event) {
+            var contactPersonName = $('#Txt_ContactPersonNameId').val();
+
+            // Check if the value is valid based on the min length
+            if (contactPersonName.length < 2) {
+                event.preventDefault();  // Prevent form submission
+                $('#WarnContactPersonNameId').show();  // Show the custom error message
+            } else {
+                $('#WarnContactPersonNameId').hide();  // Hide the custom error message if valid
+            }
+        });
+
+        var today = new Date();
+
+        // Add one day to today's date to get tomorrow's date
+        today.setDate(today.getDate() + 1);
+
+        // Format the date as YYYY-MM-DD
+        var yyyy = today.getFullYear();
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        var dd = String(today.getDate()).padStart(2, '0'); // Day of the month
+        var tomorrow = yyyy + '-' + mm + '-' + dd;
+
+        // Set the 'min' attribute to tomorrow's date
+        $('#Txt_subscriptionId').attr('min', tomorrow);
+
+        function sendSelectedRowIds() {
+            // Check if there are any selected row IDs
+            var searchValue = SearchText;
+            var rowIdsString = selectedRowIds.join(',');
+            // Make an AJAX request to send the data to the controller action
+            $.ajax({
+                type: "POST",
+                url: "/TenantMaster/ExportdataTenant",
+                data: {
+                    selectedRowIds: rowIdsString,
+                    searchValue: searchValue
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Decode Base64 to binary string
+                        var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                        var byteArray = new Uint8Array(byteCharacters.length);
+
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                        }
+
+                        // Create a blob from the byte array
+                        var blob = new Blob([byteArray], { type: response.fileType });
+
+                        // Create a link element for downloading
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.fileName; // Set the download file name
+                        link.click();
+                    } else {
+                        ShowErrorMsg(response.message)
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error (failure)
+                    console.error('Error occurred while sending data to the server:', error);
+
+                    // Optionally, display an error message
+                    alert('An error occurred while processing your request.');
+                }
+            });
+
+        }
+
+        $('#Btn_SearchTenatId').on('click', function () {
+            SearchText = $('#Txt_SearchInputTenantName').val();
+            GetTenantData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchTenantId").on("click", function () {
+            location.reload();
+        });
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelTenantId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+    });
+
+    function EditTenantId(id, Flag)
+    //this function used for edit vendor    function EditCityId(id)
+    {
+        $.ajax({
+            type: "POST",
+            url: "/Tenantmaster/EditTenant",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var TenantData = res["TenantData"]
+                //console.log(TenantData[0]["subscription_valid_till"]);
+                //var dateStr = TenantData[0]["subscription_valid_till"];
+                //String.Format("{0:mm-MM-yyyy}", dateStr);
+
+                //console.log(dateStr);
+                console.log(TenantData)
+                //console.log(VendorData)
+                var Flag = res["Flag"]
+                //console.log(Flag)
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+
+
+                // $("#addProductModalLabel").text("Edit Country Details")
+                document.getElementById('RecordId').value = TenantData[0]["id"];
+                document.getElementById('UpdateTxt_TenantNameId').value = TenantData[0]["tenant_name"];
+                document.getElementById('UpdateTxt_EmailId').value = TenantData[0]["email_id"];
+                document.getElementById('UpdateTxt_MobileNumberId').value = TenantData[0]["mobile_no"];
+                document.getElementById('UpdateTxt_ContactPersonNameId').value = TenantData[0]["contact_person_name"];
+                document.getElementById('UpdateTxt_RessidentialAddressId').value = TenantData[0]["address"];
+                document.getElementById('Txt_PrefixUpdateId').value = TenantData[0]["prefix"];
+                document.getElementById('UpdateTxt_AreaId').value = TenantData[0]["area_description"];
+                document.getElementById('UpdateTxt_pincodeId').value = TenantData[0]["pincode"];
+                document.getElementById('UpdateTxt_countryId').value = TenantData[0]["country_id"];
+
+                document.getElementById('UpdateTxt_StateId').value = TenantData[0]["state_id"];
+
+                document.getElementById('UpdateTxt_cityId').value = TenantData[0]["city_id"];
+                document.getElementById('UpdateTxt_gstId').value = TenantData[0]["gst_no"];
+                document.getElementById('UpdateTxt_pancardId').value = TenantData[0]["pancard_no"];
+                // Assuming TenantData[0]["subscription_valid_till"] is a full datetime string or a Date object
+                var subscriptionDate = TenantData[0]["subscription_valid_till"];
+
+                if (subscriptionDate instanceof Date) {
+                    subscriptionDate = subscriptionDate.toISOString().split('T')[0];
+                } else if (typeof subscriptionDate === 'string' && subscriptionDate.includes("T")) {
+                    subscriptionDate = subscriptionDate.split('T')[0];
+                }
+                // Set the value of the input field to the formatted date
+                document.getElementById('UpdateTxt_subscriptionId').value = subscriptionDate;
+                document.getElementById('UpdateTxt_remarkId').value = TenantData[0]["remark"];
+                //THIS IS USED FOR CHECKED ACTIVE INACTIVE
+                if (TenantData[0]["is_active"] == "1") {
+                    $("#UpdateRadioIsActive").prop("checked", true);
+                } else {
+                    $("#UpdateRadioIsDeactive").prop("checked", true);
+                }
+
+                $("#Btn_EditTenant").click();
+
+
+            },
+            error: function (response) {
+                console.log("error")
+
+            }
+        });
+    }
+
+    $('#Txt_TenantNameId, #UpdateTxt_TenantNameId, #Txt_MobileNumberId, #Txt_EmailId, #Txt_gstId, #Txt_pancardId, #Txt_PrefixId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id');  // Get the ID of the field that triggered the event
+        const value = $(this).val();  // Get the current value of the field
+        let ColName;
+        // Set ColName based on the field ID
+        if (inputFieldId === "Txt_MobileNumberId") {
+            ColName = "mobile_no";  // For mobile number
+        } else if (inputFieldId === "Txt_gstId") {
+            ColName = "gst_no";  // For GST number
+        } else if (inputFieldId === "Txt_pancardId") {
+            ColName = "pancard_no";  // For PAN card number
+        }
+        else if (inputFieldId === "Txt_PrefixId") {
+            ColName = "prefix";  // For order number prefix
+        } else {
+            ColName = "tenant_name";  // For tenant name or other fields
+        }
+
+        // Handle GST validation only if the field changed is "Txt_gstId"
+        if (inputFieldId === "Txt_gstId") {
+            if (validateGST(value.toUpperCase())) {
+                $("#WarnGSTId").css({ "display": "none" }).text("");
+            } else {
+                // Show error if GST number is invalid
+                $("#WarnGSTId").css({ "display": "block", "color": "red" }).text("Invalid GST No...");
+                $("#Txt_gstId").val('');  // Clear the GST number input if invalid
+                return true;  // Exit the function early to prevent further processing
+            }
+        }
+
+        // Handle PAN card validation
+        if (inputFieldId === "Txt_pancardId") {
+            if (validatePAN(value)) {
+                $("#WarnPanId").css({ "display": "none" }).text("");
+            } else {
+                // Show error if PAN number is invalid
+                $("#WarnPanId").css({ "display": "block", "color": "red" }).text("Invalid Pan No...");
+                $("#Txt_pancardId").val('');  // Clear the PAN card number input if invalid
+                return true;  // Exit the function early to prevent further processing
+            }
+        }
+
+        // Perform the AJAX check for duplicate records only for TenantName, MobileNumber, Email, GSTNo, or PanNo
+        if (inputFieldId === "Txt_TenantNameId" || inputFieldId === "UpdateTxt_TenantNameId" || inputFieldId === "Txt_MobileNumberId" || inputFieldId === "Txt_EmailId" || inputFieldId === "Txt_gstId" || inputFieldId === "Txt_pancardId" || inputFieldId === "Txt_PrefixId") {
+            $.ajax({
+                type: "POST",
+                url: "/TenantMaster/CheckDuplicateRecord",
+                data: {
+                    ColName: ColName,
+                    Username: value  // Value entered in the field
+                },
+                success: function (data) {
+                    // If a duplicate is found (data > 0)
+                    if (data > 0) {
+                        // Clear the field if a duplicate is found
+                        $('#' + inputFieldId).val("");
+
+                        // Display warning message based on the input field
+                        switch (inputFieldId) {
+                            case "Txt_TenantNameId":
+                                $("#WarnADDTenantNameId").css({ "display": "block", "color": "red" }).text("Tenant Name Already Exists...");
+                                break;
+                            case "UpdateTxt_TenantNameId":
+                                $("#WarnUpdateTenantNameId").css({ "display": "block", "color": "red" }).text("Tenant Name Already Exists...");
+                                break;
+                            case "Txt_MobileNumberId":
+                                $("#WarnMobileId").css({ "display": "block", "color": "red" }).text("Mobile Number Already Exists...");
+                                break;
+                            case "Txt_EmailId":
+                                $("#WarnEmailId").css({ "display": "block", "color": "red" }).text("Email Already Exists...");
+                                break;
+                            case "Txt_gstId":
+                                $("#WarnGSTId").css({ "display": "block", "color": "red" }).text("GST No Already Exists...");
+                                break;
+                            case "Txt_pancardId":
+                                $("#WarnPanId").css({ "display": "block", "color": "red" }).text("Pan No Already Exists...");
+                                break;
+                            case "Txt_PrefixId":
+                                $("#WarnPrefixId").css({ "display": "block", "color": "red" }).text("Prefix Already Exists...");
+                                break;
+                        }
+                    } else {
+                        // Hide all warning messages if no duplicates are found
+                        $("#WarnADDTenantNameId, #WarnUpdateTenantNameId, #WarnMobileId, #WarnEmailId, #WarnGSTId, #WarnPanId #WarnPrefixId").css({ "display": "none" });
+                        $('#Txt_gstId').removeAttr('readonly');
+                        // For GST input field, ensure it's in uppercase
+                        if (inputFieldId === "Txt_gstId") {
+                            var gstNumber = $('#Txt_gstId').val();
+                            var extractedPAN = gstNumber.substring(2, 12);
+                            if ($('#Txt_pancardId').val() == extractedPAN) {
+                                $('#WarnGSTId').css({ "display": "none" });
+                            } else {
+                                $("#WarnGSTId").css({ "display": "block", "color": "red" }).text("GST & PAN No is not Matching...");
+                                $("#Txt_gstId").val("");
+                            }
+                        }
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        }
+    });
+
+    function validateGST(gstNumber) {
+        var regex = /^([0-2][0-9]|3[0-5])[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/;
+        return regex.test(gstNumber);
+    }
+
+    function validatePAN(panNumber) {
+        var regex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        return regex.test(panNumber);
+    }
+
+    function ClearAllValue() {
+        $("#Txt_TenantNameId").val("");
+        $("#Txt_EmailId").val("");
+        $("#Txt_MobileNumberId").val("");
+        $("#Txt_ContactPersonNameId").val("");
+        $("#Txt_RessidentialAddressId").val("");
+        $("#Txt_AreaId").val("");
+        $("#Txt_pincodeId").val("");
+        $("#Select_CountryID").val("");
+        $("#Select_StateID").val("");
+        $("#Select_CityID").val("");
+        $("#Txt_gstId").val("");
+        $("#Txt_pancardId").val("");
+        $("#Txt_subscriptionId").val("");
+        $("#Txt_remakId").val("");
+        $("#Txt_PrefixUpdateId").val("");
+        $("#Txt_PrefixId").val("");
+        $("#WarnGSTId").css({ "display": "none" });
+        $("#WarnADDTenantNameId").css({ "display": "none" });
+        $("#WarnUpdateTenantNameId").css({ "display": "none" });
+        $("#WarnMobileId").css({ "display": "none" });
+        $("#WarnPanId").css({ "display": "none" });
+        $("#WarnPrefixId").css({ "display": "none" });
+    }
+
+    // Function to convert input value to uppercase
+    function convertToUpperCase(inputSelector) {
+        $(inputSelector).on("input paste", function () {
+            let value = $(this).val();
+            value = value.toUpperCase();
+            $(this).val(value);
+        });
+    }
+
+    // Call the function to convert GST and PAN numbers to uppercase
+    convertToUpperCase("#Txt_gstId, #Txt_pancardId");
+
+    //this is for state dropdown
+    $('#Select_CountryID').on("change", function () {
+        const countryId = $('#Select_CountryID').val();  // Get the selected CountryId
+        console.log(countryId);
+
+        if (countryId) {
+            $.ajax({
+                type: "POST",
+                url: "/TenantMaster/GetStateName",
+                data: {
+                    CountryId: countryId
+                },
+                success: function (response) {
+                    // Parse the response (assuming the response is a JSON string)
+                    var res = JSON.parse(response);  // Parse the JSON string
+                    console.log(res);  // Log the parsed response
+
+                    // Access the "Table" array from the response
+                    var stateTable = res.Table;  // Access the "Table" array
+
+                    // Check if the "Table" array has any items
+                    if (stateTable && stateTable.length > 0) {
+                        // Clear the state dropdown
+                        $('#Select_StateID').empty();
+                        $('#Select_StateID').append('<option value="">Select State</option>');
+
+                        // Loop through the rows of the "Table" array and populate the dropdown
+                        stateTable.forEach(function (row) {
+                            // Append options to the dropdown with `id` as the value and `state_name` as the text
+                            $('#Select_StateID').append(`<option value="${row.id}">${row.state_name}</option>`);
+                        });
+                    } else {
+                        // If no states are available, append a "No states available" option
+                        $('#Select_StateID').empty();
+                        $('#Select_StateID').append('<option value="">No states available</option>');
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        } else {
+            // If no country is selected, clear the state dropdown
+            $('#Select_StateID').empty();
+            $('#Select_StateID').append('<option value="">Select State</option>');
+        }
+    });
+
+    //this is for city dropdown
+    $('#Select_StateID').on("change", function () {
+        const stateId = $('#Select_StateID').val();  // Get the selected CountryId
+        console.log(stateId);
+
+        if (stateId) {
+            $.ajax({
+                type: "POST",
+                url: "/TenantMaster/GetCityName",
+                data: {
+                    StateId: stateId
+                },
+                success: function (response) {
+
+                    var res = JSON.parse(response);
+                    console.log(res);
+
+                    // Access the "Table" array from the response
+                    var cityTable = res.Table;  // Access the "Table" array
+
+
+                    if (cityTable && cityTable.length > 0) {
+
+                        $('#Select_CityID').empty();
+                        $('#Select_CityID').append('<option value="">Select City</option>');
+
+                        cityTable.forEach(function (row) {
+
+                            $('#Select_CityID').append(`<option value="${row.id}">${row.city_name}</option>`);
+                        });
+                    } else {
+
+                        $('#Select_CityID').empty();
+                        $('#Select_CityID').append('<option value="">No city available</option>');
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        } else {
+            // If no country is selected, clear the city dropdown
+            $('#Select_CityID').empty();
+            $('#Select_CityID').append('<option value="">Select City</option>');
+        }
+    });
+
+    function GetTenantData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText // Replace with the actual search text or global variable
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/TenantMaster/GetTenantData", // Replace with your backend endpoint
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                const tenantData = response.TenantData;
+                const paginationInfo = response.PaginationInfo;
+
+                // Bind data to the table
+                BindTenantTableData(tenantData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching tenant data:", xhr.responseText);
+
+                $("#TenantMasterTable_Id tbody").empty();
+                $("#TenantMasterTable_Id tbody").html(`
+                        <tr>
+                            <td colspan="14" style="text-align: center;">No Data Available</td>
+                        </tr>
+                    `);
+                generatePagination(1, $('#ShowRowid').val()); // Handle pagination for empty data
+            }
+        });
+    }
+
+    function BindTenantTableData(res, paginationInfo) {
+        $("#TenantMasterTable_Id tbody").empty(); // Clear existing rows
+
+        let srNo;
+        if (paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srNo = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber); // Generate pagination dynamically
+        } else {
+            console.error("PaginationInfo is missing or incorrect.");
+        }
+
+        if (Array.isArray(res) && res.length > 0) {
+            res.forEach(item => {
+                const tenantId = item.id.toString();
+
+                const isChecked = selectedRowIds.some(id => id.toString() === tenantId);
+
+                const data = `
+                        <tr id="${item.id}">
+                            <td>${srNo}</td>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input RowCheckbox" type="checkbox" data-id="${item.id}" id="TenantRowCheckBoxId_${item.id}" ${isChecked ? 'checked' : ''}>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <span class="btn btn-sm btn-info" style="margin:1px; cursor:pointer;" onclick="EditTenantId(${item.id},'Hide')" id="Btn_ViewTenantId">
+                                            <i class="fa fa-eye"></i>
+                                        </span>
+                                    </div>
+
+                                                        </div>
+                                </div>
+                            </td>
+                            <td>${item.tenant_name || ''}</td>
+                            <td>${item.mobile_no || ''}</td>
+                            <td>${item.email_id || ''}</td>
+                            <td>${item.contact_person_name || ''}</td>
+                            <td>${item.address || ''}</td>
+                            <td>${item.country_name || ''}</td>
+                            <td>${item.state_name || ''}</td>
+                            <td>${item.city_name || ''}</td>
+                            <td>${item.gst_no || ''}</td>
+                            <td>${item.prefix || ''}</td>
+                            <td>${item.pancard_no || ''}</td>
+                            <td>${item.is_active === 1 ? "Active" : "Deactive"}</td>
+                        </tr>
+                    `;
+
+                $("#TenantMasterTable_Id tbody").append(data);
+
+                srNo++;
+            });
+        } else {
+            $("#TenantMasterTable_Id tbody").html(`
+                    <tr>
+                        <td colspan="14" style="text-align: center;">No Data Available</td>
+                    </tr>
+                `);
+        }
+
+        updateSelectAllCheckboxState(); // Update the "Select All" checkbox state
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+
+        $.ajax({
+            type: "POST",
+            url: "/TenantMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+
+                $("#TenantHistorytable-id tbody").empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.tenant_name || '') + '</td>';
+                        row += '<td>' + (item.mobile_no || '') + '</td>';
+                        row += '<td>' + (item.email_id || '') + '</td>';
+                        row += '<td>' + (item.contact_person_name || '') + '</td>';
+                        row += '<td>' + (item.address || '') + '</td>';
+                        row += '<td>' + (item.country_name || '') + '</td>';
+                        row += '<td>' + (item.state_name || '') + '</td>';
+                        row += '<td>' + (item.city_name || '') + '</td>';
+                        row += '<td>' + (item.gst_no || '') + '</td>';
+                        row += '<td>' + (item.prefix || '') + '</td>';
+                        row += '<td>' + (item.pancard_no || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        row += '<td>' + (item.created_at || '') + '</td>';
+                        row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at || '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        $("#TenantHistorytable-id tbody").append(row); // This is correct
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    $("#TenantHistorytable-id tbody").append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+</script>

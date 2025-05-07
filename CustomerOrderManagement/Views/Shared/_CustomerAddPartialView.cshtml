@@ -1,0 +1,430 @@
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addCustomerMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ClearAllValue()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddCustomerNew", "OrderMaster"))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Tenant  <span style="color:red;font-weight:800">*</span></label>
+                        <select name="TenantID" id="Select_TenantID" class="form-control" required>
+                            @foreach (var item in ViewBag.TenantID)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3">
+                        <label class="form-label">Customer Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlycharacterandspace" name="CustomerName" id="Txt_CustomerNameId" required minlength="3" maxlength="100" />
+                        <span id="WarnADDCustomerNameId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Mobileno" id="Txt_MobileNumberId" required minlength="10" maxlength="10" value="@TempData["MobileNoGet"]" />
+                        <span id="WarnMobileId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Email ID<span style="color:red;font-weight:800">*</span></label>
+                        <input type="email" class="form-control " name="EmailID" id="Txt_EmailId" required maxlength="50" />
+                        <span id="WarnEmailId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Address<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="Address" id="Txt_AddressId" required maxlength="100" />
+                        <span id="WarnAddressId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Area<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control " name="Area" id="Txt_AreaId" required maxlength="100" />
+                        <span id="WarnAreaId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">PinCode<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Pincode" id="Txt_PincodeId" required maxlength="6" />
+                        <span id="WarnPincodeId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Country<span style="color:red;font-weight:800">*</span></label>
+                        <select name="CountryID" id="Select_CountryID" class="form-control" required>
+                            <option value="">-- Please Select Country --</option>
+                            @foreach (var country in ViewBag.CountryID)
+                            {
+                                <option value="@country["id"]">@country["country_name"]</option>
+                            }
+                        </select>
+                        <span id="WarnCountryId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">State <span style="color:red;font-weight:800">*</span></label>
+                        <select name="StateID" id="Select_StateID" class="form-control" required>
+                        </select>
+                        <span id="WarnStateId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">City<span style="color:red;font-weight:800">*</span></label>
+                        <select name="CityID" id="Select_CityID" class="form-control" required>
+                        </select>
+                        <span id="WarnCityId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status<span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked required />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0" required>&nbsp;
+                                <label> DeActive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary Btn_preventMultiEnter" id="Btn_SubmitId">
+                                <i class="align-bottom me-1"></i> Add
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function sendSelectedRowIds() {
+        // Check if there are any selected row IDs
+        var searchValue = $('#Txt_SearchInputCustomerName').val();
+        var rowIdsString = selectedRowIds.join(',');
+        // Make an AJAX request to send the data to the controller action
+        $.ajax({
+            type: "POST",
+            url: "/CustomerMaster/ExportdataExcelCustomers",
+            data: {
+                selectedRowIds: rowIdsString,
+                searchValue: searchValue
+            },
+            success: function (response) {
+                // Handle the response from the controller (success)
+                console.log('y');
+                console.log(response.downloadUrl);
+                if (response.success) {
+                    // Optionally, you can display a success message or handle the response
+                    window.location.href = response.downloadUrl;  // Assuming response contains the download URL
+                } else {
+                    alert(response.message);  // Display error message
+                }
+            },
+            error: function (xhr, status, error) {
+                // Handle the error (failure)
+                console.error('Error occurred while sending data to the server:', error);
+
+                // Optionally, display an error message
+                alert('An error occurred while processing your request.');
+            }
+        });
+
+    }
+
+     $('#Txt_MobileNumberId, #UpdateTxt_MobileNumberId').on("change", function () {
+
+         const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+         const value = $(this).val();
+
+         $.ajax({
+             type: "POST",
+             url: "/CustomerMaster/CheckDuplicateRecord",
+             data: {
+                 ColName: "mobile_no",
+                 Username: value
+             },
+             success: function (data) {
+                 if (data > 0) {
+                     // Clear the field that triggered the event
+                     $('#' + inputFieldId).val("");
+                     console.log(inputFieldId);
+                     // Show warning for the respective field
+                     if (inputFieldId === "Txt_MobileNumberId") {
+                         $("#WarnMobileId").css({ "display": "block", "color": "red" }).text("Mobile Number Already Exists...");
+                     } else if (inputFieldId === "UpdateTxt_MobileNumberId") {
+                         $("#UpdateWarnMobileId").css({ "display": "block", "color": "red" }).text("Mobile Number Already Exists...");
+                     }
+                 } else {
+                     $("#WarnMobileId").css({ "display": "none" });
+                     $("#UpdateWarnMobileId").css({ "display": "none" });
+                 }
+             },
+             error: function (response) {
+                 console.error("Error during AJAX request:", response);
+             }
+         });
+     });
+     function ClearAllValue() {
+         $("#Txt_CustomerNameId").val("");
+         $("#Txt_MobileNumberId").val("");
+         $("#Txt_EmailId").val("");
+         $("#Txt_AddressId").val("");
+         $("#Txt_AreaId").val("");
+         $("#Txt_PincodeId").val("");
+         $("#Select_CountryID").val("");
+         $("#Select_StateID").val("");
+         $("#Select_CityID").val("");
+         $("#Txt_RemarkId").val("");
+         $("#UpdateWarnMobileId").css({ "display": "none" });
+         $("#WarnMobileId").css({ "display": "none" });
+     }
+     // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+     function ShowHistory(id) {
+         console.log(id);
+
+         $.ajax({
+             type: "POST",
+             url: "/CustomerMaster/GetHistoryData",
+             data: { id: id },
+             success: function (data) {
+                 var res = JSON.parse(data);
+                 var HistoryData = res["HistoryData"];
+
+                 var historyTableBody = $('#GetHistory');
+                 historyTableBody.empty();
+
+
+                 if (HistoryData.length > 0) {
+
+                     HistoryData.forEach(function (item) {
+                         var row = '<tr>';
+                         row += '<td>' + (item.tenant_name || '') + '</td>';
+                         row += '<td>' + (item.customer_name || '') + '</td>';
+                         row += '<td>' + (item.mobile_no || '') + '</td>';
+                         row += '<td>' + (item.email_id || '') + '</td>';
+                         row += '<td>' + (item.address || '') + '</td>';
+                         row += '<td>' + (item.area_description || '') + '</td>';
+                         row += '<td>' + (item.pincode || '') + '</td>';
+                         row += '<td>' + (item.country_name || '') + '</td>';
+                         row += '<td>' + (item.state_name || '') + '</td>';
+                         row += '<td>' + (item.city_name || '') + '</td>';
+                         row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                         row += '<td>' + (item.ip_address || '') + '</td>';
+                         row += '<td>' + (item.client_detail || '') + '</td>';
+                         row += '<td>' + (item.remark || '') + '</td>';
+                         row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                         row += '<td>' + (item.created_at || '') + '</td>';
+                         row += '<td>' + (item.created_by || '') + '</td>';
+                         row += '<td>' + (item.updated_at || '') + '</td>';
+                         row += '<td>' + (item.updated_by || '') + '</td>';
+                         row += '</tr>';
+
+                         historyTableBody.append(row); // Append row to table
+                     });
+                 } else {
+                     // If no data, show a message (optional)
+                     historyTableBody.append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                     $('#HistoryModal').modal('show');
+                 }
+             },
+             error: function (response) {
+                 console.error("Error during AJAX request:", response);
+             }
+         });
+     }
+
+     //this is for state dropdown
+     $('#Select_CountryID').on("change", function () {
+         const countryId = $('#Select_CountryID').val();  // Get the selected CountryId
+         console.log(countryId);
+
+         if (countryId) {
+             $.ajax({
+                 type: "POST",
+                 url: "/CustomerMaster/GetStateName",
+                 data: {
+                     CountryId: countryId
+                 },
+                 success: function (response) {
+                     // Parse the response (assuming the response is a JSON string)
+                     var res = JSON.parse(response);  // Parse the JSON string
+                     console.log(res);  // Log the parsed response
+
+                     // Access the "Table" array from the response
+                     var stateTable = res.Table;  // Access the "Table" array
+
+                     // Check if the "Table" array has any items
+                     if (stateTable && stateTable.length > 0) {
+                         // Clear the state dropdown
+                         $('#Select_StateID').empty();
+                         $('#Select_StateID').append('<option value="">Select State</option>');
+
+                         // Loop through the rows of the "Table" array and populate the dropdown
+                         stateTable.forEach(function (row) {
+                             // Append options to the dropdown with `id` as the value and `state_name` as the text
+                             $('#Select_StateID').append(`<option value="${row.id}">${row.state_name}</option>`);
+                         });
+                     } else {
+                         // If no states are available, append a "No states available" option
+                         $('#Select_StateID').empty();
+                         $('#Select_StateID').append('<option value="">No states available</option>');
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+         } else {
+             // If no country is selected, clear the state dropdown
+             $('#Select_StateID').empty();
+             $('#Select_StateID').append('<option value="">Select State</option>');
+         }
+     });
+     $('#UpdateTxt_Country').on("change", function () {
+         const countryId = $('#UpdateTxt_Country').val();  // Get the selected CountryId
+         console.log(countryId);
+
+         if (countryId) {
+             $.ajax({
+                 type: "POST",
+                 url: "/CustomerMaster/GetStateName",
+                 data: {
+                     CountryId: countryId
+                 },
+                 success: function (response) {
+                     // Parse the response (assuming the response is a JSON string)
+                     var res = JSON.parse(response);  // Parse the JSON string
+                     console.log(res);  // Log the parsed response
+
+                     // Access the "Table" array from the response
+                     var stateTable = res.Table;  // Access the "Table" array
+
+                     // Check if the "Table" array has any items
+                     if (stateTable && stateTable.length > 0) {
+                         // Clear the state dropdown
+                         $('#Update_StateID').empty();
+                         $('#Update_StateID').append('<option value="">Select State</option>');
+
+                         // Loop through the rows of the "Table" array and populate the dropdown
+                         stateTable.forEach(function (row) {
+                             // Append options to the dropdown with `id` as the value and `state_name` as the text
+                             $('#Update_StateID').append(`<option value="${row.id}">${row.state_name}</option>`);
+                         });
+                     } else {
+                         // If no states are available, append a "No states available" option
+                         $('#Update_StateID').empty();
+                         $('#Update_StateID').append('<option value="">No states available</option>');
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+         } else {
+             // If no country is selected, clear the state dropdown
+             $('#Update_StateID').empty();
+             $('#Update_StateID').append('<option value="">Select State</option>');
+         }
+     });
+     //this is for city dropdown
+     $('#Select_StateID').on("change", function () {
+         const stateId = $('#Select_StateID').val();  // Get the selected CountryId
+         console.log(stateId);
+
+         if (stateId) {
+             $.ajax({
+                 type: "POST",
+                 url: "/CustomerMaster/GetCityName",
+                 data: {
+                     StateId: stateId
+                 },
+                 success: function (response) {
+
+                     var res = JSON.parse(response);
+                     console.log(res);
+
+                     // Access the "Table" array from the response
+                     var cityTable = res.Table;  // Access the "Table" array
+
+
+                     if (cityTable && cityTable.length > 0) {
+
+                         $('#Select_CityID').empty();
+                         $('#Select_CityID').append('<option value="">Select City</option>');
+
+                         cityTable.forEach(function (row) {
+
+                             $('#Select_CityID').append(`<option value="${row.id}">${row.city_name}</option>`);
+                         });
+                     } else {
+
+                         $('#Select_CityID').empty();
+                         $('#Select_CityID').append('<option value="">No city available</option>');
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+         } else {
+             // If no country is selected, clear the city dropdown
+             $('#Select_CityID').empty();
+             $('#Select_CityID').append('<option value="">Select City</option>');
+         }
+     });
+     //this is for city dropdown
+     $('#Update_StateID').on("change", function () {
+         const stateId = $('#Update_StateID').val();  // Get the selected CountryId
+         console.log(stateId);
+
+         if (stateId) {
+             $.ajax({
+                 type: "POST",
+                 url: "/CustomerMaster/GetCityName",
+                 data: {
+                     StateId: stateId
+                 },
+                 success: function (response) {
+
+                     var res = JSON.parse(response);
+                     console.log(res);
+
+                     // Access the "Table" array from the response
+                     var cityTable = res.Table;  // Access the "Table" array
+
+
+                     if (cityTable && cityTable.length > 0) {
+
+                         $('#Update_CityID').empty();
+                         $('#Update_CityID').append('<option value="">Select City</option>');
+
+                         cityTable.forEach(function (row) {
+
+                             $('#Update_CityID').append(`<option value="${row.id}">${row.city_name}</option>`);
+                         });
+                     } else {
+
+                         $('#Update_CityID').empty();
+                         $('#Update_CityID').append('<option value="">No city available</option>');
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+         } else {
+             // If no country is selected, clear the city dropdown
+             $('#Update_CityID').empty();
+             $('#Update_CityID').append('<option value="">Select City</option>');
+         }
+     });
+</script>

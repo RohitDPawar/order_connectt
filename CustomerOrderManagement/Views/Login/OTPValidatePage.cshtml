@@ -1,0 +1,189 @@
+@{
+    Layout = "_BlankLayout";
+    ViewData["Title"] = "TwoSteps Basic - Pages";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/form-validation.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/cleavejs/cleave.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/popular.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/bootstrap5.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/auto-focus.js"></script>
+}
+
+@section PageStyles {
+    <link rel="stylesheet" href="~/vendor/css/pages/page-auth.css">
+}
+
+@section PageScripts {
+    <script src="~/js/pages-auth.js"></script>
+    <script src="~/js/pages-auth-two-steps.js"></script>
+}
+@* ************** Content ************** *@
+
+<div class="positive-relative">
+    <div class="authentication-wrapper authentication-basic">
+        <div class="authentication-inner py-6 mx-4">
+            @using (Html.BeginForm("CheckingUserExistOrNot", "Login"))
+            {
+                <!--  Two Steps Verification -->
+                <div class="card p-7">
+                    <!-- Logo -->
+                    <div class="app-brand justify-content-center mt-5">
+                        <a href="/" class="app-brand-link gap-3">
+                            <span class="app-brand-logo demo"><img src="~/img/icons/brands/brand_logo_com3.png" class="img-fluid" style="max-width:190px !important" /></span>
+                           @*  <span class="app-brand-text demo text-heading fw-semibold">@TempData.Peek("appName")</span> *@
+                        </a>
+                    </div>
+
+                    <!-- /Logo -->
+                    <div class="card-body mt-1">
+                        <h4 class="mb-1">Two Step Verification 💬</h4>
+                        <p class="text-start mb-5">
+                            We sent a verification code to your mobile. Enter the code from the mobile in the field below.
+                            <span class="d-block mt-1 h6">******@ViewBag.Last4Digit</span>
+                            <input type="hidden" name="MobileNumber" value="@ViewBag.MobileNumber" />
+                        </p>
+                        <p class="mb-0">Type your 6 digit security code</p>
+                        <form id="twoStepsForm" action="~/" method="POST">
+                            <div class="mb-5">
+                                <div class="auth-input-wrapper d-flex align-items-center justify-content-between numeral-mask-wrapper">
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1" autofocus>
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1">
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1">
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1">
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1">
+                                    <input type="tel" class="form-control auth-input text-center numeral-mask h-px-50 mx-sm-1 my-2" maxlength="1">
+                                </div>
+                                <label id="OTPWarn" style="display:none"></label>
+                                <!-- Create a hidden field which is combined by 3 fields above -->
+                                <input type="hidden" name="otp" />
+                            </div>
+                            <div class="text-center">
+                                <span id="time" class="">00:00</span>
+                            </div>
+                            <button class="btn btn-primary d-grid w-100 mb-5" onclick="return CheckValidation()" id="ValidateBtnId">
+                                Verify my account
+                            </button>
+                            <div class="text-center">
+                                Didn't get the code?
+                                <a href="javascript:void(0);" onclick="location.reload();">
+                                    Resend
+                                </a>
+                            </div>
+                            <br />
+                            @* @Html.ActionLink("Sign in with your password", "Login", "Login", null, new { @class = "btn border border-dark d-grid w-100 mb-5" }) *@
+                        </form>
+                    </div>
+                </div>
+                <!-- / Two Steps Verification -->
+                <img src="~/img/illustrations/tree-3.png" alt="auth-tree" class="authentication-image-object-left d-none d-lg-block">
+                <img src="~/img/illustrations/auth-basic-mask-light.png" class="authentication-image d-none d-lg-block scaleX-n1-rtl" height="172" alt="triangle-bg" data-app-light-img="illustrations/auth-basic-mask-light.png" data-app-dark-img="illustrations/auth-basic-mask-dark.png">
+                <img src="~/img/illustrations/tree.png" alt="auth-tree" class="authentication-image-object-right d-none d-lg-block">
+            }
+
+            @if (TempData["OTPHIDE"] != null)
+            {
+                <h4>@TempData["OTP"]</h4>
+            }
+            else
+            {
+                <h4></h4>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    var EnterOTP = "";
+    function CheckValidation()
+    {
+      var Gene = @TempData["OTP"];
+        // Retrieve the OTP value from the hidden input
+        EnterOTP = document.querySelector('input[name="otp"]').value;
+
+        if(EnterOTP == Gene)
+        {
+          console.log("Ok")
+          return true;
+        }
+        else
+        {
+          $("#OTPWarn").css({ "display": "block", "color": "red" }).text("Enter Valid OTP...!!");
+          return false;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const otpInputs = document.querySelectorAll('.auth-input'); // Get all OTP input fields
+        const otpField = document.querySelector('input[name="otp"]'); // Hidden field to store combined OTP
+
+        // Add event listener for each input field to auto-focus the next input after entering a digit
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function () {
+                // Ensure that the value entered is a digit
+                if (this.value.match(/\D/)) {
+                    this.value = ''; // Clear if it's not a digit
+                    return;
+                }
+
+                // Combine all the input values to form the OTP
+                let otpValue = '';
+                otpInputs.forEach(input => otpValue += input.value);
+                otpField.value = otpValue; // Store the OTP in the hidden input
+
+                // Focus next input if the current one is filled
+                if (this.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+        });
+
+        // Optional function to programmatically fill the OTP (e.g., for testing)
+        function fillOTP(otp) {
+            if (otp.length === 6) {
+                otpInputs.forEach((input, index) => {
+                    input.value = otp.charAt(index);
+                });
+                otpField.value = otp; // Update the hidden OTP field
+            }
+        }
+
+    });
+
+    function startTimer(duration, display) {
+        var timer = duration, minutes, seconds;
+        var interval = setInterval(function () {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(interval); // Stop the timer
+                $("#ValidateBtnId").prop("disabled", true);
+            }
+            else{
+              $("#ValidateBtnId").prop("disabled", false);
+            }
+        }, 1000);
+    }
+
+    $(document).ready(function()
+    {
+        var twoMinutes = 20, // 2 minutes in seconds
+        display = document.querySelector('#time'); // Target the element with id="time"
+        startTimer(twoMinutes, display); // Call the startTimer function
+    });
+
+</script>
+

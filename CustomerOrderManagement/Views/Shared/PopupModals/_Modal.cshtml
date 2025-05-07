@@ -1,0 +1,488 @@
+<style>
+    .img-equal-size {
+        width: 100%; /* Full width of the parent column */
+        height: 200px; /* Set a fixed height */
+        object-fit: cover; /* Ensures the image covers the area without distortion */
+        border: 1px solid #ddd; /* Optional: Add a border for aesthetics */
+        border-radius: 4px; /* Optional: Add rounded corners */
+    }
+</style>
+<!-- Filter Modal -->
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filterModalLabel">Filter Orders</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filter Form -->
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="filterItemName" class="form-label">Item Name</label>
+                        <input type="text" id="filterItemName" class="form-control onlycharacterandspace" placeholder="Enter Item Name" maxlength="50"/>
+                    </div>
+
+                   @*  <div class="col-6">
+                        <label for="filterNetWeight" class="form-label">Net Weight</label>
+                        <input type="text" class="form-control onlyNumberAndDot" id="filterNetWeight" placeholder="Enter Net Weight" step="0.001" />
+                    </div> *@
+
+                    <div class="col-6">
+                        <label for="filterItemName" class="form-label">Order No</label>
+                        <input type="text" id="filterOrderNo" class="form-control" placeholder="Enter Order No" maxlength="50" />
+                    </div>
+
+                </div>
+
+                <!-- Filter by Category (Dropdown) -->
+                <div class="row mb-3">
+
+                    <div class="col-6">
+                        <label for="filterCategory" class="form-label">Category</label>
+                        <input type="text" id="filterCategory" class="form-control onlycharacterandspace" placeholder="Enter Category Name" maxlength="50" />
+                    </div>
+
+                    @*  <div class="col-6">
+                        <label for="filterItemSize" class="form-label">Item Size </label>
+                        <input type="text" class="form-control numbers" id="filterItemSize">
+                    </div> *@
+
+                    <div class="col-6">
+                        <label for="filterVendorName" class="form-label">Vendor Name </label>
+                        <input type="text" class="form-control onlycharacterandspace" id="filterVendorName" placeholder="Enter Vendor Name" maxlength="50" />
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="filterCustomerName" class="form-label">Customer Name</label>
+                        <input type="text" id="filterCustomerName" class="form-control onlycharacterandspace" placeholder="Enter Customer Name" maxlength="100" />
+                    </div>
+                    <div class="col-6">
+                        <label for="filterBranchName" class="form-label">Branch Name</label>
+                        <input type="text" id="filterBranchName" class="form-control onlycharacterandspace" placeholder="Enter Branch Name" maxlength="50" />
+                    </div>
+                </div>
+
+                <!-- Filter by Order Date Range (Two Fields in One Row) -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="filterOrderDateFrom" class="form-label">From Order Date Range</label>
+                        <input type="date" class="form-control" id="filterOrderDateFrom" >
+                        <span id="WarnfilterOrderDateFrom" style="display:none;color:red">This field is required.</span>
+                    </div>
+
+                    <div class="col-6">
+                        <label for="filterOrderDateTo" class="form-label">To Order Date Range</label>
+                        <input type="date" class="form-control" id="filterOrderDateTo">
+                        <span id="WarnfilterOrderDateTo" style="display:none;color:red">This field is required.</span>
+                    </div>
+                </div>
+
+                <!-- Filter by Delivery Date Range (Two Fields in One Row) -->
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label for="filterDeliveryDateFromandto" class="form-label">From Order Delivery Date </label>
+                        <input type="date" class="form-control" id="filterDeliveryDateFrom">
+                        <span id="WarnfilterDeliveryDateFrom" style="display:none;color:red">This field is required.</span>
+                    </div>
+                    <div class="col-6">
+                        <label for="filterDeliveryDateTo" class="form-label">To Order Delivery Date</label>
+                        <input type="date" class="form-control" id="filterDeliveryDateTo">
+                        <span id="WarnfilterDeliveryDateTo" style="display:none;color:red">This field is required.</span>
+                    </div>
+                </div>
+
+                <!-- Submit Filter Form -->
+                <div class="d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary me-2" id="applyFiltersButton" aria-label="Close">Apply Filter</button>
+                    <button type="button" class="btn btn-secondary" id="ClearFiltersButton" aria-label="Close" data-bs-dismiss="modal">Clear Filter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*###################################################################  JOB CARD MODAL  ######################################################################*@
+
+<!-- Modal for Job Card Details -->
+<div class="modal fade" id="JobCardModalId" tabindex="-1" aria-labelledby="JobCardModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    @using (Html.BeginForm("ShareJobCardDetailsTocustomer", "OrderMaster"))
+    {
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header d-flex w-100">
+                    <h5 class="modal-title flex-grow-1 text-center" id="JobCardModalLabel">-Job Card-</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table table-bordered table-sm">
+                                <tbody>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Order No.</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_OrderNo" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Item Name</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_ItemName" class="form-label small"></label></td>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Order Date</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_Date" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Item Size</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_Size" class="form-label small"></label></td>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Order Delivery Date</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_DeliveryDate" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Item Pieces</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_Pieces" class="form-label small"></label></td>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Category</strong></td>
+                                        <td class="p-0 text-left"><label id="Lbl_Category" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Gross Weight</strong></td>
+                                        <td class="p-0 text-left"><label id="grossWt" class="form-label small"></label></td>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Product Group</strong></td>
+                                        <td class="p-0 text-left"><label id="productGroup" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Net Weight</strong></td>
+                                        <td class="p-0 text-left"><label id="netWt" class="form-label small"></label></td>
+                                    </tr>
+                                    <tr style="border:1px solid black">
+                                        <td class="p-0 text-left"><strong class="small">Purity</strong></td>
+                                        <td class="p-0 text-left"><label id="PurityId" class="form-label small"></label></td>
+                                        <td class="p-0 text-left"><strong class="small">Remark</strong></td>
+                                        <td class="p-0 text-left"><label id="remarkid" class="form-label small"></label></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="hidden" name="OrderDetailsId" id="OrderDetailsId" />
+                    </div>
+                    <div class="row" id="StoneDetailsTableId">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" id="ImageAppendDivId">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="DownloadJobCardId" class="btn btn-primary" onclick="DownloadJobCardFile()">Download</button>
+                    <button type="submit" id="sharejobCardbtn" class="btn btn-primary">Share</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+
+    }
+</div>
+
+<!-- Modal for Job Card Details -->
+<div class="modal fade" id="JobCardModalVendorId" tabindex="-1" aria-labelledby="JobCardModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header d-flex w-100">
+                <h5 class="modal-title flex-grow-1 text-center" id="JobCardModalLabel">-Job Card-</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered table-sm">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Order No.</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_OrderNoId" class="form-label small"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Order Date</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_DateId" class="form-label small"></label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Reference Barcode</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_BarcodeNoId" class="form-label small">BC12345678</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">New Barcode</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_NewBarcodeNoId" class="form-label small">BC12345678</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Item Name</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_ItemNameId" class="form-label small">Ring</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Item Size</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_SizeId" class="form-label small">5</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Item Pieces</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_PiecesId" class="form-label small">1</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Category</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_CategoryId" class="form-label small">Gold</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Stone Weight</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_WeightId" class="form-label small">10g</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Stone Name</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_StoneNameId" class="form-label small">Diamond</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Stone Size</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_StoneSizeId" class="form-label small">1.5</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Stone Pieces</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_StonePiecesId" class="form-label small">1.5</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Design Code</strong></td>
+                                    <td class="p-0 text-left"><label id="Lbl_DesignCodeId" class="form-label small">RNG123</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-0 text-left"><strong class="small">Narration</strong></td>
+                                    <td class="max-height-150 overflow-auto p-0 text-left">
+                                        <label id="Lbl_Remark" class="form-label small">Remark.</label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <input type="hidden" name="OrderDetailsId" id="OrderDetailsId" />
+                    <div class="col-md-6 d-flex align-items-center justify-content-center h-100">
+                        <div id="VendorImageDivId" class="row">
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@* ############################################################# ORDER HISTORY DATA ################################################################### *@
+<!-- Modal for History Details -->
+<div class="modal fade" id="OrderHistoryData" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="table-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Ip Address</th>
+                                <th>Tenant Name</th>
+                                <th>Item Name</th>
+                                <th>Category Name</th>
+                                <th>Purity</th>
+                                <th>Gross Weight</th>
+                                <th>Net Weight</th>
+                                <th>Actual Item Gross Weight</th>
+                                <th>Actual Item Net Weight</th>
+                                <th>Vendor Name</th>
+                                <th>Order Status</th>
+                                <th>Remark</th>
+                                <th>Rejected Remark</th>
+                                <th>Updated By</th>
+                                <th>Updated At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="GetHistory">
+                            <tr>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ############################################################################ REJECTED RESOAN MODAL ############################################################### *@
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="RejectedModalId" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    @using (Html.BeginForm("HO_OrderRejected", "OrderMaster"))
+    {
+        <div class="modal-dialog" style="margin-top:15%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejected Remark</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="SelectedOrderItemId" id="Txt_RejectedBindAllItemsId" />
+                        <div class="col">
+                            <label>Rejected Remark</label>
+                            <input type="text" class="form-control" name="RejectedRemark" id="RejectedRemarkId" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+@* ######################################################################################################################################################## *@
+            <div class="modal fade" id="attachmentView" tabindex="-1" aria-labelledby="" aria-hidden="true" name="AttachmentViewNm_fsbi">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="padding:10px !important;color:white">
+                <h5 class="modal-title" id=""><b>Attachment</b></h5>
+                <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close" id="file_attachView_id_fsbi" name="file_attachView_nm_fsbi"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="AttachId" name="AttachIdNm">
+                </div>
+            </div>
+            <div style="display:none" id="ImageUrlStoreId" name="ImageUrlStoreIdNm">
+            </div>
+            <div style="display:none" id="DocTypeArray" name="docDivName">
+                <input type="hidden" name="DocTypeArrayNm" id="DocTypeArray">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="imageViewModal" tabindex="-1" aria-labelledby="imageViewModalLabel" aria-hidden="true" name="ImageViewModalNm_fsbi">
+    <div class="modal-dialog modal-m">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageViewModalLabel" name="imageViewModalLabelname">Full-Size Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="file_ImageView_id_fsbi" name="file_ImageView_nm_fsbi"></button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" name="modalImageName" src="" class="img-fluid" alt="Full Size">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="VendorRejectedModalId" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    @using (Html.BeginForm("VendorRejected", "OrderMaster"))
+    {
+        <div class="modal-dialog" style="margin-top:15%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejected Remark</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="SelectedOrderItemId" id="Txt_RejectedVendorItemsId" />
+                        <div class="col">
+                            <label>Rejected Remark</label>
+                            <input type="text" class="form-control" name="RejectedRemark" id="RejectedRemarkId" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="VendorRejectedModalId1" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    @using (Html.BeginForm("VendorFromNewOrdersRejected", "OrderMaster"))
+    {
+        <div class="modal-dialog" style="margin-top:15%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejected Remark</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="SelectedOrderItemId" id="Txt_RejectedVendorItemsId1" />
+                        <div class="col">
+                            <label>Rejected Remark</label>
+                            <input type="text" class="form-control" name="RejectedRemark" id="RejectedRemarkId1" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+
+@* this is stone details modal *@
+<!-- Modal -->
+<!-- Stone Details Modal -->
+<div class="modal fade" id="stoneDetailsModalShow" tabindex="-1" aria-labelledby="stoneDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stoneDetailsModalLabel">Stone Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12 mb-3 form-modal-section clearfix">
+                    <!-- Add a wrapper div for horizontal scrolling -->
+                    <div class="table-responsive" style="max-height: 400px; overflow-x: auto;">
+                        <table class="table table-bordered" id="stoneDetailsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Stone Name</th>
+                                    <th>Stone Category</th>
+                                    <th>Stone Color</th>
+                                    <th>Stone Weight</th>
+                                    <th>Pcs</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stoneDetailsBody">
+                                <!-- Data will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

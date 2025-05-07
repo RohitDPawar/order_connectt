@@ -1,0 +1,616 @@
+@{
+    int srno = 1;
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                          <div class="d-flex justify-content-between align-items-center flex-wrap">
+                          <!-- Title -->
+                          <h3 class="mb-0">Country Master</h3>
+                           
+                              <!-- Buttons -->
+                          <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-danger" id="Btn_ExportToExcelCountryId">Export File</button>
+                           
+                          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCountryMasterModal" id="Btn_AddCountryId" onclick="ClearAllValue()">
+                          <i class="align-bottom me-1"></i> Add Country
+                          </button>
+                          </div>
+                          </div>
+                        </div>
+
+                        <!-- Second Row: Search Textbox and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputCountryName" maxlength="50" />
+                                <button type="button" class="btn btn-primary" id="Btn_SearchCountryId">Search</button>
+                                <button type="button" class="btn btn-secondary" id="Btn_ResetSearchCountryId">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditCountryMasterModal" id="Btn_EditCountryId" style="display:none"></button>
+                    </div>
+
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="CountryMasterTable_Id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllCountryHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Country Name</th>
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                               
+                            </tbody>
+                        </table>
+                    </div>
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addCountryMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Country</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddCountry", "CountryMaster"))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Country Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="Name" id="Txt_CountryNameId" required autocomplete="off" maxlength="50" minlength="1" />
+                        <span id="WarnAddDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_IsActiveId" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_DeactiveId" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="Btn_SubmitId">
+                                <i class="align-bottom me-1"></i> Add
+                            </button>
+
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="EditCountryMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Country Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveEditCountry", "CountryMaster"))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Country Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="Name" id="Txt_UpdateCountryNameId" minlength="1" maxlength="50" required autocomplete="off" />
+                        <span id="WarnUpdateDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_UpdateRemarkId" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status<span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateActiveId" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateDeactiveId" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3" id="ButtonDiv">
+                        <div>
+                            <button type="submit" class="btn btn-primary d-grid" id="Btn_UpdateId">
+                                <i class="align-bottom me-1"></i> Update
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModalCountry" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="Historytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Country Name</th>
+                                <th>Remark</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                                <th>Ip Address</th>
+                                <th>Created At</th>
+                                <th>Created By</th>
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include SheetJS (XLSX) library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+<script>
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'success',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+    function loadPageData(page, rowsToShow) {
+        GetCountryMasterData(page, $('#ShowRowid').val());
+
+
+    }
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#CountryMasterTable_Id");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+    var selectedRowIds = [];
+    var SearchText;
+
+
+    $(document).ready(function () {
+
+        GetCountryMasterData(1, $('#ShowRowid').val());
+
+        $(".Checkbox_SelectAllHeader").on("change", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Select or deselect all row checkboxes based on the header checkbox state
+            table.find(".RowCheckbox").prop('checked', isChecked);
+
+            // Update the selectedRowIds array based on the "Select All" checkbox
+            if (isChecked) {
+                // Add all row IDs to the selectedRowIds array for the specific table
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId && !selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                });
+            } else {
+
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId) {
+                        // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                        selectedRowIds = selectedRowIds.filter(function (id) {
+                            return id !== rowId;
+                        });
+                    }
+                });
+            }
+        });
+
+        $(document).on("change", ".RowCheckbox", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+            var rowId = $(this).data('id');  // Get the row ID from data attribute
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Add or remove the row ID from the selectedRowIds array based on checkbox state
+            if (isChecked) {
+                if (!selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                }
+            } else {
+                var index = selectedRowIds.indexOf(rowId);
+                if (index !== -1) {
+                    selectedRowIds.splice(index, 1);
+                }
+            }
+
+            // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+            updateSelectAllCheckboxState()
+
+
+        });
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]');
+
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+    }
+
+
+            function sendSelectedRowIds() {
+                // Check if there are any selected row IDs
+                var searchValue = $('#Txt_SearchInputCountryName').val();
+                var rowIdsString = selectedRowIds.join(',');
+                // Make an AJAX request to send the data to the controller action
+                $.ajax({
+                    type: "POST",
+                    url: "/CountryMaster/ExportdataExcelCountry",
+                    data: {
+                        selectedRowIds: rowIdsString,
+                        searchValue: searchValue
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click();
+                        } else {
+                            ShowErrorMsg(response.message)
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error (failure)
+                        console.error('Error occurred while sending data to the server:', error);
+
+                        // Optionally, display an error message
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+
+            }
+
+
+        $('#Btn_SearchCountryId').on('click', function () {
+            SearchText = $('#Txt_SearchInputCountryName').val();
+            GetCountryMasterData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchCountryId").on("click", function () {
+            location.reload();
+        });
+
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelCountryId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+
+    });
+
+    // RHIS FUNCTION IS USED TO BIND EDIT DATA TO POPUP
+    function EditCountryId(id, Flag) {
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+
+        $.ajax({
+            type: "POST",
+            url: "/CountryMaster/EditCountry",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var CountryData = res["CountryData"]
+                //console.log(CountryData)
+                var Flag = res["Flag"]
+                //console.log(Flag)
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+                document.getElementById('RecordId').value = CountryData[0]["id"];
+                document.getElementById('Txt_UpdateCountryNameId').value = CountryData[0]["country_name"];
+                document.getElementById('Txt_UpdateRemarkId').value = CountryData[0]["remark"];
+
+                //THIS IS USED FOR CHECKED ACTIVE INACTIVE
+                if (CountryData[0]["is_active"] == "1") {
+                    $("#Radio_UpdateActiveId").prop("checked", true);
+                } else {
+                    $("#Radio_UpdateDeactiveId").prop("checked", true);
+                }
+
+                $("#Btn_EditCountryId").click();
+
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    // CHECK DUPLICATE COUNTRY NAME
+    $('#Txt_CountryNameId, #Txt_UpdateCountryNameId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+        const value = $(this).val();
+
+        $.ajax({
+            type: "POST",
+            url: "/CountryMaster/CheckDuplicateRecord",
+            data: {
+                ColName: "country_name",
+                value: value
+            },
+            success: function (data) {
+
+                if (data !== "") {
+                    console.log("in");
+
+                    // Clear the field that triggered the event
+                    $('#' + inputFieldId).val("");
+                    console.log("in1 " + inputFieldId);
+
+                    // Show warning for the respective field
+                    if (inputFieldId === "Txt_CountryNameId") {
+                        console.log("in2 " + inputFieldId);
+                        $("#WarnAddDataId").css({ "display": "block", "color": "red" }).text("Country Name Already Exists...");
+                    } else if (inputFieldId === "Txt_UpdateCountryNameId") {
+                        $("#WarnUpdateDataId").css({ "display": "block", "color": "red" }).text("Country Name Already Exists...");
+                    }
+                } else {
+                    $("#WarnAddDataId").css({ "display": "none" });
+                    $("#WarnUpdateDataId").css({ "display": "none" });
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    });
+
+    function ClearAllValue() {
+        $("#Txt_CountryNameId").val("");
+        $("#Txt_RemarkId").val("");
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+        console.log(id);
+
+        $.ajax({
+            type: "POST",
+            url: "/CountryMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+                $("#Historytable-id tbody").empty();
+                //var historyTableBody = $('#GetHistory');
+                //historyTableBody.empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        // row += '<td>' + (item.id || '') + '</td>';
+                        row += '<td>' + (item.country_name || '') + '</td>';
+                        // row += '<td>' + (item.client_detail || '') + '</td>';
+                        row += '<td>' + (item.remark || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        row += '<td>' + (item.created_at || '') + '</td>';
+                        row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at || '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        //historyTableBody.append(row); // Append row to table
+                        $("#Historytable-id tbody").append(row); // This is correct
+
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    historyTableBody.append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                    
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+    function GetCountryMasterData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText // Global or passed input
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/CountryMaster/GetCountryData", // Adjust the URL as per your backend route
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                const countryData = response.CountryData;
+                const paginationInfo = response.PaginationInfo;
+
+                // Bind data to table
+                TableBindCountryMasterData(countryData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching country data", xhr.responseText);
+
+                $("#CountryMasterTable_Id tbody").empty();
+                $("#CountryMasterTable_Id tbody").html(`
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No Data Available</td>
+                    </tr>
+                `);
+                generatePagination(1, $('#ShowRowid').val()); // Handle pagination for empty data
+            }
+        });
+    }
+
+    function TableBindCountryMasterData(res, paginationInfo) {
+        $("#CountryMasterTable_Id tbody").empty(); // Clear table body
+
+        let srno;
+        if (paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber); // Generate pagination dynamically
+        } else {
+            console.error('PaginationInfo is not available or is in an incorrect format.');
+        }
+
+        if (Array.isArray(res) && res.length > 0) {
+            res.forEach(item => {
+                const countryId = item.id.toString();
+
+                const isChecked = selectedRowIds.some(id => {
+                    return id.toString() === countryId;
+                });
+
+                const data = `
+                    <tr id="${item.id}">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input RowCheckbox" type="checkbox" data-id="${item.id}" id="CountryRowCheckBoxId_${item.id}" ${isChecked ? 'checked' : ''}>
+                            </div>
+                        </td>
+                        <td>${srno}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <div class="edit">
+                                    <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditCountryId(${item.id}, 'Show')" id="Btn_EditCountryId">
+                                        <i class="fa fa-edit"></i>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </td>
+                        <td>${item.country_name || ''}</td>
+                        <td>${item.is_active === 1 ? "Active" : "Deactive"}</td>
+                    </tr>
+                `;
+
+                $("#CountryMasterTable_Id tbody").append(data);
+
+                srno++;
+            });
+        } else {
+            $("#CountryMasterTable_Id tbody").html(`
+                <tr>
+                    <td colspan="5" style="text-align: center;">No Data Available</td>
+                </tr>
+            `);
+        }
+
+        updateSelectAllCheckboxState(); // Update "Select All" checkbox state
+    }
+
+</script>

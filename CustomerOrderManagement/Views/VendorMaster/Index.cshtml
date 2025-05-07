@@ -1,0 +1,1025 @@
+@{
+    int srno = 1;
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <!-- Title -->
+                                <h3 class="mb-0">Vendor Master</h3>
+
+                                <!-- Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#ImportVendorModalId" id="Btn_ImportVendorData">
+                                        <i class="ri-upload-cloud-line ri-18px me-2"></i> Import
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="Btn_ExportToExcelVendorId">Export File</button>
+
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVendorMasterModal" id="Btn_AddVendor" onclick="ClearAllValue()">
+                                        <i class="align-bottom me-1"></i> Add Vendor
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Second Row: Search Textbox and Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputVendorName" maxlength="50" />
+                            <button type="button" class="btn btn-primary" id="Btn_SearchVendorNameId">Search</button>
+                            <button type="button" class="btn btn-secondary" id="Btn_ResetSearchVendorId">Reset</button>
+                        </div>
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditVendorMasterModal" id="Btn_EditVendor" style="display:none"></button>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="VendorMasterTable_Id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllVendorHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Tenant Id</th>
+                                    <th class="sort fw-bold" data-sort="state_id">Vendor Name</th>
+                                    <th class="sort fw-bold" data-sort="name">Mobile No</th>
+                                    <th class="sort fw-bold" data-sort="name">Email ID</th>
+                                    <th class="sort fw-bold" data-sort="name">Gst No</th>
+                                    <th class="sort fw-bold" data-sort="name">PanCard No</th>
+                                    <th class="sort fw-bold" data-sort="name">Residential Address</th>
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addVendorMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add Vendor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="ClearAllValue()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddVendor", "VendorMaster"))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name <span style="color:red;font-weight:800">*</span></label>
+                        <select name="TenantID" id="Select_TenantID" class="form-control" required>
+                            @foreach (var item in ViewBag.TenantID)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3">
+                        <label class="form-label">Vendor Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="VendorName" id="Txt_VendorNameId" maxlength="50" required />
+                        <span id="WarnADDVendorNameId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Mobileno" id="Txt_MobileNumberId" required minlength="10" maxlength="10" inputmode="numeric" pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/\D/g, '')" />
+                        <span id="WarnMobileId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Email ID</label>
+                        <input type="email" class="form-control " name="EmailID" id="Txt_EmailId"  maxlength="50" />
+                        <span id="WarnEmailId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pan Card No</label>
+                        <input type="text" class="form-control numbercharacter" name="PanCard" id="Txt_PanCardNoId" onchange="validatePAN(this.value, this.id)"  maxlength="10" />
+                        <span id="WarnPanCardNoId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Gst Number</label>
+                        <input type="text" class="form-control numbercharacter" name="GstNo" id="Txt_GstNoId"  maxlength="15" />
+                        <span id="WarnGSTnoId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Residential Address</label>
+                        <input type="text" class="form-control " name="RessidentialAddress" id="Txt_RessidentialAddressId" maxlength="100"  />
+                        <span id="WarnRessidentialAddressId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary" id="Btn_SubmitId">
+                                <i class="align-bottom me-1"></i> Add
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Product -->
+<div class="modal fade" id="EditVendorMasterModal" tabindex="-1" aria-labelledby="editVendorModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editVendorModalLabel">Edit Vendor Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick=ClearAllValue()></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for editing -->
+                @using (Html.BeginForm("SaveEditVendor", "VendorMaster"))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name <span style="color:red;font-weight:800">*</span></label>
+                        <select name="TenantID" id="Update_TenantID" class="form-control" required>
+                            @foreach (var item in ViewBag.TenantID)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3">
+                        <label class="form-label">Vendor Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="VendorName" id="UpdateTxt_VendorNameId" required />
+                        <span id="WarnUpdateVendorNameId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Mobile Number<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control numberOnly" name="Mobileno" id="UpdateTxt_MobileNumberId" required maxlength="10" minlength="10" inputmode="numeric" pattern="[0-9]{10}"
+                               oninput="this.value = this.value.replace(/\D/g, '')" />
+                        <span id="WarnUpdateMobileId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Email ID</label>
+                        <input type="email" class="form-control " name="EmailID" id="UpdateTxt_EmailId"  maxlength="50" />
+                        <span id="WarnEmailId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Pan Card No</label>
+                        <input type="text" class="form-control numbercharacter" name="PanCard" id="UpdateTxt_PanCardNoId" onchange="validatePAN(this.value, this.id)"  maxlength="10" />
+                        <span id="WarnUpdatePanCardNoId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Gst Number</label>
+                        <input type="text" class="form-control numbercharacter" name="GstNo" id="UpdateTxt_GstNoId"  maxlength="15" />
+                        <span id="WarnUpdateGSTnoId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Residential Address</label>
+                        <input type="text" class="form-control" name="RessidentialAddress" id="UpdateTxt_RessidentialAddressId" maxlength="100"  />
+                        <span id="WarnRessidentialAddressId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="UpdateTxt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="UpdateRadioIsActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="UpdateRadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-center align-items-center px-3">
+
+                        <div class="d-flex justify-content-end gap-2 px-3">
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="Btn_UpdateId">
+                                    <i class="align-bottom me-1"></i> Update
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for import file -->
+<div class="modal fade" id="ImportVendorModalId" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUploadfileLabel">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row px-3 mt-3 gap-2">
+                    <!-- Wrap this section with a form to send data -->
+                    @using (Html.BeginForm("UploadVendorMaster", "CustomerMaster", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm" }))
+                    {
+                        <label class="form-label">Select File<span style="color:red;font-weight:500">*</span></label>
+                        <div class="d-flex">
+                            <input type="file" class="form-control" name="file" id="file_Id" required accept=".xlsx" />
+                        </div>
+                        <span id="WarnbrowseId" style="color:red; display:none;">Please upload only .xlsx file extension</span>
+
+                        <div id="loadingSpinner" style="display: none; text-align: center;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>Uploading file...</div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-end px-3 m-3 gap-2">
+                            <button type="button" class="btn btn-outline-primary d-flex align-items-center" id="samplesheetbtn">
+                                <i class="align-bottom me-1"></i> Download Format
+                            </button>
+                            <button type="submit" class="btn btn-primary d-grid" id="uploadBtn">
+                                <i class="align-bottom me-1"></i> Upload
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModalvendor" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="vendorHistorytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Tenant Name</th>
+                                <th>Vendor Name</th>
+                                <th>Mobile No</th>
+                                <th>Email ID</th>
+                                <th>Gst No</th>
+                                <th>PanCard No</th>
+                                @* <th>Residential Address</th> *@
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                               @*  <th>Created At</th>
+                                <th>Created By</th> *@
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+   // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowWarning(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+    $(document).ready(function () {
+
+        // Handle the form submission using AJAX
+        $("#uploadForm").submit(function (e) {
+            e.preventDefault(); // Prevent default form submission
+            var fileInput = $('#file_Id')[0];
+            var file = fileInput.files[0]; // Get the first file from the input
+
+            // Check if a file was selected
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            // Validate the file type (allow only .csv, .xls, .xlsx)
+            var allowedExtensions = /(\.csv|\.xls|\.xlsx)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                $('#WarnbrowseId').show(); // Show warning message
+                return; // Stop form submission if the file type is not valid
+            } else {
+                $('#WarnbrowseId').hide();
+            }
+            var formData = new FormData(this); // Create FormData object from the form
+            showSpinner();
+            $.ajax({
+                url: '@Url.Action("UploadVendorMaster", "VendorMaster")', // Your controller action URL
+                type: 'POST',
+                data: formData,
+                processData: false, // Don't process the data
+                contentType: false, // Don't set content type header
+                success: function (response) {
+                    if (response.success) {
+                        // Decode Base64 to binary string
+                        var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                        var byteArray = new Uint8Array(byteCharacters.length);
+
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                        }
+
+                        // Create a blob from the byte array
+                        var blob = new Blob([byteArray], { type: response.fileType });
+
+                        // Create a link element for downloading
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.fileName; // Set the download file name
+                        link.click(); // Trigger the download
+
+                        $('#file_Id').val(''); // Clear the file input (if it exists)
+                        hideSpinner(); // Hide the spinner when there's an error
+                        // Close the modal (if present)
+                        $('#importFileModal2').modal('hide');
+                        ShowErrorMsg("File Imported Succesfully....", "1")
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000); // 3000 milliseconds = 3 seconds
+                    } else {
+                        $('#file_Id').val('');
+                        if (response.flag === '1') {
+                            $('#file_Id').val(''); // Clear the file input (if it exists)
+                            hideSpinner(); // Hide the spinner when there's an error
+                            // Close the modal (if present)
+                            $('#importFileModal2').modal('hide');
+                            ShowErrorMsg("File Imported Succesfully....", "1")
+                            setTimeout(function () {
+                                location.reload();
+                            }, 500); // 3000 milliseconds = 3 seconds
+
+                        } else {
+                            ShowWarning(response.message)
+                        }
+                        hideSpinner();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    //alert("Error uploading file. Please try again.");
+                    ShowWarning("Error uploading file. Please try again.....")
+                    hideSpinner(); // Hide the spinner when there's an error
+                }
+            });
+
+        });
+
+        // Show spinner and disable the upload button when upload starts
+        function showSpinner() {
+            $('#loadingSpinner').show(); // Display the spinner
+            $('#uploadBtn').prop('disabled', true); // Disable the upload button
+        };
+
+        // Hide spinner and enable the upload button after the upload is complete
+        function hideSpinner() {
+            $('#loadingSpinner').hide(); // Hide the spinner
+            $('#uploadBtn').prop('disabled', false); // Enable the upload button
+        };
+
+        $('#samplesheetbtn').on('click', function () {
+            // Make AJAX call to download the sample sheet
+            $.ajax({
+                url: '/VendorMaster/DownloadSampleSheet',  // The URL to your controller action
+                type: 'GET',
+                success: function (response) {
+                    // Construct the full URL using the current site's base URL and the relative path
+                    var fileUrl = window.location.origin + response.fileUrl;
+
+                    // Create a link to trigger the download
+                    var link = document.createElement('a');
+                    link.href = fileUrl;  // Use the full URL of the file
+                    link.download = 'Vendor_Import_Format.xlsx';  // Specify the filename for the download
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error downloading the sample sheet:', error);
+                    alert('There was an error downloading the file. Please try again later.');
+                }
+            });
+        });
+
+    });
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'success',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+     function loadPageData(page, rowsToShow) {
+        GetVendorData(page, $('#ShowRowid').val());
+
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#VendorMasterTable_Id");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+
+    var selectedRowIds = [];
+    var SearchText;
+
+    $(document).ready(function () {
+
+        GetVendorData(1, $('#ShowRowid').val());
+
+        $(".Checkbox_SelectAllHeader").on("change", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Select or deselect all row checkboxes based on the header checkbox state
+            table.find(".RowCheckbox").prop('checked', isChecked);
+
+            // Update the selectedRowIds array based on the "Select All" checkbox
+            if (isChecked) {
+                // Add all row IDs to the selectedRowIds array for the specific table
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId && !selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                });
+            } else {
+
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId) {
+                        // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                        selectedRowIds = selectedRowIds.filter(function (id) {
+                            return id !== rowId;
+                        });
+                    }
+                });
+            }
+        });
+
+        $(document).on("change", ".RowCheckbox", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+            var rowId = $(this).data('id');  // Get the row ID from data attribute
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Add or remove the row ID from the selectedRowIds array based on checkbox state
+            if (isChecked) {
+                if (!selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                }
+            } else {
+                var index = selectedRowIds.indexOf(rowId);
+                if (index !== -1) {
+                    selectedRowIds.splice(index, 1);
+                }
+            }
+
+            // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+            updateSelectAllCheckboxState()
+
+
+        });
+
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]');
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+    }
+
+
+            function sendSelectedRowIds() {
+                // Check if there are any selected row IDs
+                var searchValue = $('#Txt_SearchInputVendorName').val();
+                var rowIdsString = selectedRowIds.join(',');
+                // Make an AJAX request to send the data to the controller action
+                $.ajax({
+                    type: "POST",
+                    url: "/VendorMaster/ExportdataExcelVendor",
+                    data: {
+                        selectedRowIds: rowIdsString,
+                        searchValue: searchValue
+                    },
+                    success: function (response) {
+
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click();
+                        } else {
+                            ShowErrorMsg(response.message)
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error (failure)
+                        console.error('Error occurred while sending data to the server:', error);
+
+                        // Optionally, display an error message
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+
+            }
+
+
+        $('#Btn_SearchVendorNameId').on('click', function () {
+            SearchText = $('#Txt_SearchInputVendorName').val();
+            GetVendorData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchVendorId").on("click", function () {
+            location.reload();
+        });
+
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelVendorId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+
+    });
+
+    function EditVendorId(id, Flag)
+    //this function used for edit vendor    function EditCityId(id)
+    {
+        $.ajax({
+            type: "POST",
+            url: "/Vendormaster/EditVendor",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var VendorData = res["VendorData"]
+                //console.log(VendorData)
+                var Flag = res["Flag"]
+                //console.log(Flag)
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+
+                // $("#addProductModalLabel").text("Edit Country Details")
+                // Set values for the fields using jQuery
+                $('#RecordId').val(VendorData[0]["id"]);
+                $('#Update_TenantID').val(VendorData[0]["tenant_id"]);
+                $('#UpdateTxt_VendorNameId').val(VendorData[0]["vendor_name"]);
+                $('#UpdateTxt_MobileNumberId').val(VendorData[0]["mobile_no"]);
+                $('#UpdateTxt_EmailId').val(VendorData[0]["email_id"]);
+                $('#UpdateTxt_GstNoId').val(VendorData[0]["gst_no"]);
+                $('#UpdateTxt_PanCardNoId').val(VendorData[0]["pancard_no"]);
+                $('#UpdateTxt_RessidentialAddressId').val(VendorData[0]["residential_address"]);
+                $('#UpdateTxt_RemarkId').val(VendorData[0]["remark"]);
+
+                // Check Active/Inactive status using jQuery
+                if (VendorData[0]["is_active"] == "1") {
+                    $('#UpdateRadioIsActive').prop('checked', true);
+                } else {
+                    $('#UpdateRadioIsDeactive').prop('checked', true);
+                }
+                // Open the modal and bind events
+                $('#EditVendorMasterModal').modal('show');
+
+                // Wait until the modal is fully shown before performing further actions
+                $('#EditVendorMasterModal').on('shown.bs.modal', function () {
+                    // Trigger change event to ensure validations are run
+                    $('#UpdateTxt_VendorNameId, #UpdateTxt_MobileNumberId, #UpdateTxt_GstNoId, #UpdateTxt_PanCardNoId').trigger('change');
+                });
+
+            },
+            error: function (response) {
+                console.log("error")
+
+            }
+        });
+    }
+
+    // This is your existing code with minor improvements.
+    $('#Txt_MobileNumberId, #UpdateTxt_MobileNumberId, #Txt_GstNoId, #UpdateTxt_GstNoId, #Txt_PanCardNoId, #UpdateTxt_PanCardNoId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+        const value = $(this).val();
+        let ColName;
+
+        // Clear all previous warning messages when the modal is opened or form is updated
+        $(".modal").on('shown.bs.modal', function () {
+            $("#WarnUpdateVendorNameId, #WarnADDVendorNameId, #WarnUpdateMobileId, #WarnMobileId, #WarnUpdateGSTnoId, #WarnGSTnoId, #WarnUpdatePanCardNoId, #WarnPanCardNoId").css({ "display": "none" });
+        });
+
+        // Determine the column name based on the input field ID
+        if (inputFieldId === "Txt_VendorNameId" || inputFieldId === "UpdateTxt_VendorNameId") {
+            ColName = "vendor_name";
+        } else if (inputFieldId === "Txt_MobileNumberId" || inputFieldId === "UpdateTxt_MobileNumberId") {
+            ColName = "mobile_no";
+        } else if (inputFieldId === "Txt_GstNoId" || inputFieldId === "UpdateTxt_GstNoId") {
+            ColName = "gst_no";
+            // Validate GST number format
+            if (!validateGST(value)) {
+                $("#" + inputFieldId).val(""); // Clear the invalid GST number
+                // Show warning for invalid GST format
+                if (inputFieldId === "Txt_GstNoId" && value !='') {
+                    $("#WarnGSTnoId").css({ "display": "block", "color": "red" }).text("Invalid GST Number format.");
+                    return true; // Stop further execution
+                } else if (inputFieldId === "UpdateTxt_GstNoId" && value !='') {
+                    $("#WarnUpdateGSTnoId").css({ "display": "block", "color": "red" }).text("Invalid GST Number format.");
+                    return true; // Stop further execution
+                }
+            } else {
+                $("#WarnGSTnoId, #WarnUpdateGSTnoId").css({ "display": "none" });
+
+                // For GST input field, ensure it's in uppercase
+                if (inputFieldId === "Txt_GstNoId" && $('#Txt_PanCardNoId').val() != '') {
+                    // var gstNumber = $('#Txt_GstNoId').val();
+                    // var extractedPAN = gstNumber.substring(2, 12);
+                    // if ($('#Txt_PanCardNoId').val() == extractedPAN) {
+                    //     $('#WarnGSTnoId').css({ "display": "none" });
+                    // } else {
+                    //     $("#WarnGSTnoId").css({ "display": "block", "color": "red" }).text("GST & PAN No is not Matching...");
+                    //     $("#Txt_GstNoId").val("");
+                    //     return false;
+                    // }
+                } else if (inputFieldId === "UpdateTxt_GstNoId" && $('#UpdateTxt_PanCardNoId').val() != '') {
+                    // var gstNumber = $('#UpdateTxt_GstNoId').val();
+                    // var extractedPAN = gstNumber.substring(2, 12);
+                    // if ($('#UpdateTxt_PanCardNoId').val() == extractedPAN) {
+                    //     $('#WarnUpdateGSTnoId').css({ "display": "none" });
+                    // } else {
+                    //     $("#WarnUpdateGSTnoId").css({ "display": "block", "color": "red" }).text("GST & PAN No is not Matching...");
+                    //     $("#UpdateTxt_GstNoId").val("");
+                    //     return false;
+                    // }
+                }
+            }
+        } else if (inputFieldId === "Txt_PanCardNoId" || inputFieldId === "UpdateTxt_PanCardNoId") {
+            ColName = "pancard_no";
+        }
+
+        // Perform AJAX request to check for duplicates
+        $.ajax({
+            type: "POST",
+            url: "/VendorMaster/CheckDuplicateRecord",
+            data: {
+                ColName: ColName,
+                Username: value
+            },
+            success: function (data) {
+                
+                if (data > 0) {
+                    // Clear the field that triggered the event if duplicate found
+                    $('#' + inputFieldId).val("");
+
+                    // Show warning for the respective field
+                    // if (inputFieldId === "Txt_VendorNameId" || inputFieldId === "UpdateTxt_VendorNameId") {
+                    //     $("#" + (inputFieldId === "Txt_VendorNameId" ? "WarnADDVendorNameId" : "WarnUpdateVendorNameId"))
+                    //         .css({ "display": "block", "color": "red" }).text("Vendor Name Already Exists...");
+                    // }
+
+                    if (inputFieldId === "Txt_MobileNumberId" || inputFieldId === "UpdateTxt_MobileNumberId") {
+                        $("#" + (inputFieldId === "Txt_MobileNumberId" ? "WarnMobileId" : "WarnUpdateMobileId"))
+                            .css({ "display": "block", "color": "red" }).text("Mobile Number Already Exists...");
+                    }
+
+                    if (inputFieldId === "Txt_GstNoId" || inputFieldId === "UpdateTxt_GstNoId") {
+                        $("#" + (inputFieldId === "Txt_GstNoId" ? "WarnGSTnoId" : "WarnUpdateGSTnoId"))
+                            .css({ "display": "block", "color": "red" }).text("GST Number Already Exists...");
+                    }
+
+                    if (inputFieldId === "Txt_PanCardNoId" || inputFieldId === "UpdateTxt_PanCardNoId") {
+                        $("#" + (inputFieldId === "Txt_PanCardNoId" ? "WarnPanCardNoId" : "WarnUpdatePanCardNoId"))
+                            .css({ "display": "block", "color": "red" }).text("Pan Card Number Already Exists...");
+                    } else {
+                        
+                        validatePAN(value, id);
+                    }
+
+                } else {
+                    // Hide warning messages if no duplicates found
+                    $("#WarnMobileId, #WarnUpdateMobileId, #WarnGSTnoId, #WarnUpdateGSTnoId, #WarnPanCardNoId, #WarnUpdatePanCardNoId")
+                        .css({ "display": "none" });
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    });
+
+    function validateGST(gstNumber) {
+        var regex = /^([0-2][0-9]|3[0-5])[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/;
+        return regex.test(gstNumber);
+    }
+
+    function ClearAllValue() {
+        $("#Txt_VendorNameId").val("");
+        $("#Txt_MobileNumberId").val("");
+        $("#Txt_EmailId").val("");
+        $("#Txt_GstNoId").val("");
+        $("#Txt_PanCardNoId").val("");
+        $("#Txt_RessidentialAddressId").val("");
+        $("#Txt_RemarkId").val("");
+        $("#WarnMobileId").css({ "display": "none" });
+        $("#WarnADDVendorNameId").css({ "display": "none" });
+        $("#WarnUpdateVendorNameId").css({ "display": "none" });
+        $("#WarnADDVendorNameId").css({ "display": "none" });
+        $("#WarnUpdateMobileId").css({ "display": "none" });
+        $("#WarnGSTnoId").css({ "display": "none" });
+        $("#WarnUpdateGSTnoId").css({ "display": "none" });
+        $("#WarnPanCardNoId").css({ "display": "none" });
+        $("#WarnUpdatePanCardNoId").css({ "display": "none" });
+    }
+
+    // USED FOR PAN CARD VALIDATION
+    function validatePAN(panCard, id) {
+        const regex = /^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$/;
+
+        if (regex.test(panCard)) {
+            if (id === "Txt_PanCardNoId" && $('#Txt_GstNoId').val() != '') {
+                // var gstNumber = $('#Txt_GstNoId').val();
+                // var extractedPAN = gstNumber.substring(2, 12);
+                // if (panCard == extractedPAN) {
+                //     $('#WarnPanCardNoId').css({ "display": "none" });
+                // } else {
+                //     $("#WarnPanCardNoId").css({ "display": "block", "color": "red" }).text("GST & PAN No is not Matching...");
+                //     $("#Txt_PanCardNoId").val("");
+                //     return false;
+                // }
+            } else if (id === "UpdateTxt_PanCardNoId" && $('#UpdateTxt_GstNoId').val() != '') {
+                // var gstNumber = $('#UpdateTxt_GstNoId').val();
+                // var extractedPAN = gstNumber.substring(2, 12);
+                // if (panCard == extractedPAN) {
+                //     $('#WarnUpdatePanCardNoId').css({ "display": "none" });
+                // } else {
+                //     $("#WarnUpdatePanCardNoId").css({ "display": "block", "color": "red" }).text("GST & PAN No is not Matching...");
+                //     $("#UpdateTxt_PanCardNoId").val("");
+                //     return false;
+                // }
+            }
+        } else {
+            if ($('#Txt_PanCardNoId').val() != '' || $('#UpdateTxt_PanCardNoId').val() != '') {
+
+                ShowWarning('Invalid PAN card format. Please enter a valid PAN number.');
+            }
+            $("#UpdateTxt_PanCardNoId").val("");
+            $("#Txt_PanCardNoId").val("");
+        }
+    }
+
+    // Function to convert input value to uppercase
+    function convertToUpperCase(inputSelector) {
+        $(inputSelector).on("input paste", function () {
+            let value = $(this).val();
+            value = value.toUpperCase();
+            $(this).val(value);
+        });
+    }
+
+    // Call the function to convert GST and PAN numbers to uppercase
+    convertToUpperCase("#Txt_GstNoId, #UpdateTxt_GstNoId");
+    convertToUpperCase("#Txt_PanCardNoId, #UpdateTxt_PanCardNoId");
+
+    function GetVendorData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText // Replace with the actual search text or global variable
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/VendorMaster/GetVendorData", // Replace with your backend endpoint
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                const vendorData = response.VendorData;
+                const paginationInfo = response.PaginationInfo;
+
+                // Bind data to the table
+                BindVendorTableData(vendorData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching vendor data:", xhr.responseText);
+
+                $("#VendorMasterTable_Id tbody").empty();
+                $("#VendorMasterTable_Id tbody").html(`
+                    <tr>
+                        <td colspan="11" style="text-align: center;">No Data Available</td>
+                    </tr>
+                `);
+                generatePagination(1, $('#ShowRowid').val()); // Handle pagination for empty data
+            }
+        });
+    }
+
+    function BindVendorTableData(res, paginationInfo) {
+        $("#VendorMasterTable_Id tbody").empty(); // Clear existing rows
+
+        let srno;
+        if (paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber); // Generate pagination dynamically
+        } else {
+            console.error("PaginationInfo is missing or incorrect.");
+        }
+
+        if (Array.isArray(res) && res.length > 0) {
+            res.forEach(item => {
+                const vendorId = item.id.toString();
+
+                const isChecked = selectedRowIds.some(id => id.toString() === vendorId);
+
+                const data = `
+                    <tr id="${item.id}">
+                        <td>
+                            <div class="form-check">
+                                <input class="form-check-input RowCheckbox" type="checkbox" data-id="${item.id}" id="VendorRowCheckBoxId_${item.id}" ${isChecked ? 'checked' : ''}>
+                            </div>
+                        </td>
+                        <td>${srno}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <div class="edit">
+                                    <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditVendorId(${item.id}, 'Show')" id="Btn_EditVendorId">
+                                        <i class="fa fa-edit"></i>
+                                    </span>
+                                </div>
+                                     <div class="history">
+                                                        <span class="btn btn-sm btn-warning" style="margin:1px; cursor:pointer;" title="History" data-bs-toggle="modal" data-bs-target="#HistoryModalvendor" id="Btn_vendorHistoryId" onclick="ShowHistory(${item.id})">
+                                                    <i class="fas fa-history"></i>
+                                                </span>
+                                            </div>
+                                                    </div>
+                            </div>
+                        </td>
+                        <td>${item.tenant_name || ''}</td>
+                        <td>${item.vendor_name || ''}</td>
+                        <td>${item.mobile_no || ''}</td>
+                        <td>${item.email_id || ''}</td>
+                        <td>${item.gst_no || ''}</td>
+                        <td>${item.pancard_no || ''}</td>
+                        <td>${item.residential_address || ''}</td>
+                        <td>${item.is_active === 1 ? "Active" : "Deactive"}</td>
+                    </tr>
+                `;
+
+                $("#VendorMasterTable_Id tbody").append(data);
+
+                srno++;
+            });
+        } else {
+            $("#VendorMasterTable_Id tbody").html(`
+                <tr>
+                    <td colspan="11" style="text-align: center;">No Data Available</td>
+                </tr>
+            `);
+        }
+
+        updateSelectAllCheckboxState(); // Update the "Select All" checkbox state
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+
+        $.ajax({
+            type: "POST",
+            url: "/VendorMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+
+                $("#vendorHistorytable-id tbody").empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.tenant_name || '') + '</td>';
+                        row += '<td>' + (item.vendor_name || '') + '</td>';
+                        row += '<td>' + (item.mobile_no || '') + '</td>';
+                        row += '<td>' + (item.email_id || '') + '</td>';
+                        row += '<td>' + (item.gst_no || '') + '</td>';
+                        row += '<td>' + (item.pancard_no || '') + '</td>';
+                        // row += '<td>' + (item.residential_address || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        // row += '<td>' + (item.created_at || '') + '</td>';
+                        // row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at ? item.updated_at.replace('T', ' ') : '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        $("#vendorHistorytable-id tbody").append(row); // This is correct
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    $("#vendorHistorytable-id tbody").append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+</script>

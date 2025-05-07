@@ -1,0 +1,1039 @@
+@using Newtonsoft.Json
+@{
+    int srno = 1;
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <!-- Title and Buttons in a Single Row -->
+                    <div class="row g-4 mb-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <!-- Title -->
+                                <h3 class="mb-0">Item Master</h3>
+                                <!-- Buttons -->
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-success d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#ImportItemModalId" id="Btn_ImportOrderData">
+                                        <i class="ri-upload-cloud-line ri-18px me-2"></i> Import
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="Btn_ExportToExcelItemId">Export File</button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemMasterModal" id="Btn_AddItemId" onclick="ClearAllValue()">
+                                        <i class="align-bottom me-1"></i> Add Item
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Second Row: Search Textbox and Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputItemName" />
+                            <button type="button" class="btn btn-primary" id="Btn_SearchItemId">Search</button>
+                            <button type="button" class="btn btn-secondary" id="Btn_ResetSearchItemId">Reset</button>
+                        </div>
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditItemMasterModal" id="Btn_EditItemId" style="display:none"></button>
+                    </div>
+
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="ItemMasterTable_Id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllItemHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold" data-sort="TenantName">Tenant Name</th>
+                                    <th class="sort fw-bold" data-sort="Itemname">Item Name</th>
+                                    <th class="sort fw-bold" data-sort="productName">Product Group Name</th>
+                                    <th class="sort fw-bold" data-sort="uom">UOM</th>
+                                    <th class="sort fw-bold" data-sort="IsStone">Is Stone</th>
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div><!-- end col -->
+    </div><!-- end col -->
+</div>
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addItemMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddItem", "ItemMaster"))
+                {
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="TenantName" id="Select_TenantNameId" required>
+                            @foreach (var item in ViewBag.GetAllTenants)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                
+					<div class="row px-3">
+						<label class="form-label">Product Group Name<span style="color:red;font-weight:800">*</span></label>
+						<input type="text" class="form-control" name="ProductGroupName1" id="Select_ProductGroupNameId" placeholder="Type product group..." autocomplete="off" required />
+						<div id="suggestions" class="list-group mt-1"></div>
+						<input type="hidden" name="ProductGroupName" id="ProductGroupId" value=""/>
+					</div>
+					<div class="row px-3 mt-3">
+                        <label class="form-label">Item Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control twoWordsOnly" name="ItemName" id="Txt_ItemNameId" minlength="1" maxlength="50" required />
+                        <span id="WarnAddDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">UOM<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="UOM" id="Txt_UOMId" required>
+                          <option value="">--Please Select UOM--</option>
+                          <option value="GM">GM</option>
+                          <option value="CT">CT</option>
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3 align-items-center">
+                        <label for="Chk_IsStoneId" class="col-auto form-label mb-0">Is Stone</label>
+                        <div class="col-auto">
+                            <input class="form-check-input" type="checkbox" id="Chk_IsStoneId" name="IsStone">
+                        </div>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_RemarkId" maxlength="200" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status<span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_ActiveId" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_DeactiveId" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+							<button type="submit" class="btn btn-primary" id="Btn_SubmitId" onclick="return ValidateData()">
+								<i class="align-bottom me-1"></i> Submit
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Product -->
+<div class="modal fade" id="EditItemMasterModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Edit Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for editing -->
+                @using (Html.BeginForm("SaveEditItem", "ItemMaster"))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Tenant Name<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="TenantName" id="Select_UpdateTenantNameId" disabled>
+                            @foreach (var item in ViewBag.GetAllTenants)
+                            {
+                                <option value="@item["id"]">@item["tenant_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3">
+                        <label class="form-label">Product Group Name<span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-control" name="ProductGroupName" id="Select_UpdateProductGroupNameId" disabled>
+                            <option value="">Please Select Product</option>
+                            @foreach (var item in ViewBag.AllProductGroups)
+                            {
+                                <option value="@item["id"]">@item["product_group_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Item Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="ItemName" id="Txt_UpdateItemNameId"  disabled />
+                        <span id="WarnUpdateDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">UOM<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="UOM" id="Txt_UpdateUOMId" maxlength="15" disabled />
+                    </div>
+                    <div class="row px-3 mt-3 align-items-center">
+                        <label for="Chk_IsStoneId" class="col-auto form-label mb-0">Is Stone</label>
+                        <div class="col-auto">
+                            <input class="form-check-input" type="checkbox" id="Chk_UpdateIsStoneId" name="Is_Stone" disabled>
+                        </div>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" id="Txt_UpdateRemarkId" maxlength="200"  />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateActiveId" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateDeactiveId" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-center align-items-center px-3">
+
+                        <div class="d-flex justify-content-end gap-2 px-3">
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="Btn_UpdateId">
+                                    <i class="align-bottom me-1"></i> Update
+                                </button>
+                            </div>
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for import file -->
+<div class="modal fade" id="ImportItemModalId" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUploadfileLabel">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row px-3 mt-3 gap-2">
+                    <!-- Wrap this section with a form to send data -->
+                    @using (Html.BeginForm("UploadItemMaster", "ItemMaster", FormMethod.Post, new { enctype = "multipart/form-data", id = "uploadForm" }))
+                    {
+                        <label class="form-label">Select File<span style="color:red;font-weight:500">*</span></label>
+                        <div class="d-flex">
+                            <input type="file" class="form-control" name="file" id="file_Id" required accept=".xlsx" />
+                        </div>
+                        <span id="WarnbrowseId" style="color:red; display:none;">Please upload only .xlsx file extension</span>
+
+                        <div id="loadingSpinner" style="display: none; text-align: center;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div>Uploading file...</div>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-end px-3 m-3 gap-2">
+                            <button type="button" class="btn btn-outline-primary d-flex align-items-center" id="samplesheetbtn">
+                                <i class="align-bottom me-1"></i> Download Format
+                            </button>
+                            <button type="submit" class="btn btn-primary d-grid" id="uploadBtn">
+                                <i class="align-bottom me-1"></i> Upload
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModalitem" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="ItemHistorytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Tenant Name</th>
+                                <th>Item Name</th>
+                                <th>Product Group Name</th>
+                                <th>UOM</th>
+                                <th>Is Stone</th>
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                               @*  <th>Created At</th>
+                                <th>Created By</th> *@
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@* <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Include SheetJS (XLSX) library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script> *@
+<script>
+	//VINA CODE START FOR SEARCH FUNCTIONALITY
+	 let ProductGroupRecords = [];
+	 // THIS IS TO VALIDATE CORRECT PRODUCT NAME IS DISPLAY
+	function ValidateData()
+	{
+		if($("#ProductGroupId").val() == ""){
+			ShowWarning("Enter Valid Product Group...")
+			return false;
+		}
+		else{
+			return true;
+		}
+	}
+	//SEARCH FUNCTION 
+	$(document).ready(function ()
+	{
+		//THIS FUNCTION IS USED TO SEARCH ON PRODUCT GROUP NAME TYPED
+		 $('#Select_ProductGroupNameId').on('keyup', function () {
+			 let inp = $(this);
+             const searchTerm = inp.val().trim().toLowerCase();
+			 let filteredResults = ProductGroupRecords.filter(customer => {
+			let nameMatch = customer.product_group_name.toLowerCase().includes(searchTerm);
+			return nameMatch;
+			});
+			renderSuggestions(filteredResults, inp);
+			if ([2, 4].includes(searchTerm.length))
+			{
+				loadProductGroupData(searchTerm, inp);
+
+			}
+		});
+	 });
+	//THIS FUNCTION IS USED TO LOAD FILTERED PRODUCT GROUP
+		 function loadProductGroupData(searchTerm, inp) {
+			$.ajax({
+				url: '/ItemMaster/GetFilteredProductGroups',
+				type: 'GET',
+				data: {
+
+					SearchItem: searchTerm
+				},
+				success: function (data) {
+					if (Array.isArray(data)) {
+						ProductGroupRecords = data;
+						renderSuggestions(data, inp);
+					}
+				},
+				error: function (error) {
+					console.error("Error fetching customer data:", error);
+				}
+			});
+		}
+		// THIS FUNCTION IS USED TO RENDER THE FILTERED SUGGESTIONS
+		function renderSuggestions(data, inp)
+		{
+			const suggestionBox = document.getElementById('suggestions');
+			suggestionBox.innerHTML = ''; // Clear old suggestions
+
+			// Get and normalize input value (supports jQuery or native input)
+			const inputValue = (inp.val ? inp.val() : inp.value).trim().toLowerCase();
+
+			const filteredData = data.filter(item =>
+				item.product_group_name.toLowerCase().includes(inputValue)
+			);
+
+			if (filteredData.length === 0) {
+				const noResult = document.createElement('div');
+				noResult.classList.add('list-group-item', 'text-muted');
+				noResult.textContent = 'No matches found';
+				suggestionBox.appendChild(noResult);
+				return;
+			}
+
+			filteredData.forEach(item => {
+				const div = document.createElement('div');
+				div.classList.add('list-group-item', 'list-group-item-action');
+				div.textContent = item.product_group_name;
+
+				// Set a data attribute for ID
+				div.setAttribute('data-id', item.id);
+
+				div.addEventListener('click', function () {
+					const name = item.product_group_name;
+					const id = item.id;
+
+					// Set name in the input box
+					if (inp.val) {
+						inp.val(name); // jQuery
+					} else {
+						inp.value = name; // Native input
+					}
+					// You could also set it in a hidden input if needed:
+					const hiddenInput = document.getElementById('ProductGroupId');
+					if (hiddenInput) hiddenInput.value = id;
+
+					suggestionBox.innerHTML = ''; // Clear suggestions
+				});
+
+				suggestionBox.appendChild(div);
+			});
+		}
+		// THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+		function ShowWarning(message) {
+		Swal.fire({
+			//title: 'Good job!',
+			text: message,
+			icon: 'warning',
+			customClass: {
+				confirmButton: 'btn btn-primary waves-effect waves-light'
+			},
+			buttonsStyling: false
+		});
+
+	}
+		//vina code END SEARCH FUNCTIONALITY
+		function ShowErrorMsg(message)
+		{
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'success',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+		}
+
+    function loadPageData(page, rowsToShow) {
+        GetItemData(page, $('#ShowRowid').val());
+
+
+    }
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#ItemMasterTable_Id");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+
+    var selectedRowIds = [];
+    var SearchText;
+
+    $(document).ready(function () {
+
+        GetItemData(1, $('#ShowRowid').val());
+
+        $(".Checkbox_SelectAllHeader").on("change", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Select or deselect all row checkboxes based on the header checkbox state
+            table.find(".RowCheckbox").prop('checked', isChecked);
+
+            // Update the selectedRowIds array based on the "Select All" checkbox
+            if (isChecked) {
+                // Add all row IDs to the selectedRowIds array for the specific table
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId && !selectedRowIds.includes(rowId)) {
+                        selectedRowIds.push(rowId);
+                    }
+                });
+                console.log(selectedRowIds);
+            } else {
+
+                table.find(".RowCheckbox").each(function () {
+                    var rowId = $(this).data('id');
+                    if (rowId) {
+                        // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                        selectedRowIds = selectedRowIds.filter(function (id) {
+                            return id !== rowId;
+                        });
+                    }
+                });
+                console.log(selectedRowIds);
+            }
+        });
+
+        $(document).on("change", ".RowCheckbox", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+            var rowId = $(this).data('id');  // Get the row ID from data attribute
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Add or remove the row ID from the selectedRowIds array based on checkbox state
+            if (isChecked) {
+                if (!selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                    console.log("Added rowId:", rowId);
+                }
+            } else {
+                var index = selectedRowIds.indexOf(rowId);
+                if (index !== -1) {
+                    selectedRowIds.splice(index, 1);
+                    console.log("Removed rowId:", rowId);
+                }
+            }
+
+            // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+            updateSelectAllCheckboxState()
+
+
+        });
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]');
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+    }
+
+            function sendSelectedRowIds() {
+                // Check if there are any selected row IDs
+                var searchValue = SearchText;
+                var rowIdsString = selectedRowIds.join(',');
+                // Make an AJAX request to send the data to the controller action
+                $.ajax({
+                    type: "POST",
+                    url: "/ItemMaster/ExportDataCsv",
+                    data: {
+                        selectedRowIds: rowIdsString,
+                        searchValue: searchValue
+                    },
+                    success: function (response) {
+
+                        if (response.success) {
+                            // Decode Base64 to binary string
+                            var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                            var byteArray = new Uint8Array(byteCharacters.length);
+
+                            for (var i = 0; i < byteCharacters.length; i++) {
+                                byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                            }
+
+                            // Create a blob from the byte array
+                            var blob = new Blob([byteArray], { type: response.fileType });
+
+                            // Create a link element for downloading
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(blob);
+                            link.download = response.fileName; // Set the download file name
+                            link.click();
+                        } else {
+                            ShowErrorMsg(response.message)
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle the error (failure)
+                        console.error('Error occurred while sending data to the server:', error);
+
+                        // Optionally, display an error message
+                        alert('An error occurred while processing your request.');
+                    }
+                });
+
+            }
+
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelItemId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+        $('#Chk_IsStoneId').change(function () {
+            // Check if the checkbox is checked
+            if ($(this).is(':checked')) {
+                $(this).val(1); // Set value to 1
+            } else {
+                $(this).val(0); // Set value to 0
+            }
+        });
+
+        $('#Btn_SearchItemId').on('click', function () {
+            SearchText = $('#Txt_SearchInputItemName').val();
+            GetItemData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchItemId").on("click", function () {
+            location.reload();
+        });
+    });
+
+
+    $('#Chk_UpdateIsStoneId').change(function () {
+        // Check if the checkbox is checked
+        if ($(this).is(':checked')) {
+            $(this).val(1); // Set value to 1
+        } else {
+            $(this).val(0); // Set value to 0
+        }
+    });
+
+    function EditItemId(id, Flag) {
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+
+        $.ajax({
+            type: "POST",
+            url: "/ItemMaster/EditItem",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var ItemData = res["ItemData"]
+                //console.log(ItemData)
+
+                var Flag = res["Flag"]
+                //console.log(Flag)
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+
+                document.getElementById('RecordId').value = ItemData[0]["id"];
+                document.getElementById('Select_UpdateTenantNameId').value = ItemData[0]["tenant_id"];
+                document.getElementById('Select_UpdateProductGroupNameId').value = ItemData[0]["product_group_id"];
+                document.getElementById('Txt_UpdateItemNameId').value = ItemData[0]["item_name"];
+                document.getElementById('Txt_UpdateUOMId').value = ItemData[0]["uom"];
+                document.getElementById('Txt_UpdateRemarkId').value = ItemData[0]["remark"];
+
+
+                if (ItemData[0]["is_stone"] == "1") {
+                    $("#Chk_UpdateIsStoneId").prop("checked", true);
+                }
+                else {
+                    $("#Chk_UpdateIsStoneId").prop("checked", false);
+                }
+                //THIS IS USED FOR CHECKED ACTIVE INACTIVE
+                if (ItemData[0]["is_active"] == "1") {
+                    $("#Radio_UpdateActiveId").prop("checked", true);
+                } else {
+                    $("#Radio_UpdateDeactiveId").prop("checked", true);
+                }
+
+                $("#Btn_EditItemId").click();
+
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    $('#Txt_ItemNameId, #Txt_UpdateItemNameId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id');  // Get the ID of the field that triggered the event
+        const value = $(this).val();  // Get the value entered in the input field
+
+        let selectedProductGroupId;  // Declare the variable outside the if-else block
+
+        // Check which field triggered the event
+        if (inputFieldId === 'Txt_ItemNameId') {
+            selectedProductGroupId = $('#Select_ProductGroupNameId').val();
+        } else if (inputFieldId === 'Txt_UpdateItemNameId') {
+            selectedProductGroupId = $('#Select_UpdateProductGroupNameId').val();
+        }
+
+        // Check if a product group is selected
+        if (selectedProductGroupId !== '' && selectedProductGroupId !== null) {
+            $.ajax({
+                type: "POST",
+                url: "/ItemMaster/CheckDuplicateRecord",
+                data: {
+                    ColName: "item_name",
+                    value: value,
+                    selectedProductGroupId: selectedProductGroupId
+                },
+                success: function (data) {
+                    if (data > 0) {
+                        // If the item name already exists, clear the field and show a warning
+                        $('#' + inputFieldId).val("");
+                        if (inputFieldId === "Txt_ItemNameId") {
+                            $("#WarnAddDataId").css({ "display": "block", "color": "red" }).text("Item Name Already Exists...");
+                            $('#Txt_ItemNameId').val('');
+                        } else if (inputFieldId === "Txt_UpdateItemNameId") {
+                            $("#WarnUpdateDataId").css({ "display": "block", "color": "red" }).text("Item Name Already Exists...");
+                            $('#Txt_UpdateItemNameId').val('');
+                        }
+                    } else {
+                        // Hide warnings if the item name does not exist
+                        $("#WarnAddDataId").css("display", "none");
+                        $("#WarnUpdateDataId").css("display", "none");
+                    }
+                },
+                error: function (response) {
+                    console.error("Error during AJAX request:", response);
+                }
+            });
+        } else {
+            // If no product group is selected, show the warning message for the respective field
+            if (inputFieldId === "Txt_ItemNameId") {
+                $("#WarnAddDataId").css({ "display": "block", "color": "red" }).text("Please Choose Product Group First...");
+                $('#Txt_ItemNameId').val('');
+            } else if (inputFieldId === "Txt_UpdateItemNameId") {
+                $("#WarnUpdateDataId").css({ "display": "block", "color": "red" }).text("Please Choose Product Group First...");
+                $('#Txt_UpdateItemNameId').val('');
+            }
+        }
+    });
+
+    function ClearAllValue() {
+        $("#Radio_ActiveId").prop("checked", true);
+        $("#Chk_IsStoneId").prop("checked", false);
+        $("#Select_ProductGroupNameId").val("");
+		 $("#suggestions").empty();
+        $("#Txt_UOMId").val("");
+        $("#Chk_IsStoneId").val("");
+        $("#Txt_RemarkId").val("");
+        $("#Txt_ItemNameId").val("");
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+    }
+
+    function TableBindItemData(res, paginationt) {
+
+        $("#ItemMasterTable_Id tbody").empty();
+
+        var table = $("#ItemMasterTable_Id");
+
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+
+        let srno;
+        if (paginationt && paginationt.length > 0) {
+            const totalRows = paginationt[0].TotalRows;
+            const totalPages = paginationt[0].TotalPages;
+            const pageNumber = paginationt[0].PageNumber;
+            const pageSize = paginationt[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } else {
+            console.error('PaginationInfo is not available or is in an incorrect format. Response:', paginationt);
+        }
+
+        if (Array.isArray(res)) {
+
+            res.forEach(item => {
+
+                const itemId = item.id.toString();
+
+                const isChecked = selectedRowIds.some(id => {
+                    return id.toString() === itemId;
+                });
+
+                const data = `
+                                        <tr id="${item.id}">
+                                            <td>
+                                                <div class="form-check">
+                                                           <input class="form-check-input RowCheckbox" type="checkbox" data-id="${item.id}" id="ItemRowCheckBoxId_${item.id}" ${isChecked ? 'checked' : ''}>
+                                                </div>
+                                            </td>
+                                            <td>${srno}</td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <div class="edit">
+                                                        <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditItemId(${item.id}, 'Show')" id="Btn_EditItemId">
+                                                            <i class="fa fa-edit"></i>
+                                                        </span>
+                                                    </div>
+                                                         <div class="history">
+                                                <span class="btn btn-sm btn-warning" style="margin:1px; cursor:pointer;" title="History" data-bs-toggle="modal" data-bs-target="#HistoryModalitem" id="Btn_itemHistoryId" onclick="ShowHistory(${item.id})">
+                                                <i class="fas fa-history"></i>
+                                            </span>
+                                        </div>
+                                                </div>
+                                            </td>
+                                            <td>${item.tenant_name || ''}</td>
+                                            <td>${item.item_name || ''}</td>
+                                            <td>${item.product_group_name || ''}</td>
+                                            <td>${item.uom || ''}</td>
+                                            <td>${item.is_stone === 1 ? "Yes" : "No"}</td>
+                                            <td>${item.is_active === 1 ? "Active" : "Deactive"}</td>
+                                        </tr>
+                                    `;
+
+                $("#ItemMasterTable_Id tbody").append(data);
+
+                srno++;
+            });
+
+        } else {
+            $("#ItemMasterTable_Id tbody").empty();
+            $("#ItemMasterTable_Id tbody").html(`
+                                <tr>
+                                    <td colspan="9" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+        }
+
+        updateSelectAllCheckboxState();
+    }
+
+    function GetItemData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/ItemMaster/GetItemData",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+
+                const itemData = response.ItemData;
+                const paginationInfo = response.PaginationInfo;
+
+
+                TableBindItemData(itemData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                // // Only log the error if it's not a 'No Data Available' situation
+                // if (xhr.status !== 404 && xhr.status !== 204) {
+                //     console.error("Error fetching item data", xhr.responseText);
+                // }
+
+                // Clear the table body and display a "No Data Available" message if no data is fetched
+                $("#ItemMasterTable_Id tbody").empty();
+                $("#ItemMasterTable_Id tbody").html(`
+                                <tr>
+                                    <td colspan="9" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+                generatePagination(1, $('#ShowRowid').val());
+            }
+        });
+    }
+    // Show spinner and disable the upload button when upload starts
+    function showSpinner() {
+        $('#loadingSpinner').show(); // Display the spinner
+        $('#uploadBtn').prop('disabled', true); // Disable the upload button
+    };
+
+    // Hide spinner and enable the upload button after the upload is complete
+    function hideSpinner() {
+        $('#loadingSpinner').hide(); // Hide the spinner
+        $('#uploadBtn').prop('disabled', false); // Enable the upload button
+    };
+
+
+    $('#samplesheetbtn').on('click', function () {
+        // Make AJAX call to download the sample sheet
+        $.ajax({
+            url: '/ItemMaster/DownloadSampleSheet',  // The URL to your controller action
+            type: 'GET',
+            success: function (response) {
+                // Construct the full URL using the current site's base URL and the relative path
+                var fileUrl = window.location.origin + response.fileUrl;
+
+                // Create a link to trigger the download
+                var link = document.createElement('a');
+                link.href = fileUrl;  // Use the full URL of the file
+                link.download = 'Item_data_import.xlsx';  // Specify the filename for the download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error downloading the sample sheet:', error);
+                alert('There was an error downloading the file. Please try again later.');
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        // Handle the form submission using AJAX
+        $("#uploadForm").submit(function (e) {
+            e.preventDefault(); // Prevent default form submission
+            var fileInput = $('#file_Id')[0];
+            var file = fileInput.files[0]; // Get the first file from the input
+
+            // Check if a file was selected
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+
+            // Validate the file type (allow only .csv, .xls, .xlsx)
+            var allowedExtensions = /(\.csv|\.xls|\.xlsx)$/i;
+            if (!allowedExtensions.exec(file.name)) {
+                $('#WarnbrowseId').show(); // Show warning message
+                return; // Stop form submission if the file type is not valid
+            } else {
+                $('#WarnbrowseId').hide();
+            }
+            var formData = new FormData(this); // Create FormData object from the form
+            showSpinner();
+            $.ajax({
+                url: '@Url.Action("UploadItemMaster", "ItemMaster")', // Your controller action URL
+                type: 'POST',
+                data: formData,
+                processData: false, // Don't process the data
+                contentType: false, // Don't set content type header
+                success: function (response) {
+                    if (response.success) {
+                        // Decode Base64 to binary string
+                        var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                        var byteArray = new Uint8Array(byteCharacters.length);
+
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                        }
+
+                        // Create a blob from the byte array
+                        var blob = new Blob([byteArray], { type: response.fileType });
+
+                        // Create a link element for downloading
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.fileName; // Set the download file name
+                        link.click(); // Trigger the download
+
+                        $('#file_Id').val(''); // Clear the file input (if it exists)
+                        hideSpinner(); // Hide the spinner when there's an error
+                        // Close the modal (if present)
+                        $('#importFileModal2').modal('hide');
+                        ShowErrorMsg("File Imported Succesfully....", "1")
+                        setTimeout(function () {
+                            location.reload();
+                        }, 3000); // 3000 milliseconds = 3 seconds
+                    } else {
+                        $('#file_Id').val('');
+                        if (response.flag === '1') {
+                            $('#file_Id').val(''); // Clear the file input (if it exists)
+                            hideSpinner(); // Hide the spinner when there's an error
+                            // Close the modal (if present)
+                            $('#importFileModal2').modal('hide');
+                            ShowErrorMsg("File Imported Succesfully....", "1")
+                            setTimeout(function () {
+                                location.reload();
+                            }, 500); // 3000 milliseconds = 3 seconds
+
+                        } else {
+                            ShowWarning(response.message)
+                        }
+                        hideSpinner();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    //alert("Error uploading file. Please try again.");
+                    ShowWarning("Error uploading file. Please try again.....")
+                    hideSpinner(); // Hide the spinner when there's an error
+                }
+            });
+
+        });
+    });
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowWarning(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+        console.log(id);
+
+        $.ajax({
+            type: "POST",
+            url: "/ItemMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+
+                $("#ItemHistorytable-id tbody").empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.tenant_name || '') + '</td>';
+                        row += '<td>' + (item.item_name || '') + '</td>';
+                        row += '<td>' + (item.product_group_name || '') + '</td>';
+                        row += '<td>' + (item.uom || '') + '</td>';
+                        row += '<td>' + (item.is_stone == '1' ? 'Yes' : 'No' || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        // row += '<td>' + (item.created_at || '') + '</td>';
+                        // row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at ? item.updated_at.replace('T', ' ') : '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        $("#ItemHistorytable-id tbody").append(row); // This is correct
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    historyTableBody.append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                    $('#HistoryModal').modal('show');
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+</script>

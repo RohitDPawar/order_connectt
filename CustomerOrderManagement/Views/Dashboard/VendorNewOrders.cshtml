@@ -1,0 +1,639 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+@if (TempData["VendorOrderReject1"] != null)
+{
+    <script>
+        // Safely pass TempData["Message"] to JavaScript
+        ShowErrorMsg('@TempData["VendorOrderReject1"]');
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+            //alert(message)
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+    </script>
+    TempData["VendorOrderReject1"] = null;
+}
+
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Title on the left -->
+                                <h4>New Orders</h4>
+
+                                <!-- Right: Buttons -->
+                                <div class="d-flex">
+                                    <button class="btn btn-success btn-sm me-2" id="Btn_AcceptedId"><i class="fa fa-check me-1"></i> Accept</button>
+                                    <button class="btn btn-danger btn-sm me-2" id="Btn_RejectedId" onclick="openModal()"> <i class="fa fa-times me-1"></i> Reject</button>
+                                    <!-- Filter Button with Filter Icon, Custom Color, and Space between Icon and Label -->
+                                    <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                        <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="VendorNewOrdersTableId">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllOrders" />
+                                    </th>
+                                    <th class="sort" data-sort="Sr No">Sr No</th>
+                                    <th class="sort" data-sort="Action">Action</th>
+                                    <th class="sort" data-sort="Status">Status</th>
+                                    <th class="sort" data-sort="Order No">Order No.</th>
+                                    <th class="sort" data-sort="Item Name">Item Name</th>
+                                    <th class="sort" data-sort="Category Name">Category Name</th>
+                                    <th class="sort" data-sort="Gross Weight">Gross Weight</th>
+                                    <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                    <th class="sort" data-sort="Purity">Purity</th>
+                                    <th class="sort" data-sort="Item Pieces">Item Pieces</th>
+                                    <th class="sort" data-sort="Product Group Name">Product Group Name</th>
+                                    <th class="sort" data-sort="">Order Date</th>
+                                    <th class="sort" data-sort="">Order Delivery Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    function loadPageData(page, rowsToShow) {
+        GetOrderDate(page, $('#ShowRowid').val());
+
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#VendorNewOrdersTableId");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+    var selectedRowIds = [];
+
+    function applyFilter() {
+
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    function OpenStoneDetails(orderItemId) {
+        // Make the AJAX call to fetch the order details
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetStoneDetails",
+            data: { itemId: orderItemId },
+            success: function (response) {
+                // Parse the response data
+                var res = JSON.parse(response);
+                var orderDetails = res["StoneDetails"];
+                console.log(orderDetails);
+
+                // Check if orderDetails are found
+                if (orderDetails.length > 0) {
+                    var detailsHtml = ""; // Initialize as empty string
+
+                    for (var i = 0; i < orderDetails.length; i++) {
+                        // Construct the HTML to display the order details in a table row
+                        detailsHtml +=
+                            '<tr>' +
+                            '<td>' + orderDetails[i]["item_name"] + '</td>' +
+                            '<td>' + orderDetails[i]["stone_category_name"] + '</td>' +
+                            '<td>' + orderDetails[i]["color_name"] + '</td>' +
+                            '<td>' + orderDetails[i]["stone_wt"] + '</td>' +
+                            '<td>' + orderDetails[i]["stone_pcs"] + '</td>' +
+                            '</tr>';
+                    }
+
+                    // Set the constructed rows to the table body
+                    $('#stoneDetailsBody').html(detailsHtml);
+
+                    // Show the modal
+                    $('#stoneDetailsModalShow').modal('show');
+                } else {
+                    alert('Order details not found!');
+                }
+            },
+            error: function (error) {
+                // Handle any errors from the AJAX request
+                console.error('Error fetching order details:', error);
+                alert('An error occurred while fetching order details.');
+            }
+        });
+    }
+
+    // Select all checkboxes when 'Select All' is checked, excluding disabled checkboxes
+    $(".Checkbox_SelectAllHeader").on("change", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+        // Select or deselect all row checkboxes based on the header checkbox state
+        table.find(".RowCheckbox").prop('checked', isChecked);
+
+        // Update the selectedRowIds array based on the "Select All" checkbox
+        if (isChecked) {
+            // Add all row IDs to the selectedRowIds array for the specific table
+            table.find(".RowCheckbox").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId && !selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                    console.log(selectedRowIds);
+                }
+            });
+        } else {
+
+            table.find(".RowCheckbox").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId) {
+                    // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                    selectedRowIds = selectedRowIds.filter(function (id) {
+                        return id !== rowId;
+                    });
+                }
+            });
+        }
+    });
+
+    $(document).on("change", ".RowCheckbox", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+        var rowId = $(this).data('id');  // Get the row ID from data attribute
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+        // Add or remove the row ID from the selectedRowIds array based on checkbox state
+        if (isChecked) {
+            if (!selectedRowIds.includes(rowId)) {
+                selectedRowIds.push(rowId);
+                console.log(selectedRowIds);
+            }
+        } else {
+            var index = selectedRowIds.indexOf(rowId);
+            if (index !== -1) {
+                selectedRowIds.splice(index, 1);
+                console.log(selectedRowIds);
+            }
+        }
+
+        // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+        updateSelectAllCheckboxState();
+
+
+    });
+
+    function GetOrderDate(pageNumber, pageSize) {
+        const data = {
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/VendorNewOrdersfilter",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                var res = JSON.parse(data);
+                TableBindData(res)
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    function TableBindData(res) {
+        // Clear the tbody of the table
+        $("#VendorNewOrdersTableId tbody").empty();
+
+        var table = $("#VendorNewOrdersTableId tbody");
+
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+        const paginationInfo = res.PaginationInfo;
+
+        let srno;
+
+        if (res && paginationInfo && paginationInfo.length) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        }
+
+        if (res && res.OrderData && Array.isArray(res.OrderData)) {
+            // Iterate through the data to populate the table
+            for (let i = 0; i < res["OrderData"].length; i++) {
+                let orderStatus = res["OrderData"][i]["order_status"];
+                let statusHtml = '';
+
+                // Initialize the LinkData for the Edit button
+                let LinkData = "";
+
+                // Check if the gross weight is greater than net weight, show Stone Details button
+                if (parseFloat(res["OrderData"][i]["gross_wt"]) > parseFloat(res["OrderData"][i]["net_wt"])) {
+                    LinkData += '<a href="javascript:void(0);" class="text-primary cursor-pointer" onclick="OpenStoneDetails(' + res["OrderData"][i]["order_item_id"] + ')">' +
+                        '<span id="Btn_EditCityId" class="text-primary cursor-pointer"><i class="fa fa-gem d-inline me-2"></i></span></a>';
+                }
+
+                // Construct the action HTML for dropdown
+                let ActionHtml = '';
+                ActionHtml += LinkData; // Add the Stone Details button if applicable
+                ActionHtml += '<div class="dropdown d-inline">' +
+                    '<span id="Btn_MoreOptionsCityId" class="text-primary cursor-pointer" data-bs-toggle="dropdown">' +
+                    '<i class="fa fa-ellipsis-v d-inline me-2" aria-hidden="true"></i>' +
+                    '</span>' +
+                    '<ul class="dropdown-menu dropdown-menu-end p-0 small">' +
+                    '<li>' +
+                    '<a class="dropdown-item py-1" href="javascript:void(0);" onclick="OrderItemAction(' + res["OrderData"][i]["order_item_id"] + ', \'1\')">' +
+                    '<i class="fa fa-id-card me-2"></i>Job Card' +
+                    '</a><hr class="m-0" />' +
+                    '</li>' +
+                    '</ul>' +
+                    '</div>';
+
+                const idCheck = res["OrderData"][i]["order_item_id"] || '';
+                const isChecked = selectedRowIds.includes(Number(idCheck));
+
+                // Construct the row for the table
+                const data = '<tr id="' + idCheck + '" class="total_tr">' +
+                    '<td><input type="checkbox" class="form-check-input RowCheckbox" data-id="' + res["OrderData"][i]["order_item_id"] + '" name="OrderDetailsId" value="' + res["OrderData"][i]["order_item_id"] + '" ' + (isChecked ? 'checked' : '') + ' /></td>' +
+                    '<td>' + srno + '</td>' +
+                    '<td class="sort">' +
+                    '<div class="d-flex gap-3">' + ActionHtml + '</div>' +
+                    '</td>' +
+                    '<td>' + res["OrderData"][i]["STATUS"] + '</td>' +
+                    '<td>' + res["OrderData"][i]["order_series_no"] + '</td>' +
+                    '<td>' + res["OrderData"][i]["item_name"] + '</td>' +
+                    '<td>' + res["OrderData"][i]["category_name"] + '</td>' +
+                    '<td>' + (parseFloat(res["OrderData"][i]["gross_wt"]).toFixed(3) || '') + '</td>' +
+                    '<td>' + (parseFloat(res["OrderData"][i]["net_wt"]).toFixed(3) || '') + '</td>' +
+                    '<td>' + parseFloat(res["OrderData"][i]["purity_name"]).toFixed(2) + '</td>' +
+                     '<td>' + res["OrderData"][i]["pcs"] + '</td>' +
+                    '<td>' + res["OrderData"][i]["product_group_name"] + '</td>' +
+                    '<td>' + (res["OrderData"][i]["order_date"] ? res["OrderData"][i]["order_date"].split('T')[0] : '') + '</td>' +
+                    '<td>' + (res["OrderData"][i]["order_delivery_date"] ? res["OrderData"][i]["order_delivery_date"].split('T')[0] : '') + '</td>' +
+                    '</tr>';
+
+                // Append the row to the table
+                $("#VendorNewOrdersTableId tbody").append(data);
+                srno++;
+            }
+        } else {
+            $("#VendorNewOrdersTableId tbody").empty();
+            // If no data is available, display a "No Data Available" row
+            $("#VendorNewOrdersTableId tbody").html(`
+                                <tr>
+                                    <td colspan="14" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+            generatePagination(1, 1);
+        }
+        updateSelectAllCheckboxState();
+    }
+
+    $(document).ready(function () {
+
+        GetOrderDate(1, $('#ShowRowid').val());
+
+        // When 'Accepted' button is clicked, get selected checkboxes
+        $("#Btn_AcceptedId").on("click", function () {
+            // const selectedValues = $(".rowCheckbox:checked").map(function () {
+            //     return $(this).val();
+            // }).get();
+
+
+            if (selectedRowIds.length > 0) {
+
+                OrderStatusFromHO(selectedRowIds.join(", "), "1");
+
+            } else {
+                // Show a warning if no checkboxes are selected
+                WarningMessage("Before Proceeding, Please Select Order Line(s)!");
+            }
+        });
+
+        // When 'Rejected' button is clicked, get selected checkboxes
+        $("#Btn_RejectedId").on("click", function () {
+            // const selectedValues = $(".rowCheckbox:checked").map(function () {
+            //     return $(this).val();
+            // }).get();
+
+
+            if (selectedRowIds.length > 0)
+            {
+                $("#Txt_RejectedVendorItemsId1").val(selectedRowIds.join(", "))
+                if (selectedRowIds.join(", ").length > 0) {
+                    // // Use Bootstrap's modal object to show the modal
+                    const myModal = new bootstrap.Modal(document.getElementById('VendorRejectedModalId1'));
+                    myModal.show();
+                    return true;
+                }
+                else {
+                    WarningMessage("Before Proceed Please Select Order Line....!!!")
+                }
+            } else {
+                // Show a warning if no checkboxes are selected
+                WarningMessage("Before Proceeding, Please Select Order Line(s)!");
+            }
+        });
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+
+    });
+
+    function OrderStatusFromHO(SelectedData, Status) {
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/VendorOrderUpdatedStatus",
+            data: {
+                SelectedDataIds: SelectedData,
+                Status: Status
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                ShowErrorMsg("Order Accpted Successfully...!!","0")
+                setTimeout(() =>
+                {
+                  window.location.href = '/Dashboard/VendorNewOrders';
+                }, 2000); // 3000 milliseconds = 2 seconds
+
+                    
+
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function WarningMessage(message) {
+        //alert(message)
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: "warning",
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message, flag) {
+        if (flag == "0") {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        else {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        //alert(message)
+
+    }
+
+    function OrderItemAction(ItemId, Flag) {
+        if (Flag == '1') {
+            $.ajax({
+                type: "POST",
+                url: "/Dashboard/GetJobcardDetails",
+                data: {
+                    ItemId: ItemId
+                },
+                success: function (data) {
+                    var res = JSON.parse(data);
+                    var OrderData = res["OrderData"];
+                    var Image = res["ImageData"];
+                    var StoneData = res["StoneData"];
+
+                    if (OrderData.length > 0) {
+                        console.log(OrderData);
+                        $("#OrderDetailsId").val(OrderData[0]["order_details_id"])
+                        $("#Lbl_OrderNo").text(OrderData[0]["order_series_no"])
+                        $("#Lbl_Date").text(OrderData[0]["order_date"].split('T')[0])
+                        $("#Lbl_DeliveryDate").text(OrderData[0]["order_delivery_date"].split('T')[0])
+                        $("#Lbl_ItemName").text(OrderData[0]["item_name"])
+                        $("#Lbl_Size").text(OrderData[0]["size"])
+                        $("#Lbl_Pieces").text(OrderData[0]["pcs"])
+                        $("#Lbl_Category").text(OrderData[0]["category_name"])
+                        $("#grossWt").text(parseFloat(OrderData[0]["gross_wt"]).toFixed(3))
+                        $("#netWt").text(parseFloat(OrderData[0]["net_wt"]).toFixed(3))
+                        $("#productGroup").text(OrderData[0]["product_group_name"])
+                        $("#PurityId").text(OrderData[0]["purity"])
+                        $("#remarkid").text(OrderData[0]["remark"])
+                    }
+                    $("#StoneDetailsTableId").empty();
+                    if (StoneData.length > 0) {
+                        var StoneAppendData = `<table class="table table-bordered table-sm">
+                                  <thead>
+                                      <tr>
+                                          <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Name</strong></th>
+                                          <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Category</strong></th>
+                                          <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Color</strong></th>
+                                          <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Weight</strong></th>
+                                          <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Pcs</strong></th>
+                                      </tr>
+                                  </thead><tbody>`;
+
+                        for (var i = 0; i < StoneData.length; i++) {
+                            StoneAppendData += `<tr>
+                                                           <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["item_name"] + `</td>
+                                                           <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["stone_category_name"] + `</td>
+                                                           <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["color_name"] + `</td>
+                                                           <td style="padding-top: 5px; padding-bottom: 5px;">` + parseFloat(StoneData[i]["stone_wt"]).toFixed(3) + `</td>
+                                                           <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["stone_pcs"] + `</td>
+                                                        </tr>`;
+                        }
+
+                        $("#StoneDetailsTableId").append(StoneAppendData + '</tbody></table>');
+
+                    }
+                    $("#ImageAppendDivId").empty();
+                    if (Image.length > 0) {
+                        console.log(Image)
+                        // Get the parent container
+                        var parentContainer = document.getElementById("ImageAppendDivId");
+
+                        // Create a row container
+                        var rowElement = null;
+
+                        // Loop through the images
+                        for (var i = 0; i < Image.length; i++) {
+                            // Start a new row for every group of 3 images
+                            if (i % 3 === 0) {
+                                rowElement = document.createElement('div');
+                                rowElement.className = "row mb-3"; // Add row class and margin
+                                parentContainer.appendChild(rowElement); // Append the row to the parent container
+                            }
+
+                            // Process the image
+                            var Path = Image[i]["path"].replace('~', ''); // Replace '~' in the path
+                            var imgElement = document.createElement('img');
+                            imgElement.alt = "Item Image";
+                            imgElement.id = "ItemImage_" + i; // Set dynamic id
+                            imgElement.src = Path; // Set the source
+                            imgElement.className = "img-equal-size"; // Add a custom class for size control
+
+                            // Create a div for the image
+                            var colElement = document.createElement('div');
+                            colElement.className = "col-md-4"; // Set column class
+                            colElement.appendChild(imgElement); // Append the image to the column
+
+                            // Append the column to the current row
+                            rowElement.appendChild(colElement);
+                        }
+                    }
+                },
+                error: function (response) {
+
+                }
+            });
+            const myModal = new bootstrap.Modal(document.getElementById('JobCardModalId'));
+            myModal.show();
+            // Disable the "sharejobCardbtn" button
+            $('#sharejobCardbtn').prop('disabled', true);
+
+        }
+    }
+
+</script>

@@ -1,0 +1,1004 @@
+@{
+    int srno = 1;
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                <!-- Title on the left -->
+                                <h3>City Master</h3>
+
+                                <!-- Buttons on the right -->
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-danger" id="Btn_ExportToExcelCityId">Export File</button>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCityMasterModal" id="Btn_AddCityId" onclick="ClearAllValue()">
+                                        <i class="align-bottom me-1"></i> Add City
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Second Row: Search Textbox and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="text" class="form-control" name="search" placeholder="Search..." id="Txt_SearchInputCityName" maxlength="50" />
+                                <button type="button" class="btn btn-primary" id="Btn_SearchCityId">Search</button>
+                                <button type="button" class="btn btn-secondary" id="Btn_ResetSearchCityId">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Edit Button -->
+                        <button type="button" data-bs-toggle="modal" data-bs-target="#EditCityMasterModal" id="Btn_EditCityId" style="display:none"></button>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="CityMasterTable_Id">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort fw-bold">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllCityHeader" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="srno">SR No</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold" data-sort="country_id">Country Name</th>
+                                    <th class="sort fw-bold" data-sort="state_id">State Name</th>
+                                    <th class="sort fw-bold" data-sort="name">City</th>
+                                    <th class="sort fw-bold" data-sort="status">Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @* THIS PARTIAL VIEW USED FOR PAGGINATION *@
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+
+<!-- Modal for Adding Product -->
+<div class="modal fade" id="addCityMasterModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductModalLabel">Add City</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for adding a new product group -->
+                @using (Html.BeginForm("SaveAddCity", "CityMaster"))
+                {
+                @*     <div class="row px-3">
+                        <label class="form-label">Country Name <span style="color:red;font-weight:800">*</span></label>
+                        <select name="CountryId" id="Select_CountryId" class="form-control" required>
+                            <option value="">Please Select Country </option>
+                            @foreach (var item in ViewBag.Country)
+                            {
+                                <option value="@item["id"]">@item["country_name"]</option>
+                            }
+                        </select>
+                    </div> *@
+					<div class="row px-3">
+						<label class="form-label">Country Name<span style="color:red;font-weight:800">*</span></label>
+						<input type="text" class="form-control" name="CountryId1" id="Select_CountryId" placeholder="Type Country name..." required />
+						<div id="suggestions" class="list-group mt-1"></div>
+						<input type="hidden" name="CountryId" id="CountryId" value="" />
+					</div>
+                    <div class="row px-3">
+                        <label class="form-label">State Name<span style="color:red;font-weight:800">*</span></label>
+                        @* <select name="StateId" id="Select_StateId" class="form-control" required>
+                        </select> *@
+						<input type="text" class="form-control" name="StateId1" id="Select_StateId" placeholder="Type State name..." required />
+						<div id="suggestions1" class="list-group mt-1"></div>
+						<input type="hidden" name="StateId" id="StateId" value="" />
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">City Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="Name" id="Txt_CityNameId" minlength="2" maxlength="50" required />
+                        <span id="WarnAddDataId" style="display:none"></span>
+                    </div>
+
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control onlyCharacterAndDash" name="remark" maxlength="200" id="Txt_RemarkId" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status<span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="RadioIsActive" name="IsActive" value="1" checked />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="RadioIsDeactive" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+							<button type="submit" class="btn btn-primary" id="Btn_SubmitId" onclick="return ValidateData()">
+                                <i class="align-bottom me-1"></i> Add
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Editing Product -->
+<div class="modal fade" id="EditCityMasterModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog" data-bs-backdrop="static">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Edit City Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal Form for editing -->
+                @using (Html.BeginForm("SaveEditCity", "CityMaster"))
+                {
+                    <input type="hidden" id="RecordId" name="UpdateRecordId" />
+                    <div class="row px-3">
+                        <label class="form-label">Country Name <span style="color:red;font-weight:800">*</span></label>
+                        <select name="CountryId" id="Select_UpdateCountryId" class="form-control" required>
+                            @foreach (var item in ViewBag.Country)
+                            {
+                                <option value="@item["id"]">@item["country_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3">
+                        <label class="form-label">State Name<span style="color:red;font-weight:800">*</span></label>
+                        <select name="StateId" id="Select_UpdateStateId" class="form-control" required>
+                            <option value="">-- Please Select State Id--</option>
+                            @foreach (var item in ViewBag.State)
+                            {
+                                <option value="@item["id"]">@item["state_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">City Name<span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control" name="Name" id="Txt_UpdateCityNameId" minlength="2" maxlength="50" required />
+                        <span id="WarnUpdateDataId" style="display:none"></span>
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Remark</label>
+                        <input type="text" class="form-control" name="remark" maxlength="200" id="Txt_UpdateRemarkId" />
+                    </div>
+                    <div class="row px-3 mt-3">
+                        <label class="form-label">Status <span style="color:red;font-weight:800">*</span></label>
+                        <div class="row pt-2">
+                            <div class="col-md-3">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateActiveId" name="IsActive" value="1" />
+                                <label> Active</label>&nbsp;
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="form-check-input" id="Radio_UpdateDeactiveId" name="IsActive" value="0">&nbsp;
+                                <label> Deactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="d-flex justify-content-end gap-2 px-3">
+                        <div>
+                            <button type="submit" class="btn btn-primary d-grid" id="Btn_UpdateId">
+                                Update
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for History Details -->
+<div class="modal fade" id="HistoryModalCity" tabindex="-1" aria-labelledby="HistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">History Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="CityHistorytable-id">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Country Name</th>
+                                <th>State Name</th>
+                                <th>City</th>
+                                <th>Status</th>
+                                <th>Ip Address</th>
+                                <th>Created At</th>
+                                <th>Created By</th>
+                                <th>Updated At</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include SheetJS (XLSX) library from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+<script>
+	let CountryGroupRecords = [];
+	let StateGroupRecords =[];
+		// THIS IS TO VALIDATE CORRECT ITEM NAME IS DISPLAY
+	function ValidateData()
+	{
+			if($("#CountryId").val() == "" && $("#StateId").val() == ""){
+				ShowWarning("Enter Valid Country Name & State Name...")
+				return false;
+			}
+			else{
+				return true;
+			}
+	}
+	$(document).ready(function ()
+	{
+			//THIS FUNCTION IS USED TO SEARCH ON ITEM GROUP NAME TYPED
+		$('#Select_CountryId').on('keyup', function () {
+			 let inp = $(this);
+			 console.log(inp);
+			 const searchTerm = inp.val().trim().toLowerCase();
+			 console.log(searchTerm);
+				let filteredResults = CountryGroupRecords.filter(city => {
+				let nameMatch = city.country_name.toLowerCase().includes(searchTerm);
+			return nameMatch;
+			});
+			renderCountrySuggestions(filteredResults, inp);
+			if ([2,4].includes(searchTerm.length))
+			{
+				loadCountryGroupData(searchTerm, inp);
+
+			}
+		});
+			// THIS FUNCTION IS USED TO BIND ID AND NAME ON ITEM GROUP DROPDOWN SHOWS
+		// $('#suggestions').on('click', '.list-group-item', function ()
+		// {
+		// 	const selectedName = $(this).text();
+		// 	const selectedId = $(this).data('id');
+		// 	const abc = $(this).val();
+		// 	$('#Select_CountryId').val(selectedName);
+		// 	$('#CountryId').val(selectedId);
+		// 	$('#suggestions').empty();
+		// });
+
+
+		$('#Select_StateId, #Select_StateId').on("keyup", function () {
+		let inp = $(this);
+			 console.log(inp);
+			 console.log("ba");
+			 const searchTerm = inp.val().trim().toLowerCase();
+			 console.log(searchTerm);
+				let filteredResults = StateGroupRecords.filter(state => {
+				let nameMatch = state.state_name.toLowerCase().includes(searchTerm);
+			return nameMatch;
+			});
+			renderStateSuggestions(filteredResults, inp);
+			if ([2,4].includes(searchTerm.length))
+			{
+				loadStateGroupData(searchTerm, inp);
+
+			}
+		});
+	});
+		//THIS FUNCTION IS USED TO LOAD FILTERED COUNTRY GROUP
+	function loadCountryGroupData(searchTerm, inp)
+	{
+			$.ajax({
+				url: '/CityMaster/GetFilteredCountryGroups',
+				type: 'GET',
+				data: {
+
+					SearchItem: searchTerm
+				},
+				success: function (data) {
+
+
+
+					if (Array.isArray(data)) {
+							CountryGroupRecords = data;
+						renderCountrySuggestions(data, inp);
+					}
+				},
+				error: function (error) {
+					console.error("Error fetching customer data:", error);
+				}
+			});
+	}
+
+	//THIS FUNCTION IS USED TO LOAD STATE GROUP
+	function loadStateGroupData(searchTerm, inp,Countryid)
+	{
+		 var countryid = $("#CountryId").val();
+			$.ajax({
+				url: '/CityMaster/GetStateName',
+				type: 'GET',
+				data: {
+
+					SearchItem: searchTerm,
+					CountryId: countryid
+				},
+				success: function (data) {
+
+
+
+					if (Array.isArray(data)) {
+							StateGroupRecords = data;
+						renderStateSuggestions(data, inp);
+					}
+				},
+				error: function (error) {
+					console.error("Error fetching customer data:", error);
+				}
+			});
+	}
+	// THIS FUNCTION IS USED TO RENDER THE FILTERED SUGGESTIONS
+	function renderCountrySuggestions(data, inp)
+		{
+			const suggestionBox = document.getElementById('suggestions');
+			suggestionBox.innerHTML = ''; // Clear old suggestions
+
+			// Get and normalize input value (supports jQuery or native input)
+			const inputValue = (inp.val ? inp.val() : inp.value).trim().toLowerCase();
+
+			const filteredData = data.filter(item =>
+					item.country_name.toLowerCase().includes(inputValue)
+			);
+
+			if (filteredData.length === 0) {
+				const noResult = document.createElement('div');
+				noResult.classList.add('list-group-item', 'text-muted');
+				noResult.textContent = 'No matches found';
+				suggestionBox.appendChild(noResult);
+				return;
+			}
+
+			filteredData.forEach(item => {
+				const div = document.createElement('div');
+				div.classList.add('list-group-item', 'list-group-item-action');
+					div.textContent = item.country_name;
+
+				// Set a data attribute for ID
+				div.setAttribute('data-id', item.id);
+
+				div.addEventListener('click', function () {
+						const name = item.country_name;
+					const id = item.id;
+					if (inp.val) {
+						inp.val(name);
+					} else {
+						inp.value = name;
+					}
+					// You could also set it in a hidden input if needed:
+					const hiddenInput = document.getElementById('CountryId');
+					if (hiddenInput) hiddenInput.value = id;
+
+					suggestionBox.innerHTML = '';
+				});
+
+				suggestionBox.appendChild(div);
+			});
+		}
+		//state render
+	function renderStateSuggestions(data, inp)
+		{
+			const suggestionBox = document.getElementById('suggestions1');
+			suggestionBox.innerHTML = ''; // Clear old suggestions
+
+			// Get and normalize input value (supports jQuery or native input)
+			const inputValue = (inp.val ? inp.val() : inp.value).trim().toLowerCase();
+
+			const filteredData = data.filter(item =>
+					item.state_name.toLowerCase().includes(inputValue)
+			);
+
+			if (filteredData.length === 0) {
+				const noResult = document.createElement('div');
+				noResult.classList.add('list-group-item', 'text-muted');
+				noResult.textContent = 'No matches found';
+				suggestionBox.appendChild(noResult);
+				return;
+			}
+
+			filteredData.forEach(item => {
+				const div = document.createElement('div');
+				div.classList.add('list-group-item', 'list-group-item-action');
+					div.textContent = item.state_name;
+
+				// Set a data attribute for ID
+				div.setAttribute('data-id', item.id);
+
+				div.addEventListener('click', function () {
+						const name = item.state_name;
+					const id = item.id;
+					if (inp.val) {
+						inp.val(name);
+					} else {
+						inp.value = name;
+					}
+					// You could also set it in a hidden input if needed:
+					const hiddenInput = document.getElementById('StateId');
+					if (hiddenInput) hiddenInput.value = id;
+
+					suggestionBox.innerHTML = '';
+				});
+
+				suggestionBox.appendChild(div);
+			});
+		}
+		
+
+		// THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowWarning(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'warning',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message) {
+        Swal.fire({
+            //title: 'Good job!',
+            text: message,
+            icon: 'success',
+            customClass: {
+                confirmButton: 'btn btn-primary waves-effect waves-light'
+            },
+            buttonsStyling: false
+        });
+
+    }
+
+    function loadPageData(page, rowsToShow) {
+        GetCityData(page, $('#ShowRowid').val());
+
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#CityMasterTable_Id");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+
+    var selectedRowIds = [];
+    var SearchText;
+
+    $(document).ready(function () {
+
+        GetCityData(1, $('#ShowRowid').val());
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        if ('@TempData["Message"]' !== "") {
+            ShowErrorMsg('@TempData["Message"]');
+        }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+    }
+
+            $(".Checkbox_SelectAllHeader").on("change", function () {
+                var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+                var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+                // Select or deselect all row checkboxes based on the header checkbox state
+                table.find(".RowCheckbox").prop('checked', isChecked);
+
+                // Update the selectedRowIds array based on the "Select All" checkbox
+                if (isChecked) {
+                    // Add all row IDs to the selectedRowIds array for the specific table
+                    table.find(".RowCheckbox").each(function () {
+                        var rowId = $(this).data('id');
+                        if (rowId && !selectedRowIds.includes(rowId)) {
+                            selectedRowIds.push(rowId);
+                        }
+                    });
+                    console.log(selectedRowIds);
+                } else {
+
+                    table.find(".RowCheckbox").each(function () {
+                        var rowId = $(this).data('id');
+                        if (rowId) {
+                            // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                            selectedRowIds = selectedRowIds.filter(function (id) {
+                                return id !== rowId;
+                            });
+                        }
+                    });
+                    console.log(selectedRowIds);
+                }
+            });
+
+        $(document).on("change", ".RowCheckbox", function () {
+            var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+            var rowId = $(this).data('id');  // Get the row ID from data attribute
+            var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+            // Add or remove the row ID from the selectedRowIds array based on checkbox state
+            if (isChecked) {
+                if (!selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                }
+            } else {
+                var index = selectedRowIds.indexOf(rowId);
+                if (index !== -1) {
+                    selectedRowIds.splice(index, 1);
+                }
+            }
+
+            // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+            updateSelectAllCheckboxState()
+
+
+        });
+
+        function sendSelectedRowIds() {
+            // Check if there are any selected row IDs
+            var searchValue = SearchText;
+            var rowIdsString = selectedRowIds.join(',');
+            // Make an AJAX request to send the data to the controller action
+            $.ajax({
+                type: "POST",
+                url: "/CityMaster/ExportdataExcelCity",
+                data: {
+                    selectedRowIds: rowIdsString,
+                    searchValue: searchValue
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Decode Base64 to binary string
+                        var byteCharacters = atob(response.fileContent); // Decode Base64 to binary string
+                        var byteArray = new Uint8Array(byteCharacters.length);
+
+                        for (var i = 0; i < byteCharacters.length; i++) {
+                            byteArray[i] = byteCharacters.charCodeAt(i); // Convert to byte array
+                        }
+
+                        // Create a blob from the byte array
+                        var blob = new Blob([byteArray], { type: response.fileType });
+
+                        // Create a link element for downloading
+                        var link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.fileName; // Set the download file name
+                        link.click();
+                    } else {
+                        ShowErrorMsg(response.message)
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error (failure)
+                    console.error('Error occurred while sending data to the server:', error);
+
+                    // Optionally, display an error message
+                    alert('An error occurred while processing your request.');
+                }
+            });
+
+        }
+
+
+        // EXPORT TO EXCEL BUTTON FUNCTIONALITY
+        $("#Btn_ExportToExcelCityId").click(function () {
+
+            sendSelectedRowIds();
+
+        });
+
+        // $('#Select_CountryId, #Select_UpdateCountryId').on("change", function () {
+        //     // Get the selected CountryId from the element that triggered the event
+        //     const countryId = $(this).val();  // Get the selected CountryId
+        //     console.log(countryId);
+
+        //     if (countryId) {
+        //         $.ajax({
+        //             type: "POST",
+        //             url: "/CityMaster/GetStateName",
+        //             data: {
+        //                 CountryId: countryId
+        //             },
+        //             success: function (response) {
+        //                 // Parse the response (assuming the response is a JSON string)
+        //                 var res = JSON.parse(response);  // Parse the JSON string
+        //                 console.log(res);  // Log the parsed response
+
+        //                 // Access the "Table" array from the response
+        //                 var stateTable = res.Table;  // Access the "Table" array
+
+        //                 // Check if the "Table" array has any items
+        //                 if (stateTable && stateTable.length > 0) {
+        //                     // Clear the state dropdown
+        //                     $('#Select_StateId, #Select_UpdateStateId').empty();
+        //                     $('#Select_StateId, #Select_UpdateStateId').append('<option value="">Select State</option>');
+
+        //                     // Loop through the rows of the "Table" array and populate the dropdown
+        //                     stateTable.forEach(function (row) {
+        //                         // Append options to the dropdown with `id` as the value and `state_name` as the text
+        //                         $('#Select_StateId, #Select_UpdateStateId').append(`<option value="${row.id}">${row.state_name}</option>`);
+        //                     });
+        //                 } else {
+        //                     // If no states are available, append a "No states available" option
+        //                     $('#Select_StateId, #Select_UpdateStateId').empty();
+        //                     $('#Select_StateId, #Select_UpdateStateId').append('<option value="">No states available</option>');
+        //                 }
+        //             },
+        //             error: function (response) {
+        //                 console.error("Error during AJAX request:", response);
+        //             }
+        //         });
+        //     } else {
+        //         // If no country is selected, clear the state dropdown
+        //         $('#Select_StateId, #Select_UpdateStateId').empty();
+        //         $('#Select_StateId, #Select_UpdateStateId').append('<option value="">Select State</option>');
+        //     }
+        // });
+
+        $('#Btn_SearchCityId').on('click', function () {
+            SearchText = $('#Txt_SearchInputCityName').val();
+            GetCityData(1, $('#ShowRowid').val());
+        });
+
+        $("#Btn_ResetSearchCityId").on("click", function () {
+            location.reload();
+        });
+
+    });
+
+    $(document).on('keypress', '.onlyCharacterAndDash', function (event) {
+        // Restrict first character to be alphabetic only
+        if (this.value.length === 0 && !/[a-zA-Z]/.test(String.fromCharCode(event.which))) {
+            event.preventDefault();
+            return false;
+        }
+
+        var regex = new RegExp("^[a-zA-Z -_]+$");
+        var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+        // Allow only alphabetic characters, space, underscore, and dash
+        if (!regex.test(key)) {
+            event.preventDefault();
+            return false;
+        }
+
+        var lastChar = this.value.slice(-1);
+
+        // Prevent consecutive spaces, underscores, or dashes
+        if (
+            ((event.which === 32 && lastChar === ' ') ||
+                (event.which === 45 && lastChar === '-') ||
+                (event.which === 95 && lastChar === '_'))
+        ) {
+            event.preventDefault();
+            return false;
+        }
+
+        // Prevent a space, underscore, or dash directly after another space, underscore, or dash
+        if (
+            (event.which === 32 || event.which === 45 || event.which === 95) &&
+            (lastChar === ' ' || lastChar === '-' || lastChar === '_')
+        ) {
+            event.preventDefault();
+            return false;
+        }
+
+        // Ensure space, underscore, or dash is allowed only after two words
+        var parts = this.value.split(/[\s-_]+/);
+        if (parts.length > 2 && (event.which === 32 || event.which === 45 || event.which === 95)) {
+            event.preventDefault();
+            return false;
+        }
+    });
+
+    //THIS IS EDIT DATA
+    function EditCityId(id, Flag) {
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+        $.ajax({
+            type: "POST",
+            url: "/CityMaster/EditCity",
+            data: {
+                ID: id,
+                Flag: Flag
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var CityData = res["CityData"]
+                var Flag = res["Flag"]
+                if (Flag === "Show") {
+                    $("#Btn_UpdateId").prop("disabled", false);
+                }
+                else {
+                    $("#Btn_UpdateId").prop("disabled", true);
+                }
+
+                document.getElementById('RecordId').value = CityData[0]["id"];
+                document.getElementById('Select_UpdateCountryId').value = CityData[0]["country_id"];
+                document.getElementById('Select_UpdateStateId').value = CityData[0]["state_id"];
+                document.getElementById('Txt_UpdateCityNameId').value = CityData[0]["city_name"];
+                document.getElementById('Txt_UpdateRemarkId').value = CityData[0]["remark"];
+
+                //THIS IS USED FOR CHECKED ACTIVE INACTIVE
+                if (CityData[0]["is_active"] == "1") {
+                    $("#Radio_UpdateActiveId").prop("checked", true);
+                } else {
+                    $("#Radio_UpdateDeactiveId").prop("checked", true);
+                }
+
+                $("#Btn_EditCityId").click();
+
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    $('#Txt_CityNameId, #Txt_UpdateCityNameId').on("change paste", function () {
+        const inputFieldId = $(this).attr('id'); // Get the ID of the field that triggered the event
+        const value = $(this).val();
+        let Country, State;
+
+        // Assign Country and State values based on the field ID
+        if (inputFieldId === "Txt_CityNameId") {
+            Country = $("#Select_CountryId").val();
+            State = $("#Select_StateId").val();
+        } else if (inputFieldId === "Txt_UpdateCityNameId") {
+            Country = $("#Select_UpdateCountryId").val();
+            State = $("#Select_UpdateStateId").val();
+        }
+        $.ajax({
+            type: "POST",
+            url: "/CityMaster/CheckDuplicateRecord",
+            data: {
+                City: value,
+                Country: Country,
+                State: State
+            },
+            success: function (data) {
+                if (data != '') {
+                    // Clear the field that triggered the event
+                    $('#' + inputFieldId).val("");
+                    // Show warning for the respective field
+                    if (inputFieldId === "Txt_CityNameId") {
+                        $("#WarnAddDataId").css({ "display": "block", "color": "red" }).text("City Name Already Exists...");
+                        $("#Txt_CityNameId").val('');
+                    } else if (inputFieldId === "Txt_UpdateCityNameId") {
+                        $("#WarnUpdateDataId").css({ "display": "block", "color": "red" }).text("City Name Already Exists...");
+                        $("#Txt_UpdateCityNameId").val('');
+                    }
+                } else {
+                    $("#WarnAddDataId").css({ "display": "none" });
+                    $("#WarnUpdateDataId").css({ "display": "none" });
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    });
+
+    function ClearAllValue() {
+        $("#Select_StateId").val("");
+        $("#Txt_CityNameId").val("");
+		 $("#Select_CountryId").val("");
+		$("#suggestions").empty();
+		$("#suggestions1").empty();
+        $("#Txt_RemarkId").val("");
+        $("#WarnAddDataId").css({ "display": "none" });
+        $("#WarnUpdateDataId").css({ "display": "none" });
+    }
+
+    $('#Txt_CityNameId,#Txt_UpdateCityNameId').on('input', function () {
+        let value = $(this).val();
+
+        // Remove any character that is not a letter (A-Z, a-z) or space
+        value = value.replace(/[^a-zA-Z\s]/g, '');
+
+        // If the first character is a space, remove it
+        if (value.charAt(0) === ' ') {
+            value = value.substring(1);  // Remove the first character if it's a space
+        }
+
+        // Set the cleaned value back to the input field
+        $(this).val(value);
+    });
+
+    function TableBindCityData(res, paginationt) {
+
+        $("#CityMasterTable_Id tbody").empty();
+
+        var table = $("#CityMasterTable_Id");
+
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+        let srno;
+        if (paginationt && paginationt.length > 0) {
+            const totalRows = paginationt[0].TotalRows;
+            const totalPages = paginationt[0].TotalPages;
+            const pageNumber = paginationt[0].PageNumber;
+            const pageSize = paginationt[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } else {
+            console.error('PaginationInfo is not available or is in an incorrect format. Response:', paginationt);
+        }
+
+        if (Array.isArray(res)) {
+
+            res.forEach(city => {
+
+                const cityid = city.id.toString();
+
+                const isChecked = selectedRowIds.some(id => {
+                    return id.toString() === cityid;
+                });
+
+                const data = `
+                                <tr id="${city.id}">
+                                <td>
+                                    <div class="form-check">
+                                                <input class="form-check-input RowCheckbox" type="checkbox" data-id="${city.id}" id="CityRowCheckBoxId_${city.id}" ${isChecked ? 'checked' : ''}>
+                                    </div>
+                                </td>
+                                <td>${srno}</td>
+                                <td>
+                                    <div class="d-flex gap-2">
+                                        <div class="edit">
+                                                <span class="btn btn-sm btn-success" style="margin:1px; cursor:pointer;" onclick="EditCityId(${city.id}, 'Show')" id="Btn_EditCityId">
+                                                <i class="fa fa-edit"></i>
+                                            </span>
+                                                    </div>
+                                    </div>
+                                </td>
+                                    <td>${city.country || ''}</td>
+                                    <td>${city.state || ''}</td>
+                                    <td>${city.city_name || ''}</td>
+                                    <td>${city.is_active === 1 ? "Active" : "Deactive"}</td>
+                            </tr>
+                        `;
+
+                $("#CityMasterTable_Id tbody").append(data);
+
+                srno++;
+            });
+
+        } else {
+            $("#CityMasterTable_Id tbody").empty();
+            $("#CityMasterTable_Id tbody").html(`
+                        <tr>
+                            <td colspan="7" style="text-align: center;">No Data Available</td>
+                        </tr>
+                    `);
+        }
+
+        updateSelectAllCheckboxState();
+    }
+
+    function GetCityData(pageNumber, pageSize) {
+        const data = {
+            PageNumber: pageNumber,
+            PageSize: pageSize,
+            SearchText: SearchText
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/CityMaster/GetCityData",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+
+                const cityData = response.CityData;
+                const paginationInfo = response.PaginationInfo;
+
+
+                TableBindCityData(cityData, paginationInfo);
+            },
+            error: function (xhr, status, error) {
+                // // Only log the error if it's not a 'No Data Available' situation
+                // if (xhr.status !== 404 && xhr.status !== 204) {
+                //     console.error("Error fetching item data", xhr.responseText);
+                // }
+
+                // Clear the table body and display a "No Data Available" message if no data is fetched
+                $("#CityMasterTable_Id tbody").empty();
+                $("#CityMasterTable_Id tbody").html(`
+                                    <tr>
+                                        <td colspan="9" style="text-align: center;">No Data Available</td>
+                                    </tr>
+                                `);
+                generatePagination(1, $('#ShowRowid').val());
+            }
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW HISTORY DETAILS
+    function ShowHistory(id) {
+        console.log(id);
+
+        $.ajax({
+            type: "POST",
+            url: "/CityMaster/GetHistoryData",
+            data: { id: id },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var HistoryData = res["HistoryData"];
+
+                $("#CityHistorytable-id tbody").empty();
+
+
+                if (HistoryData.length > 0) {
+
+                    HistoryData.forEach(function (item) {
+                        var row = '<tr>';
+                        row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                        row += '<td>' + (item.country || '') + '</td>';
+                        row += '<td>' + (item.state || '') + '</td>';
+                        row += '<td>' + (item.city_name || '') + '</td>';
+                        row += '<td>' + (item.is_active == '1' ? 'Active' : 'Deactive') + '</td>';
+                        row += '<td>' + (item.ip_address || '') + '</td>';
+                        row += '<td>' + (item.created_at || '') + '</td>';
+                        row += '<td>' + (item.created_by || '') + '</td>';
+                        row += '<td>' + (item.updated_at || '') + '</td>';
+                        row += '<td>' + (item.updated_by || '') + '</td>';
+                        row += '</tr>';
+
+                        $("#CityHistorytable-id tbody").append(row); // This is correct
+                    });
+                } else {
+                    // If no data, show a message (optional)
+                    historyTableBody.append('<tr><td colspan="13" class="text-center">No history available</td></tr>');
+                }
+            },
+            error: function (response) {
+                console.error("Error during AJAX request:", response);
+            }
+        });
+    }
+
+</script>
+

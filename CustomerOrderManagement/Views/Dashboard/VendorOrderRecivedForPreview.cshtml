@@ -1,0 +1,579 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+@if (TempData["PreviewAcceptReject"] != null)
+{
+    <script>
+        // Safely pass TempData["Message"] to JavaScript
+        ShowErrorMsg('@TempData["PreviewAcceptReject"]');
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+            //alert(message)
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+    </script>
+    TempData["PreviewAcceptReject"] = null;
+}
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card p-0">
+            <div class="card-body p-1">
+                <div id="customerList">
+                    <div class="container mt-5 d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">Order Received For Preview</h4>
+                    </div>
+
+                    @* <div class="row g-4 mb-3"> *@
+                    <!-- First Row: Title and Buttons -->
+                    <div class="container mt-5 d-flex justify-content-between align-items-center">
+                        <!-- Left: Nav tabs -->
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="Tab_AllOrderTabId" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" onclick="GetOrderPreviewData(this.id,'1',1, $('#ShowRowid').val())">All Order's</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="Tab_AcceptedOrdersId" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" onclick="GetOrderPreviewData(this.id,'2',1, $('#ShowRowid').val())">Accepted</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="Tab_RejectedOrdersId" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" onclick="GetOrderPreviewData(this.id,'3',1, $('#ShowRowid').val())">Rejected</button>
+                            </li>
+                        </ul>
+
+                        <!-- Right: Buttons -->
+                        <div class="d-flex">
+                            <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                        <div class="table-responsive table-card mt-3 mb-1">
+                            <table class="table align-middle table-nowrap" id="VendorOrderRecivedForPreviewTableId">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sort" data-sort="Sr No">Sr No</th>
+                                        <th class="sort" data-sort="Action">Action</th>
+                                        <th class="sort" data-sort="Status">Status</th>
+                                        <th class="sort" data-sort="Order No">Order No.</th>
+                                        <th class="sort" data-sort="Item Name">Item Name</th>
+                                        <th class="sort" data-sort="Category">Category</th>
+                                        <th class="sort" data-sort="Net Weight">Gross Weight</th>
+                                        <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                        <th class="sort" data-sort="Purity">Purity</th>
+                                        <th class="sort" data-sort="Item Pieces">Item Pieces</th>
+                                        <th class="sort" data-sort="Product Group">Product Group</th>
+                                        <th class="sort" data-sort="Branch Name">Branch Name</th>
+                                        <th class="sort" data-sort="Order Date">Order Date</th>
+                                        <th class="sort" data-sort="Order Delivery Date">Order Delivery Date</th>
+                                        <th class="sort" data-sort="Vendor Name">Vendor Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="form-check-all">
+                                </tbody>
+                            </table>
+                        </div>
+                        @await Html.PartialAsync("Sections/Menu/_pagination")
+                    </div>
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+<input type="hidden" name="Order_Item_Id" id="ItemDetailsId" />
+
+<!-- Large modal -->
+<!-- Modal Structure -->
+<div class="modal fade" id="OpenOrderViewId" tabindex="-1" aria-labelledby="OpenOrderViewLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="OpenOrderViewLabel">Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Order Details Section -->
+                <div class="mb-3">
+                    @* <h6 class="text-white p-2 rounded" style="background-color:darkorchid">Order Details</h6> *@
+                    <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                        <h5 class="text-white mb-0">Order Details</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col">
+                            <label for="Txt_OrderNo" class="form-label">Order No</label>
+                            <input type="text" id="Txt_OrderNo" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Select_BranchNameId" class="form-label">Branch </label>
+                            <input type="text" id="BranchId" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Txt_CustomerMobileId" class="form-label">Order Date</label>
+                            <input type="text" id="OrderDateId" class="form-control" disabled />
+                        </div>
+
+                        <div class="col">
+                            <label for="Txt_NetWtId" class="form-label">Delivery Date</label>
+                            <input type="text" id="OrderDeliveryId" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Sections as Needed -->
+                <div class="mb-3">
+                    <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                        <h5 class="text-white mb-0">Item Details</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col">
+                            <label for="Txt_NetWtId" class="form-label">Net Weight (Gram) <span class="text-danger">*</span></label>
+                            <input type="text" id="Txt_NetWtId" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Txt_ItemSizeId" class="form-label">Gross Wt <span class="text-danger">*</span></label>
+                            <input type="text" id="GrossWt" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Txt_ItemPiecesId" class="form-label">Item Size <span class="text-danger">*</span></label>
+                            <input type="text" id="SizeId" class="form-control" placeholder="Enter Item Pieces" maxlength="5" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Txt_NetWtId" class="form-label">Pcs</label>
+                            <input type="text" id="PcsId" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Sections as Needed -->
+                <div class="mb-3">
+                    <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                        <h5 class="text-white mb-0">Actual Item Details</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col">
+                            <label for="Txt_NetWtId" class="form-label">Actual Gross Wt <span class="text-danger">*</span></label>
+                            <input type="text" id="ActualGrossId" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                            <label for="Txt_ItemSizeId" class="form-label">Actual Net Wt <span class="text-danger">*</span></label>
+                            <input type="text" id="ActualNetId" class="form-control" disabled />
+                        </div>
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Sections as Needed -->
+                <div class="mb-3">
+                    <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                        <h5 class="text-white mb-0">Image</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col">
+                        </div>
+                        <div class="col">
+                            <img id="ImageDataId" style="height:100%;width:100%;margin-top:4%" />
+                        </div>
+                        <div class="col">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="HOPreviewAcceptOrReject('1')">Preview Accept</button>
+                <button type="button" class="btn btn-danger" onclick="HOPreviewAcceptOrReject('2')">Preview Reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    // Mapping tab IDs to their corresponding types
+    let tabDataMapping = {
+        'Tab_AllOrderTabId': '1',
+        'Tab_AcceptedOrdersId': '2',
+        'Tab_RejectedOrdersId': '3'
+    };
+
+
+    function loadPageData(page, rowsToShow) {
+        // Use activeTabId to determine the corresponding data
+        if (tabDataMapping[activeTabId]) {
+            GetOrderPreviewData(activeTabId, tabDataMapping[activeTabId], page, $('#ShowRowid').val());
+        } else {
+            console.error("Invalid tabId: " + activeTabId);
+        }
+    }
+
+    function applyFilter() {
+
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        GetOrderPreviewData(activeTabId, tabDataMapping[activeTabId], 1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        GetOrderPreviewData(activeTabId, tabDataMapping[activeTabId], 1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    function getActiveTabId() {
+        // Find the active tab within the nav-tabs
+        var activeTab = document.querySelector('.nav-tabs .nav-link.active');
+
+        // Return the id of the active tab
+        return activeTab ? activeTab.id : null;
+    }
+
+    // Example usage
+    var activeTabId = getActiveTabId();
+
+    $(document).ready(function () {
+
+        GetOrderPreviewData(activeTabId, '1', 1, $('#ShowRowid').val());
+
+        // Attach a click event listener to update activeTabId on tab change
+        $('.nav-tabs .nav-link').on('click', function () {
+            activeTabId = getActiveTabId();
+            selectedRowIds = [];
+            ClearFilter();
+        });
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+    });
+
+    function GetOrderPreviewData(ActiveTab, Flag, pageNumber, pageSize) {
+
+        const data = {
+            Flag: Flag,
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetOrderForPreviewRelatedPriority",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                var res = JSON.parse(data);
+                console.log(res["OrderData"])
+                TableBindData(res)
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    function TableBindData(res) {
+        // Clear the tbody of the table
+        $("#VendorOrderRecivedForPreviewTableId tbody").empty();
+
+        const paginationInfo = res.PaginationInfo;
+
+        let srno;
+
+        if (res && paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } else {
+            console.error('PaginationInfo is not available or is in an incorrect format. Response:', paginationInfo);
+        }
+
+        // Check if the response has valid data
+        if (res && res.OrderData && Array.isArray(res.OrderData)) {
+            for (let i = 0; i < res["OrderData"].length; i++) {
+                const order = res["OrderData"][i];
+                    var ActionLink = '<div class="d-flex align-items-center gap-3">';
+
+                    if (order["order_status"] == "8") {
+                        ActionLink += `<span class="text-primary cursor-pointer" onclick="OpenModal('` + order["order_item_id"] + `')">
+                                         <i class="fa fa-eye"></i>
+                                       </span>`;
+                    } else if (order["order_status"] == "9") {
+                        ActionLink += `<span class="text-primary cursor-pointer" onclick="AcceptedPreview()">
+                                         <i class="fa fa-eye"></i>
+                                       </span>`;
+                    }
+
+                    if (parseFloat(res["OrderData"][i]["gross_wt"]) > parseFloat(res["OrderData"][i]["net_wt"])) {
+                        ActionLink += `<a href="javascript:void(0);" class="text-primary cursor-pointer"
+                                         onclick="ShowStoneDetails(` + res["OrderData"][i]["order_item_id"] + `)">
+                                         <i class="fa fa-gem"></i>
+                                       </a>`;
+                    } else {
+                        ActionLink += `<span>-</span>`;
+                    }
+
+                    ActionLink += `<div class="dropdown">
+                                      <span id="Btn_MoreOptionsCityId" class="text-primary cursor-pointer" data-bs-toggle="dropdown">
+                                        <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                      </span>
+                                      <ul class="dropdown-menu dropdown-menu-end p-0 small">
+                                        <li>
+                                          <a class="dropdown-item py-1" href="javascript:void(0);" onclick="ShowJobCardDetails('` + order["order_item_id"] + `')">
+                                            <i class="fa fa-id-card me-2"></i>Job Card
+                                          </a>
+                                          <hr class="m-0" />
+                                        </li>
+                                        <li>
+                                          <a class="dropdown-item py-1" href="javascript:void(0);" onclick="ShowHistoryPage('` + order["order_item_id"] + `')">
+                                            <i class="fa fa-history me-2"></i>History
+                                          </a>
+                                        </li>
+                                      </ul>
+                                    </div>`;
+
+                    ActionLink += '</div>'; // Close the flex container
+
+                    // Append or use ActionLink as needed
+
+
+                // Build the table row
+                const data = '<tr class="total_tr">'
+                    + '<td>' + srno + '</td>' // For count (1, 2, 3, ...)
+                    + '<td>' + ActionLink + '</td>'
+                    + '<td>' + (order["STATUS"] || '') + '</td>'
+                    + '<td>' + (order["order_series_no"] || '') + '</td>'
+                    + '<td>' + (order["item_name"] || '') + '</td>'
+                    + '<td>' + (order["category_name"] || '') + '</td>'
+                    + '<td>' + (order["gross_wt"] ? parseFloat(order["gross_wt"]).toFixed(3) : '') + '</td>'
+                    + '<td>' + (order["net_wt"] ? parseFloat(order["net_wt"]).toFixed(3) : '') + '</td>'
+                    + '<td>' + (parseFloat(order["purity_name"]).toFixed(2) || '') + '</td>'
+                    + '<td>' + (order["pcs"] || '') + '</td>'
+                    + '<td>' + (order["product_group_name"] || '') + '</td>'
+                    + '<td>' + (order["branch_name"] || '') + '</td>'
+                    + '<td>' + (order["order_date"] ? new Date(order["order_date"]).toISOString().split('T')[0] : '') + '</td>'
+                    + '<td>' + (order["order_delivery_date"] ? new Date(order["order_delivery_date"]).toISOString().split('T')[0] : '') + '</td>'
+                    + '<td>' + (order["vendor_name"] || '') + '</td>'
+                    + '</tr>';
+
+
+                $("#VendorOrderRecivedForPreviewTableId tbody").append(data);
+                srno++;
+            }
+        } else {
+            // If no data is available, display a "No Data Available" row
+            $("#VendorOrderRecivedForPreviewTableId tbody").empty();
+            $("#VendorOrderRecivedForPreviewTableId tbody").html(`
+                                <tr>
+                                    <td colspan="12" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+            generatePagination(1, 1);
+        }
+    }
+
+    function RejectedPreview()
+    {
+        ShowErrorMsg("Preview Already Rejected...!!")
+    }
+    function AcceptedPreview() {
+        ShowErrorMsg("Preview Already Accepted...!!")
+    }
+    function HOPreviewAcceptOrReject(Flag) {
+        //alert($("#ItemDetailsId").val())
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/PreviewAcceptAndReject",
+            data: {
+                Flag: Flag,
+                ItemDetailsId: $("#ItemDetailsId").val()
+            },
+            success: function (data)
+            {
+              var Message = JSON.parse(data);
+              ShowErrorMsg(Message["ErrorMessage"],"0")
+                setTimeout(() => {
+                    window.location.href = '/Dashboard/VendorOrderRecivedForPreview';
+                }, 2000); // 2000 milliseconds = 2 seconds
+                
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    function OpenModal(OrderItemId) {
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetOrderItemIddetailsForPreview",
+            data: {
+                OrderItemId: OrderItemId,
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                var OrderData = res["OrderData"];
+                console.log(OrderData)
+                console.log(OrderData[0]["order_header_id"])
+                if (OrderData.length > 0) {
+                    $("#Txt_OrderNo").val(OrderData[0]["order_series_no"])
+                    $("#ItemDetailsId").val(OrderData[0]["order_item_id"])
+                    $("#BranchId").val(OrderData[0]["branch_name"])
+                    $("#OrderDateId").val(OrderData[0]["order_date"].split('T')[0])
+                    $("#OrderDeliveryId").val(OrderData[0]["order_delivery_date"].split('T')[0]);
+                    $("#Txt_NetWtId").val(OrderData[0]["net_wt"])
+                    $("#GrossWt").val(OrderData[0]["gross_wt"])
+                    $("#SizeId").val(OrderData[0]["size"])
+                    $("#PcsId").val(OrderData[0]["pcs"])
+                    $("#ActualGrossId").val(OrderData[0]["actual_item_gross_wt"])
+                    $("#ActualNetId").val(OrderData[0]["actual_item_net_wt"])
+                    $("#SizeNewId").val(OrderData[0]["size"])
+
+                    const imgPath = OrderData[0]["upload_preview_image_path"].replace('~', '');
+                    console.log(imgPath)
+                    document.getElementById('ImageDataId').src = imgPath;
+                }
+            },
+            error: function (response) {
+
+            }
+        });
+
+        const myModal = new bootstrap.Modal(document.getElementById('OpenOrderViewId'));
+        myModal.show();
+    }
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message, flag) {
+        if (flag == "0") {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        else {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        //alert(message)
+
+    }
+
+</script>
+

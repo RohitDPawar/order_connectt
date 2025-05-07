@@ -1,0 +1,1570 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+@if (TempData["EditOrderMessage"] != null)
+{
+    <script>
+        // Safely pass TempData["Message"] to JavaScript
+        ShowErrorMsg('@TempData["EditOrderMessage"]');
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+            //alert(message)
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+    </script>
+    TempData["EditOrderMessage"] = null;
+}
+
+<div class="row gy-6 mb-4">
+    <div class="col-lg-12">
+        <!-- Card for the table -->
+        <div class="card p-0">
+            <div class="card-body p-1">
+
+                <div class="container mt-5 d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Order Management</h3>
+
+                    <button type="button" class="btn btn-primary pe-4" id="Btn_SendKaragirId" onclick="return openModal()">
+                        <i class="align-bottom me-1"></i> Send To Vendor
+                    </button>
+                </div>
+
+
+                <div class="container mt-5 d-flex justify-content-between align-items-center">
+                    <!-- Left: Nav tabs -->
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="Tab_WIPTabId" data-bs-toggle="tab" type="button" role="tab" aria-selected="true" onclick="GetOrdersData(this.id,'4','1',$('#ShowRowid').val())">WIP</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="Tab_AllOrdersId" data-bs-toggle="tab" type="button" role="tab" aria-selected="true" onclick="GetOrdersData(this.id,'1','1',$('#ShowRowid').val())">All Orders</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="Tab_AcceptedOrdersId" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" onclick="GetOrdersData(this.id,'2','1',$('#ShowRowid').val())">Accepted</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="Tab_RejectedOrdersId" data-bs-toggle="tab" type="button" role="tab" aria-selected="false" onclick="GetOrdersData(this.id,'3','1',$('#ShowRowid').val())">Rejected</button>
+                        </li>
+                    </ul>
+
+                    <!-- Right: Buttons -->
+                    <div class="d-flex">
+                        <button class="btn btn-success btn-sm me-2" id="Btn_AcceptedId"><i class="fa fa-check me-1"></i> Accept</button>
+                        <button class="btn btn-danger btn-sm me-2" id="Btn_RejectedId"> <i class="fa fa-times me-1"></i> Reject</button>
+                        <!-- Filter Button with Filter Icon, Custom Color, and Space between Icon and Label -->
+                        <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal">
+                            <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- Tab content -->
+                <div class="tab-content" id="myTabContent">
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="OrdersStatusTableId">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllOrders" />
+                                    </th>
+                                    <th class="sort fw-bold" data-sort="Sr. No">SR NO</th>
+                                    <th class="sort fw-bold" data-sort="action">Action</th>
+                                    <th class="sort fw-bold">Order Status</th>
+                                    @*  <th class="sort fw-bold">Tenant Name</th> *@
+                                    <th class="sort fw-bold">Branch Name</th>
+                                    <th class="sort fw-bold">Order Number</th>
+                                    <th class="sort fw-bold">Sales Person Name</th>
+                                    <th class="sort fw-bold">Item Name</th>
+                                    <th class="sort fw-bold">Category Name</th>
+                                    <th class="sort fw-bold">Gross Weight</th>
+                                    <th class="sort fw-bold">Net Weight</th>
+                                    <th class="sort fw-bold">Purity</th>
+                                    <th class="sort fw-bold">Product Group Name</th>
+
+                                    <th class="sort fw-bold">Order Date</th>
+                                    <th class="sort fw-bold">Order Delivery Date</th>
+                                    <th class="sort fw-bold">Vendor Name</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div>
+
+
+            <!-- Modal for Adding Product -->
+            <div class="modal fade" id="SandToVendorModalViewId" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog" style="margin-top:15%">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Order Send to Vendor</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <label>Assign Vendor</label>
+									<input type="text" class="form-control" name="VendorName1" id="VendorNameId" placeholder="Please Select Vendor" required />
+									<div id="suggestions" class="list-group mt-1"></div>
+									<input type="hidden" name="VendorName" id="VendorNameId1" value="" />
+                                </div>
+                                <input type="hidden" name="SelectedOrderItemId" id="Txt_BindAllItemsId" />
+                                <div class="col">
+                                    <label>Expected Delivery Date</label>
+                                    <input type="date" class="form-control" name="ExpectedDeliveryDate" id="ExpectedDeliveryDate" required />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary" onclick="return ValidateOrderDeliveryDate()">Send</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Large modal -->
+            <!-- Modal Structure -->
+            <div class="modal fade" id="OpenOrderViewId" tabindex="-1" aria-labelledby="OpenOrderViewLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="OpenOrderViewLabel">Order Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            <!-- Order Details Section -->
+                            <div class="mb-3">
+                                @* <h6 class="text-white p-2 rounded" style="background-color:darkorchid">Order Details</h6> *@
+                                <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                                    <h5 class="text-white mb-0">Order Details</h5>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col">
+                                        <label for="Txt_OrderNo" class="form-label">Order No</label>
+                                        <input type="text" id="Txt_OrderNo" class="form-control" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Select_BranchNameId" class="form-label">Branch </label>
+                                        <input type="text" id="BranchId" class="form-control" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_CustomerMobileId" class="form-label">Order Date</label>
+                                        <input type="text" id="OrderDateId" class="form-control" disabled />
+                                    </div>
+
+                                    <div class="col">
+                                        <label for="Txt_NetWtId" class="form-label">Delivery Date</label>
+                                        <input type="text" id="OrderDeliveryId" class="form-control" disabled />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Sections as Needed -->
+                            <div class="mb-3">
+                                <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                                    <h5 class="text-white mb-0">Item Details</h5>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col">
+                                        <label for="Txt_NetWtId" class="form-label">Net Weight (Gram) <span class="text-danger">*</span></label>
+                                        <input type="text" id="Txt_NetWtId" class="form-control" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_ItemSizeId" class="form-label">Gross Wt <span class="text-danger">*</span></label>
+                                        <input type="text" id="GrossWt" class="form-control" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_ItemPiecesId" class="form-label">Item Size <span class="text-danger">*</span></label>
+                                        <input type="text" id="SizeId" class="form-control" placeholder="Enter Item Pieces" maxlength="5" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_NetWtId" class="form-label">Pcs</label>
+                                        <input type="text" id="PcsId" class="form-control" disabled />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Sections as Needed -->
+                            <div class="mb-3">
+                                <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                                    <h5 class="text-white mb-0">Actual Item Details</h5>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col">
+                                        <label for="Txt_NetWtId" class="form-label">Actual Gross Wt <span class="text-danger">*</span></label>
+                                        <input type="text" id="ActualGrossId" class="form-control" placeholder="Enter Net Weight" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_ItemSizeId" class="form-label">Actual Net Wt <span class="text-danger">*</span></label>
+                                        <input type="text" id="ActualNetId" class="form-control" placeholder="Enter Item Size" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_ItemPiecesId" class="form-label">Item Pieces <span class="text-danger">*</span></label>
+                                        <input type="text" id="PcsNewId" class="form-control" placeholder="Enter Item Pieces" maxlength="5" disabled />
+                                    </div>
+                                    <div class="col">
+                                        <label for="Txt_NetWtId" class="form-label">Size</label>
+                                        <input type="text" id="SizeNewId" class="form-control" disabled />
+                                        <input type="hidden" id="ItemDetailsId" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Sections as Needed -->
+                            <div class="mb-3">
+                                <div class="col-md-12 rounded" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                                    <h5 class="text-white mb-0">Image</h5>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col">
+                                    </div>
+                                    <div class="col">
+                                        <img id="ImageDataId" style="height:100%;width:100%;margin-top:4%" />
+                                    </div>
+                                    <div class="col">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Footer -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="HOPreviewAcceptOrReject('1')">Preview Accept</button>
+                            <button type="button" class="btn btn-secondary" onclick="HOPreviewAcceptOrReject('2')">Preview Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal for Received Order Preview -->
+            <div class="modal fade" id="ReceivedOrderPreviewModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog modal-lg" style="margin-top:15%">
+                    @using (Html.BeginForm("ReceiveOrderPreSubmit", "Dashboard"))
+                    {
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Receive Order Delivery</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" class="text-center">Sr No</th>
+                                                <th rowspan="2" class="text-center">Order No</th>
+                                                <th colspan="2" class="text-center">Gross Weight</th>
+                                                <th colspan="2" class="text-center">Net Weight</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center">Before</th>
+                                                <th class="text-center">Actual</th>
+                                                <th class="text-center">Before</th>
+                                                <th class="text-center">Actual</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="ReceivedOrderPreviewtable_id">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+	//start code vina
+		let VendorGroupRecords = [];
+		$(document).ready(function () {
+				  $('#VendorNameId').on('keyup', function ()
+				  {
+					  $("#VendorNameId1").val("");
+				 let inp = $(this);
+				//console.log(inp);
+				 const searchTerm = inp.val().trim().toLowerCase();
+				 console.log(searchTerm);
+
+					 let filteredResults = VendorGroupRecords.filter(vendor => {
+					  let nameMatch = vendor.vendor_name.toLowerCase().includes(searchTerm);
+				return nameMatch;
+				});
+				renderSuggestions(filteredResults, inp);
+				if ([2,4].includes(searchTerm.length))
+				{
+					loadVendorGroupData(searchTerm, inp);
+
+				}
+		 });
+
+		// $('#suggestions').on('click', '.list-group-item', function () {
+		// 	console.log("v1");
+		// 	const selectedName = $(this).text();
+		// 	console.log(selectedName);
+		// 	const selectedId = $(this).data('id');
+		// 	 $('#VendorNameId').val(selectedName);
+		// 	 $('#VendorNameId1').val(selectedId);
+		// 	$('#suggestions').empty();
+		// });
+		});
+		// THIS FUNCTION IS USED TO LIST PRODUCT GROUPS
+		function loadVendorGroupData(searchTerm, inp) {
+				$.ajax({
+					url: '/Dashboard/GetFilteredVendorGroups',
+					type: 'GET',
+					data: {
+
+						SearchItem: searchTerm
+					},
+					success: function (data) {
+						if (Array.isArray(data)) {
+								 VendorGroupRecords = data;
+							renderSuggestions(data, inp);
+						}
+					},
+					error: function (error) {
+						console.error("Error fetching customer data:", error);
+					}
+				});
+			}
+
+		//THIS FUNCTION IS USED TO FILTER THE FILTERED DATA
+			function renderSuggestions(data, inp)
+			{
+				const suggestionBox = document.getElementById('suggestions');
+				suggestionBox.innerHTML = '';
+
+				// Get and normalize input value (supports jQuery or native input)
+				const inputValue = (inp.val ? inp.val() : inp.value).trim().toLowerCase();
+
+				const filteredData = data.filter(item =>
+						 item.vendor_name.toLowerCase().includes(inputValue)
+				);
+				if (filteredData.length === 0) {
+					const noResult = document.createElement('div');
+					noResult.classList.add('list-group-item', 'text-muted');
+					noResult.textContent = 'No matches found';
+					suggestionBox.appendChild(noResult);
+					return;
+				}
+				filteredData.forEach(item => {
+					const div = document.createElement('div');
+					div.classList.add('list-group-item', 'list-group-item-action');
+						 div.textContent = item.vendor_name;
+
+					// Set a data attribute for ID
+					div.setAttribute('data-id', item.id);
+
+					div.addEventListener('click', function () {
+						const name = item.vendor_name;
+						const id = item.id;
+						// Set name in the input box
+						if (inp.val) {
+							inp.val(name); // jQuery
+						} else {
+							inp.value = name; // Native input
+						}
+						// You could also set it in a hidden input if needed:
+							 const hiddenInput = document.getElementById('VendorNameId1');
+							
+						if (hiddenInput)
+						hiddenInput.value = id;
+						console.log()
+						suggestionBox.innerHTML = ''; // Clear suggestions
+					});
+
+					suggestionBox.appendChild(div);
+				});
+			}
+			// THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+	function ShowWarning(message) {
+		Swal.fire({
+			//title: 'Good job!',
+			text: message,
+			icon: 'warning',
+			customClass: {
+				confirmButton: 'btn btn-primary waves-effect waves-light'
+			},
+			buttonsStyling: false
+		});
+
+	}
+	//end code
+    // Mapping tab IDs to their corresponding types
+     let tabDataMapping = {
+         'Tab_WIPTabId': '4',
+         'Tab_AllOrdersId': '1',
+         'Tab_AcceptedOrdersId': '2',
+         'Tab_RejectedOrdersId': '3'
+     };
+
+     function loadPageData(page, rowsToShow) {
+
+         // Use activeTabId to determine the corresponding data
+         if (tabDataMapping[activeTabId]) {
+             GetOrdersData(activeTabId, tabDataMapping[activeTabId], page, $('#ShowRowid').val());
+         } else {
+             console.error("Invalid tabId: " + activeTabId);
+         }
+     }
+
+     // Function to update the Select All checkbox state based on individual checkbox selections
+     function updateSelectAllCheckboxState()
+     {
+         // $(".Checkbox_SelectAllHeader").each(function ()
+         // {
+         //     var table = $(this).closest('table');
+         //     var allEnabledChecked = table.find(".RowCheckbox:not(:disabled)").length === table.find(".RowCheckbox:not(:disabled):checked").length;
+         //     $(this).prop('checked', allEnabledChecked);
+         // });
+          $(".Checkbox_SelectAllHeader").each(function () {
+            var table = $(this).closest('table');
+            var rowCheckboxes = table.find(".RowCheckbox");
+            var enabledCheckboxes = rowCheckboxes.not(':disabled');
+
+            if (enabledCheckboxes.length === 0) {
+                // If all checkboxes are disabled, uncheck the Select All checkbox
+                $(this).prop('checked', false);
+            } else {
+                // Otherwise, check if all enabled checkboxes are checked
+                var allEnabledChecked = enabledCheckboxes.length === enabledCheckboxes.filter(':checked').length;
+                $(this).prop('checked', allEnabledChecked);
+            }
+        });
+     }
+
+     var selectedRowIds = [];
+
+     function applyFilter() {
+
+         var orderDateFrom = $("#filterOrderDateFrom").val();
+         var orderDateTo = $("#filterOrderDateTo").val();
+         var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+         var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+         $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+         $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+         var valid = true;
+
+         if (orderDateFrom || orderDateTo) {
+             if (!orderDateFrom) {
+                 $("#WarnfilterOrderDateFrom").show();
+                 valid = false;
+             }
+             if (!orderDateTo) {
+                 $("#WarnfilterOrderDateTo").show();
+                 valid = false;
+             }
+         }
+
+         if (deliveryDateFrom || deliveryDateTo) {
+             if (!deliveryDateFrom) {
+                 $("#WarnfilterDeliveryDateFrom").show();
+                 valid = false;
+             }
+             if (!deliveryDateTo) {
+                 $("#WarnfilterDeliveryDateTo").show();
+                 valid = false;
+             }
+         }
+
+         if (!valid) {
+             return;
+         }
+
+         $('#filtercheck').removeClass('d-none');
+         $('#filtercross').addClass('d-none');
+         GetOrdersData(activeTabId, tabDataMapping[activeTabId], '1', $('#ShowRowid').val());
+         $('#filterModal').modal('hide');
+     }
+
+     function ClearFilter() {
+         $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+         $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+         $('#filterCustomerMobile').val('');
+         $('#filterItemName').val("")
+         $('#filterCategory').val('')
+         $('#filterVendorName').val('');
+         $('#filterOrderDateFrom').val('');
+         $('#filterCustomerName').val('');
+         $('#filterBranchName').val('');
+         $('#filterOrderNo').val('');
+         $('#filterOrderDateTo').val('');
+         $('#filterDeliveryDateFrom').val('');
+         $('#filterDeliveryDateTo').val('');
+         GetOrdersData(activeTabId, tabDataMapping[activeTabId], '1', $('#ShowRowid').val());
+         $('#filtercheck').addClass('d-none');
+         $('#filtercross').removeClass('d-none');
+     };
+
+     function getActiveTabId() {
+         // Find the active tab within the nav-tabs
+         var activeTab = document.querySelector('.nav-tabs .nav-link.active');
+
+         // Return the id of the active tab
+         return activeTab ? activeTab.id : null;
+     }
+
+     // Example usage
+     var activeTabId = getActiveTabId();
+
+     // Dynamically set the minimum date to today's date
+     const todayDate = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
+     document.getElementById("ExpectedDeliveryDate").setAttribute("min", todayDate);
+
+     var ItemDetailsId;
+
+     function ValidateOrderDeliveryDate() {
+
+         if ($("#ExpectedDeliveryDate").val() != "" && $("#VendorNameId1").val() != "") {
+             ItemDetailsId = $("#Txt_BindAllItemsId").val()
+             $.ajax({
+                 type: "POST",
+                 url: "/Dashboard/CheckDeliveryDateValidOrNot",
+                 data:
+                 {
+                     ExpectedDate: $("#ExpectedDeliveryDate").val(),
+                     ItemDetailsId: ItemDetailsId
+                 },
+                 success: function (data)
+				 {
+                     var Result = JSON.parse(data);
+
+                     //THIS IS USED FOR NO EXTEND ORDER SELECT DATE
+                     if (Result["Result"] == 1) {
+                         $.ajax({
+                             type: "POST",
+                             url: "/Dashboard/SendToVendor",
+                             data: {
+                                 ExpectedDate: $("#ExpectedDeliveryDate").val(),
+                                 ItemDetailsId: ItemDetailsId,
+                                 VendorId: $("#VendorNameId1").val()
+                             },
+                             success: function (data) {
+                                 window.location.href = '/Dashboard/OrdersStatus';
+                             },
+                             error: function (response) {
+
+                             }
+                         });
+                     }
+					 
+                     else {
+                         ShowPromptAlert("Please Check Some Order's Delivery Dates...!! \n Do You Want To Continue Without that Order's...!!")
+                     }
+					 
+                 },
+                 error: function (response) {
+
+                 }
+             });
+         }
+         else {
+             WarningMessage("Please Select Vendor And ExpectedDate...!!")
+         }
+
+     }
+
+     // Select all checkboxes when 'Select All' is checked, excluding disabled checkboxes
+     $(".Checkbox_SelectAllHeader").on("change", function () {
+         var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+         var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+         // Select or deselect all row checkboxes based on the header checkbox state
+         table.find(".RowCheckbox:not(:disabled)").prop('checked', isChecked);
+
+         // Update the selectedRowIds array based on the "Select All" checkbox
+         if (isChecked) {
+             // Add all enabled row IDs to the selectedRowIds array for the specific table
+             table.find(".RowCheckbox:not(:disabled)").each(function () {
+                 var rowId = $(this).data('id');
+                 if (rowId && !selectedRowIds.includes(rowId)) {
+                     selectedRowIds.push(rowId);
+                 }
+             });
+         } else {
+             // Remove all enabled row IDs from the selectedRowIds array for the specific table
+             table.find(".RowCheckbox:not(:disabled)").each(function () {
+                 var rowId = $(this).data('id');
+                 if (rowId) {
+                     selectedRowIds = selectedRowIds.filter(function (id) {
+                         return id !== rowId;
+                     });
+                 }
+             });
+         }
+
+         // Log the updated selectedRowIds array for debugging purposes
+         //console.log(selectedRowIds);
+     });
+
+     $(document).on("change", ".RowCheckbox", function () {
+         var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+         var rowId = $(this).data('id');  // Get the row ID from data attribute
+         var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+         // Add or remove the row ID from the selectedRowIds array based on checkbox state
+         if (isChecked) {
+             if (!selectedRowIds.includes(rowId)) {
+                 selectedRowIds.push(rowId);
+                 console.log(selectedRowIds);
+             }
+         } else {
+             var index = selectedRowIds.indexOf(rowId);
+             if (index !== -1) {
+                 selectedRowIds.splice(index, 1);
+                 console.log(selectedRowIds);
+             }
+         }
+
+         // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+         updateSelectAllCheckboxState();
+
+
+     });
+
+     // THIS FUNCTION IS USED TO SHOW PROMPT ALERT WITH YES/NO
+     function ShowPromptAlert(message, callbackYes, callbackNo) {
+         Swal.fire({
+             text: message,
+             icon: "question",
+             showCancelButton: true,
+             confirmButtonText: 'Yes',
+             cancelButtonText: 'No',
+             customClass: {
+                 confirmButton: 'btn btn-primary waves-effect waves-light',
+                 cancelButton: 'btn btn-secondary waves-effect waves-light'
+             },
+             buttonsStyling: false
+         }).then((result) => {
+             if (result.isConfirmed) {
+                 $.ajax({
+                     type: "POST",
+                     url: "/Dashboard/SendToVendor",
+                     data: {
+                         ExpectedDate: $("#ExpectedDeliveryDate").val(),
+                         ItemDetailsId: ItemDetailsId,
+                         VendorId: $("#VendorNameId").val()
+                     },
+                     success: function (data) {
+                         window.location.href = '/Dashboard/OrdersStatus';
+                     },
+                     error: function (response) {
+
+                     }
+                 });
+             } else if (result.dismiss === Swal.DismissReason.cancel) {
+                 // If "No" is clicked
+                 if (callbackNo) callbackNo();
+             }
+         });
+     }
+
+     function HOPreviewAcceptOrReject(Flag) {
+         //alert($("#ItemDetailsId").val())
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/PreviewAcceptAndReject",
+             data: {
+                 Flag: Flag,
+                 ItemDetailsId: $("#ItemDetailsId").val()
+             },
+             success: function (data) {
+                 window.location.href = '/Dashboard/BackOfficeDashboard';
+             },
+             error: function (response) {
+
+             }
+         });
+     }
+
+     function OpenPreviewModal(OrderItemId) {
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/GetOrderItemIddetailsForPreview",
+             data: {
+                 OrderItemId: OrderItemId,
+             },
+             success: function (data) {
+                 var res = JSON.parse(data);
+                 var OrderData = res["OrderData"];
+                 //console.log(OrderData)
+                 //console.log(OrderData[0]["order_header_id"])
+                 if (OrderData.length > 0) {
+                     $("#Txt_OrderNo").val(OrderData[0]["order_series_no"])
+                     $("#ItemDetailsId").val(OrderData[0]["order_item_id"])
+                     $("#BranchId").val(OrderData[0]["branch_name"])
+                     $("#OrderDateId").val(OrderData[0]["order_date"].split('T')[0])
+                     $("#OrderDeliveryId").val(OrderData[0]["order_delivery_date"].split('T')[0]);
+                     $("#Txt_NetWtId").val(OrderData[0]["net_wt"])
+                     $("#GrossWt").val(OrderData[0]["gross_wt"])
+                     $("#SizeId").val(OrderData[0]["size"])
+                     $("#PcsId").val(OrderData[0]["pcs"])
+                     $("#ActualGrossId").val(OrderData[0]["actual_item_gross_wt"])
+                     $("#ActualNetId").val(OrderData[0]["actual_item_net_wt"])
+                     $("#PcsNewId").val(OrderData[0]["pcs"])
+                     $("#SizeNewId").val(OrderData[0]["size"])
+                     const imgPath = OrderData[0]["upload_preview_image_path"].replace('~', '');
+                     console.log(imgPath)
+                     document.getElementById('ImageDataId').src = imgPath;
+                 }
+             },
+             error: function (response) {
+
+             }
+         });
+
+         const myModal = new bootstrap.Modal(document.getElementById('OpenOrderViewId'));
+         myModal.show();
+     }
+
+     //THIS IS USED FOR WHEN BUTTON CLICK BEFORE THAT CHECK ORDER SELECTED OR NOT
+     function openModal() {
+         // const selectedValues = $(".rowCheckbox:checked").map(function () {
+         //     return $(this).val();
+         // }).get(); // Collect values into an array
+		  $("#suggestions").empty();
+		  $("#VendorNameId").val("");
+		  $("#ExpectedDeliveryDate").val("");
+         if (selectedRowIds.join(", ").length > 0) {
+             $("#Txt_BindAllItemsId").val(selectedRowIds.join(", "))
+             // Use Bootstrap's modal object to show the modal
+             const myModal = new bootstrap.Modal(document.getElementById('SandToVendorModalViewId'));
+             myModal.show();
+             return true;
+         }
+         else {
+              WarningMessage("Please select an order line before proceeding")
+         }
+     }
+
+     var ActiveTab = "";
+
+     // Function to handle tab activation
+     function activateTab(tabId) {
+         ActiveTab = tabId;
+         // Conditional check to change visibility for Accepted Orders
+         if (tabId != "Tab_AllOrdersId") {
+             // Optionally, hide the buttons if the tab is not 'Tab_AcceptedOrdersId'
+             $("#Btn_AcceptedId").css({ "visibility": "hidden", "display": "none" });
+             $("#Btn_RejectedId").css({ "visibility": "hidden", "display": "none" });
+         }
+         else {
+             // Make the buttons visible
+             $("#Btn_AcceptedId").css({ "visibility": "visible", "display": "inline-block" });
+             $("#Btn_RejectedId").css({ "visibility": "visible", "display": "inline-block" });
+         }
+
+         //THIS IS USED FOR SEND KARAGIR BUTTTON HIDE A
+         if (tabId === "Tab_AcceptedOrdersId") {
+             //console.log("entry")
+             $("#Btn_SendKaragirId").css({ "visibility": "visible", "display": "inline-block" });
+             $("#Btn_RejectedId").css({ "visibility": "visible", "display": "inline-block" });
+         }
+         else {
+             //console.log("out")
+             $("#Btn_SendKaragirId").css({ "visibility": "hidden", "display": "none" });
+         }
+
+         // Remove 'active' class from all tabs
+         const tabs = document.querySelectorAll(".nav-link");
+         tabs.forEach(tab => tab.classList.remove("active"));
+         // Add 'active' class to the clicked tab
+         document.getElementById(tabId).classList.add("active");
+     }
+
+     function GetOrdersData(TabId, OrderStatus, pageNumber, pageSize) {
+         activateTab(TabId);
+         GetOrderDate(OrderStatus, pageNumber, pageSize)
+     }
+
+     function GetOrderDate(OrderDataFlag, pageNumber, pageSize) {
+         const data = {
+             Flag: OrderDataFlag,
+             CustomerMobile: $('#filterCustomerMobile').val() || '',
+             ItemName: $('#filterItemName').val() || '',
+             Category: $('#filterCategory').val() || '',
+             VendorName: $('#filterVendorName').val() || '',
+             CustomerName: $('#filterCustomerName').val() || '',
+             BranchName: $('#filterBranchName').val() || '',
+             OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+             OrderNo: $('#filterOrderNo').val() || '',
+             OrderDateTo: $('#filterOrderDateTo').val() || '',
+             DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+             DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+             PageNumber: pageNumber,
+             PageSize: pageSize
+         };
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/GetAllOrder",
+             contentType: "application/json",
+             data: JSON.stringify(data),
+             success: function (data) {
+                 var res = JSON.parse(data);
+                 TableBindData(res)
+             },
+             error: function (response) {
+
+             }
+         });
+     }
+
+     $(document).ready(function () {
+
+               // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+         if ('@TempData["Message"]' !== "") {
+             ShowErrorMsg('@TempData["Message"]');
+
+         }
+
+         if ('@TempData["SendPreviewToHO"]' !== "") {
+             ShowErrorMsg('@TempData["SendPreviewToHO"]');
+
+         }
+
+    @{
+        TempData.Remove("Message");  // Remove specific key "Message" from TempData
+        TempData.Remove("SendPreviewToHO");
+    }
+
+
+         // Attach a click event listener to update activeTabId on tab change
+         $('.nav-tabs .nav-link').on('click', function () {
+             activeTabId = getActiveTabId();
+             selectedRowIds = [];
+             ClearFilter();
+         });
+
+         // Select all checkboxes when 'Select All' is checked, excluding disabled checkboxes
+         $(document).on("change", ".Checkbox_SelectAllHeader", function () {
+             var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+             var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+             // Select or deselect all row checkboxes based on the header checkbox state
+             table.find(".RowCheckbox:not(:disabled)").prop('checked', isChecked);
+
+             // Update the selectedRowIds array based on the "Select All" checkbox
+             if (isChecked) {
+                 // Add all enabled row IDs to the selectedRowIds array for the specific table
+                 table.find(".RowCheckbox:not(:disabled)").each(function () {
+                     var rowId = $(this).data('id');
+                     if (rowId && !selectedRowIds.includes(rowId)) {
+                         selectedRowIds.push(rowId);
+                     }
+                 });
+             } else {
+                 // Remove all enabled row IDs from the selectedRowIds array for the specific table
+                 table.find(".RowCheckbox:not(:disabled)").each(function () {
+                     var rowId = $(this).data('id');
+                     if (rowId) {
+                         selectedRowIds = selectedRowIds.filter(function (id) {
+                             return id !== rowId;
+                         });
+                     }
+                 });
+             }
+
+         });
+
+         $(document).on("change", ".RowCheckbox", function () {
+             var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+             var rowId = $(this).data('id');  // Get the row ID from data attribute
+             var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+             // Add or remove the row ID from the selectedRowIds array based on checkbox state
+             if (isChecked) {
+                 if (!selectedRowIds.includes(rowId)) {
+                     selectedRowIds.push(rowId);
+                 }
+             } else {
+                 var index = selectedRowIds.indexOf(rowId);
+                 if (index !== -1) {
+                     selectedRowIds.splice(index, 1);
+                 }
+             }
+
+             // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+             updateSelectAllCheckboxState();
+
+         });
+
+         GetOrdersData(activeTabId, '4', 1, $('#ShowRowid').val())
+
+         $("#Btn_SendKaragirId").css({ "visibility": "hidden", "display": "none" });
+
+         // Get values of selected checkboxes
+         $("#Btn_AcceptedId").on("click", function () {
+             // const selectedValues = $(".rowCheckbox:checked").map(function () {
+             //     return $(this).val();
+             // }).get(); // Collect values into an array
+             //console.log(selectedValues); // Output the array to console
+             //alert("Selected Values: " + selectedValues.join(", "));
+
+             if (selectedRowIds.join(", ").length > 0) {
+                 OrderStatusFromHO(selectedRowIds.join(", "), "2")
+             }
+             else {
+                 WarningMessage("Before Proceed Please Select Order Line....!!!")
+             }
+         });
+
+         // Get values of selected checkboxes
+         $("#Btn_RejectedId").on("click", function () {
+             // const selectedValues = $(".rowCheckbox:checked").map(function () {
+             //     return $(this).val();
+             // }).get(); // Collect values into an array
+             //console.log(selectedValues); // Output the array to console
+             //alert("Selected Values: " + selectedValues.join(", "));
+             if (selectedRowIds.join(", ").length > 0) {
+                 $("#Txt_RejectedBindAllItemsId").val(selectedRowIds.join(", "))
+                 $("#RejectedModalId").modal('show')
+
+             }
+             else {
+                 WarningMessage("Before Proceed Please Select Order Line....!!!")
+             }
+
+         });
+
+         $('#applyFiltersButton').on('click', function () {
+
+             applyFilter();
+
+         });
+
+         $("#ClearFiltersButton").click(function () {
+
+             ClearFilter();
+
+         });
+
+         var regex = /^\d+(\.\d{1,3})?$/;
+
+         $("#ReceivedOrderPreviewtable_id").on("keyup", ".gross-now, .net-now", function () {
+             var $this = $(this);
+             var currentVal = $this.val();
+
+             var newVal = currentVal.replace(/[^0-9.]/g, '');
+
+             var parts = newVal.split('.');
+             if (parts.length > 1) {
+                 newVal = parts.shift() + '.' + parts.join('');
+             }
+
+             if (newVal.indexOf('.') !== -1) {
+                 var splitVal = newVal.split('.');
+                 var integerPart = splitVal[0];
+                 var decimalPart = splitVal[1];
+                 if (decimalPart.length > 3) {
+                     decimalPart = decimalPart.substring(0, 3);
+                     newVal = integerPart + '.' + decimalPart;
+                 }
+             }
+
+             if (newVal !== currentVal) {
+                 $this.val(newVal);
+             }
+
+
+         });
+
+         $("#ReceivedOrderPreviewtable_id").on("change", ".gross-now, .net-now", function () {
+             var $this = $(this);
+             var $row = $this.closest("tr");
+             var grossVal = $row.find(".gross-now").val().trim();
+             var netVal = $row.find(".net-now").val().trim();
+
+             if (grossVal !== "" && netVal !== "" && regex.test(grossVal) && regex.test(netVal)) {
+                 var grossNum = parseFloat(grossVal);
+                 var netNum = parseFloat(netVal);
+
+                 if (netNum > grossNum) {
+                     WarningMessage("Net Weight Greater Than Gross Wt...!!");
+                     $row.find(".net-now").val('');
+                 }
+                 else if (grossNum === 0) {
+                     WarningMessage("Gross Weight must be greater than 0...!!");
+                     $row.find(".gross-now").val('');
+                 } else if (netNum === 0) {
+                     WarningMessage("Net Weight must be greater than 0...!!");
+                     $row.find(".net-now").val('');
+                 }
+             }
+         });
+
+     });
+
+     function OrderStatusFromHO(SelectedData, Status) {
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/OrderUpdatedsStatusFromOrders",
+             data: {
+                 SelectedDataIds: SelectedData,
+                 Status: Status
+             },
+             success: function (data) {
+                 var res = JSON.parse(data);
+                 GetOrdersData(activeTabId, '4', 1, $('#ShowRowid').val())
+                 var OrderData = res["OrderData"]
+                 //console.log(OrderData);
+
+                 if (OrderData.length > 0) {
+                     if (Status == "2") {
+                         ShowErrorMsg("Order Accepted Successfully...")
+                     }
+                     else {
+                         ShowErrorMsg("Order Rejected Successfully...")
+                     }
+                     location.reload()
+                 }
+             },
+             error: function (response) {
+
+             }
+         });
+     }
+
+     function TableBindData(res) {
+         $('#OrdersStatusTableId tbody').empty();
+
+         var table = $("#OrdersStatusTableId");
+         var VendorReceivedStatusCode = [14,9,10,8,7,6,4];
+
+         table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+         const paginationInfo = res.PaginationInfo;
+
+         let srno;
+
+         if (res && paginationInfo && paginationInfo.length > 0) {
+             const totalRows = paginationInfo[0].TotalRows;
+             const totalPages = paginationInfo[0].TotalPages;
+             const pageNumber = paginationInfo[0].PageNumber;
+             const pageSize = paginationInfo[0].PageSize;
+             srno = (pageNumber - 1) * pageSize + 1;
+
+             generatePagination(totalPages, pageNumber);
+         } else {
+             console.error('PaginationInfo is not available or is in an incorrect format. Response:', paginationInfo);
+         }
+
+         let data = '';
+
+         if (res && res["OrderData"] && Array.isArray(res["OrderData"])) {
+             for (let i = 0; i < res["OrderData"].length; i++) {
+
+                 let orderStatus = res["OrderData"][i]["order_status"];
+                 let receivedvendorHtml = '';
+
+                 if (VendorReceivedStatusCode.includes(orderStatus)) {
+                     receivedvendorHtml = '<li>' +
+                         '<a class="dropdown-item py-1" href="javascript:void(0);" onclick="OpenReceivedVendormodal(\'' + res["OrderData"][i]["order_item_id"] + '\')">' +
+                         '<i class="fa fa-check-circle me-2"></i>Received From Vendor' +
+                         '</a>' +
+                         '</li>';
+                 }
+
+                 let statusHtml = '';
+                 // USED TO CHECK SUBSSCIPTION AND SHOW EDIT BUTTON
+                 // IF SUBSSCRIPTION IS NOT VALID THEN EDIT BUTTON IS NOT SHOW
+                 var LinkData = "";
+                 if (orderStatus === 2) {
+                     LinkData = '<a href="@Url.Action("EditOrder", "OrderMaster", new { OrderItemId = "__order_item_id__" })'.replace('__order_item_id__', res["OrderData"][i]["order_item_id"]) + '" class="text-primarycursor-ointer"><span id="Btn_EditCityId" class="text-primary cursor-pointer"><i class="fa fa-edit d-inline me-2"></i></span></a>';
+                 }
+                 else {
+                     LinkData = '<a href="@Url.Action("EditOrder", "OrderMaster", new { OrderItemId = "__order_item_id__" })'.replace('__order_item_id__', res["OrderData"][i]["order_item_id"]) + '" class="text-primarycursor-ointer"><span id="Btn_EditCityId" class="cursor-pointer" onclick="return false" style="color:gray"><i class="fa fa-edit d-inline me-2"></i></span></a>'
+                 }
+
+                 if (parseFloat(res["OrderData"][i]["gross_wt"]) > parseFloat(res["OrderData"][i]["net_wt"])) {
+                     LinkData += '<a href="javascript:void(0);" class="text-primary cursor-pointer" ' +
+                         'onclick="OpenStoneDetails(' + res["OrderData"][i]["order_item_id"] + ')">' +
+                         '<span id="Btn_EditCityId" class="text-primary cursor-pointer"><i class="fa fa-gem d-inline me-2"></i></span></a>';
+                 } else {
+                     LinkData += '<span class="me-2">-</span>';
+                 }
+
+
+                 if ('@ViewBag.SubsciptionStatus' === 'true') {
+                     var ViewPeiew = '';
+                     if (res["OrderData"][i]["order_status"] == '8') {
+                         ViewPeiew = '<span id="Btn_ViewCityId" class="text-primary cursor-pointer" onclick="OpenPreviewModal(' + res["OrderData"][i]["order_item_id"] + ')"><i class="fa fa-eye d-inline me-2" ></i></span>';
+                     }
+
+                     ActionHtml = '' +
+                         LinkData +
+                         '<!-- Dropdown -->' +
+                         '<div class="dropdown d-inline">' +
+                         '<span id="Btn_MoreOptionsCityId" class="text-primary cursor-pointer" data-bs-toggle="dropdown">' +
+                         '<i class="fa fa-ellipsis-v d-inline me-2" aria-hidden="true"></i>' +
+                         '</span>' +
+                         '<ul class="dropdown-menu dropdown-menu-end p-0 small">' +
+                         '<li>' +
+                         '<a class="dropdown-item py-1" href="javascript:void(0);" onclick="OrderItemAction(' + res["OrderData"][i]["order_item_id"] + ', \'1\')">' +
+                         '<i class="fa fa-id-card me-2"></i>Job Card' +
+                         '</a>' +
+                         '<hr class="m-0" />' +
+                         '</li>' +
+                         '<li>' +
+                         '<a class="dropdown-item py-1" href="javascript:void(0);" onclick="OrderItemAction(' + res["OrderData"][i]["order_item_id"] + ', \'2\')">' +
+                         '<i class="fa fa-history me-2"></i>History' +
+                         '</a>' +
+                         '<hr class="m-0" />' +
+                         '</li>' +
+
+                         '<li>' +
+                         '<a class="dropdown-item py-1" href="javascript:void(0);" onclick="DeliveryChallanShow(' + res["OrderData"][i]["order_item_id"] + ', \'2\')">' +
+                         '<i class="fa fa-receipt me-2"></i>Delivery Challan' +
+                         '</a>' +
+                         '<hr class="m-0" />' +
+                         '</li>' +
+                         receivedvendorHtml+
+                         '</ul>' +
+                         '</div>' +
+                         ViewPeiew;
+                 } else {
+                     ActionHtml = '';
+                 }
+
+
+                 let isDisabled = [3, 4, 5, 6, 11, 12, 13].includes(res["OrderData"][i]["order_status"]) ? 'disabled' : '';
+                 let checkboxAttributes = isDisabled
+                     ? 'class="form-check-input RowCheckbox" name="name" disabled'
+                     : 'class="form-check-input RowCheckbox" name="name" value="' + res["OrderData"][i]["order_item_id"] + '"';
+
+                 const idCheck = res["OrderData"][i]["order_item_id"] || '';
+                 const isChecked = selectedRowIds.includes(Number(idCheck));
+
+                 var vandorName = res["OrderData"][i]["vendor_name"] == "" ? 'N/A' : res["OrderData"][i]["vendor_name"]
+
+                 data += '<tr id="' + idCheck + '" class="total_tr">'
+                     + '<td>'
+                     + '    <div class="form-check">'
+                     + '        <input class="form-check-input RowCheckbox" type="checkbox" ' + isDisabled + ' " data-id="' + res["OrderData"][i]["order_item_id"] + '" name="OrderDetailsId" value="' + res["OrderData"][i]["order_item_id"] + '" id="CityRowCheckBoxId_' + idCheck + '" ' + (isChecked ? 'checked' : '') + '>'
+                     + '    </div>'
+                     + '</td>'
+                     + '<td>' + srno + '</td>'
+                     + '<td StylePropertyMap="display:flex">' + ActionHtml + '</td>'
+                     + '<td>' + res["OrderData"][i]["status"] + '</td>'
+                     + '<td>' + res["OrderData"][i]["branch_name"] + '</td>'
+                     + '<td>' + res["OrderData"][i]["order_series_no"] + '</td>'
+                     // + '<td>' + res["OrderData"][i]["customer_name"] + '</td>'
+                      + '<td>' + res["OrderData"][i]["sales_person"] + '</td>'
+                     + '<td>' + res["OrderData"][i]["item_name"] + '</td>'
+                     + '<td>' + res["OrderData"][i]["category_name"] + '</td>'
+                     + '<td>' + parseFloat(res["OrderData"][i]["gross_wt"]).toFixed(3) + '</td>'
+                     + '<td>' + parseFloat(res["OrderData"][i]["net_wt"]).toFixed(3) + '</td>'
+                      + '<td>' + parseFloat(res["OrderData"][i]["purity_name"]).toFixed(2) + '</td>'
+                     + '<td>' + res["OrderData"][i]["product_group_name"] + '</td>'
+                    
+                     + '<td>' + res["OrderData"][i]["order_date"].split('T')[0] + '</td>'
+                     + '<td>' + res["OrderData"][i]["order_delivery_date"].split('T')[0] + '</td>'
+                      + '<td class="text-center">' +vandorName+ '</td>'
+
+                     + '</tr>';
+                 srno++;
+             }
+         } else {
+             $("#OrdersStatusTableId tbody").empty();
+             $("#OrdersStatusTableId tbody").html(`
+                                             <tr>
+                                                 <td colspan="17" style="text-align: center;">No Data Available</td>
+                                             </tr>
+                                         `);
+             generatePagination(1, 1);
+         }
+         // Append the row to the table body
+         $("#OrdersStatusTableId tbody").append(data);
+         updateSelectAllCheckboxState();
+
+     }
+
+     //THIS FUNCTION USED FOR EDIT ORDER DETAILS
+     function EditOrderDetailsItemId(OrderDetailsId) {
+         $.ajax({
+             type: "POST",
+             url: "/OrderMaster/EditOrder",
+             data: {
+                 OrderItemId: OrderDetailsId
+             },
+             success: function (data) {
+             },
+             error: function (response) {
+
+             }
+         });
+     }
+
+     function OrderItemAction(ItemId, Flag) {
+         if (Flag == '1') {
+             $.ajax({
+                 type: "POST",
+                 url: "/Dashboard/GetJobcardDetails",
+                 data: {
+                     ItemId: ItemId
+                 },
+                 success: function (data) {
+                     var res = JSON.parse(data);
+                     var OrderData = res["OrderData"];
+                     var Image = res["ImageData"];
+                     var StoneData = res["StoneData"];
+
+                     if (OrderData.length > 0) {
+                         console.log(OrderData);
+                         $("#OrderDetailsId").val(OrderData[0]["order_details_id"])
+                         $("#Lbl_OrderNo").text(OrderData[0]["order_series_no"])
+                         $("#Lbl_Date").text(OrderData[0]["order_date"].split('T')[0])
+                         $("#Lbl_DeliveryDate").text(OrderData[0]["order_delivery_date"].split('T')[0])
+                         $("#Lbl_ItemName").text(OrderData[0]["item_name"])
+                         $("#Lbl_Size").text(OrderData[0]["size"])
+                         $("#Lbl_Pieces").text(OrderData[0]["pcs"])
+                         $("#Lbl_Category").text(OrderData[0]["category_name"])
+                         $("#grossWt").text(parseFloat(OrderData[0]["gross_wt"]).toFixed(3))
+                         $("#netWt").text(parseFloat(OrderData[0]["net_wt"]).toFixed(3))
+                         $("#productGroup").text(OrderData[0]["product_group_name"])
+                         $("#PurityId").text(OrderData[0]["purity"])
+                         $("#remarkid").text(OrderData[0]["remark"])
+                     }
+                     $("#StoneDetailsTableId").empty();
+                     if (StoneData.length > 0) {
+                         var StoneAppendData = `<table class="table table-bordered table-sm">
+                                                           <thead>
+                                                               <tr>
+                                                                   <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Name</strong></th>
+                                                                   <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Category</strong></th>
+                                                                   <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Color</strong></th>
+                                                                   <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Weight</strong></th>
+                                                                   <th class="p-1 text-left" style="padding-top: 5px; padding-bottom: 5px;"><strong class="small">Stone Pcs</strong></th>
+                                                               </tr>
+                                                           </thead><tbody>`;
+
+                         for (var i = 0; i < StoneData.length; i++) {
+                             StoneAppendData += `<tr>
+                                                                                    <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["item_name"] + `</td>
+                                                                                    <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["stone_category_name"] + `</td>
+                                                                                    <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["color_name"] + `</td>
+                                                                                    <td style="padding-top: 5px; padding-bottom: 5px;">` + parseFloat(StoneData[i]["stone_wt"]).toFixed(3) + `</td>
+                                                                                    <td style="padding-top: 5px; padding-bottom: 5px;">` + StoneData[i]["stone_pcs"] + `</td>
+                                                                                 </tr>`;
+                         }
+
+                         $("#StoneDetailsTableId").append(StoneAppendData + '</tbody></table>');
+
+                     }
+                     $("#ImageAppendDivId").empty();
+                     if (Image.length > 0) {
+                         console.log(Image)
+                         // Get the parent container
+                         var parentContainer = document.getElementById("ImageAppendDivId");
+
+                         // Create a row container
+                         var rowElement = null;
+
+                         // Loop through the images
+                         for (var i = 0; i < Image.length; i++) {
+                             // Start a new row for every group of 3 images
+                             if (i % 3 === 0) {
+                                 rowElement = document.createElement('div');
+                                 rowElement.className = "row mb-3"; // Add row class and margin
+                                 parentContainer.appendChild(rowElement); // Append the row to the parent container
+                             }
+
+                             // Process the image
+                             var Path = Image[i]["path"].replace('~', ''); // Replace '~' in the path
+                             var imgElement = document.createElement('img');
+                             imgElement.alt = "Item Image";
+                             imgElement.id = "ItemImage_" + i; // Set dynamic id
+                             imgElement.src = Path; // Set the source
+                             imgElement.className = "img-equal-size"; // Add a custom class for size control
+
+                             // Create a div for the image
+                             var colElement = document.createElement('div');
+                             colElement.className = "col-md-4"; // Set column class
+                             colElement.appendChild(imgElement); // Append the image to the column
+
+                             // Append the column to the current row
+                             rowElement.appendChild(colElement);
+                         }
+                     }
+                 },
+                 error: function (response) {
+
+                 }
+             });
+             const myModal = new bootstrap.Modal(document.getElementById('JobCardModalId'));
+             myModal.show();
+         }
+         else if (Flag == '2') {
+             $.ajax({
+                 type: "POST",
+                 url: "/OrderMaster/GetHistoryData",
+                 data: { OrderDetailsId: ItemId },
+                 success: function (data) {
+                     var res = JSON.parse(data);
+                     var HistoryData = res["HistoryData"];
+                     console.log(HistoryData)
+                     $("#GetHistory").empty();
+                     if (HistoryData.length > 0) {
+                         HistoryData.forEach(function (item) {
+                             var row = '<tr>';
+                             row += '<td>' + (item.action_name === 'A' ? 'Add' : item.action_name === 'U' ? 'Update' : 'Delete') + '</td>';
+                             row += '<td>' + (item.ip_address || '') + '</td>';
+                             row += '<td>' + (item.tenant_name || '') + '</td>';
+                             row += '<td>' + (item.item_name || '') + '</td>';
+                             row += '<td>' + (item.category_name || '') + '</td>';
+                             row += '<td>' + (item.purity_name || '') + '</td>';
+                             row += '<td>' + (parseFloat(item.gross_wt).toFixed(3) || '') + '</td>';
+                             row += '<td>' + (parseFloat(item.net_wt).toFixed(3) || '') + '</td>';
+                             row += '<td>' + (parseFloat(item.actual_item_gross_wt).toFixed(3) || '') + '</td>';
+                             row += '<td>' + (parseFloat(item.actual_item_net_wt).toFixed(3) || '') + '</td>';
+                             row += '<td>' + (item.vendor_name ? item.vendor_name : '-') + '</td>';
+                             row += '<td>' + (item.status_name || '') + '</td>';
+                             row += '<td>' + (item.remark || '') + '</td>';
+                             row += '<td>' + (item.rejected_remark || '') + '</td>';
+                              row += '<td>' + (item.updated_name || '') + '</td>';
+                              row += '<td>' + (item.updated_at.split('T')[0] +' '+item.updated_at.split('T')[1] || '') + '</td>';
+                             row += '</tr>';
+
+                             $("#GetHistory").append(row); // Append row to table
+                             $('#OrderHistoryData').modal('show');
+                         });
+                     } else {
+                         // If no data, show a message (optional)
+                         $("#GetHistory").append('<tr><td colspan="11" class="text-center">No history available</td></tr>');
+                         $('#OrderHistoryData').modal('show');
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+         }
+     }
+
+     // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+     function ShowErrorMsg(message) {
+         //alert(message)
+         Swal.fire({
+             //title: 'Good job!',
+             text: message,
+             icon: "success",
+             customClass: {
+                 confirmButton: 'btn btn-primary waves-effect waves-light'
+             },
+             buttonsStyling: false
+         });
+     }
+
+     // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+     function WarningMessage(message) {
+         //alert(message)
+         Swal.fire({
+             //title: 'Good job!',
+             text: message,
+             icon: "warning",
+             customClass: {
+                 confirmButton: 'btn btn-primary waves-effect waves-light'
+             },
+             buttonsStyling: false
+         });
+     }
+
+     // ___new function_____________________________
+     // Function to open the preview modal with order details
+     function OpenStoneDetails(orderItemId) {
+         // Make the AJAX call to fetch the order details
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/GetStoneDetails",
+             data: { itemId: orderItemId },
+             success: function (response) {
+                 // Parse the response data
+                 var res = JSON.parse(response);
+                 var orderDetails = res["StoneDetails"];
+                 console.log(orderDetails);
+
+                 // Check if orderDetails are found
+                 if (orderDetails.length > 0) {
+                     var detailsHtml = ""; // Initialize as empty string
+
+                     for (var i = 0; i < orderDetails.length; i++) {
+                         // Construct the HTML to display the order details in a table row
+                         detailsHtml +=
+                             '<tr>' +
+                             '<td>' + orderDetails[i]["item_name"] + '</td>' +
+                             '<td>' + orderDetails[i]["stone_category_name"] + '</td>' +
+                             '<td>' + orderDetails[i]["color_name"] + '</td>' +
+                             '<td>' + parseFloat(orderDetails[i]["stone_wt"]).toFixed(3) + '</td>' +
+                             '<td>' + orderDetails[i]["stone_pcs"] + '</td>' +
+                             '</tr>';
+                     }
+
+                     // Set the constructed rows to the table body
+                     $('#stoneDetailsBody').html(detailsHtml);
+
+                     // Show the modal
+                     $('#stoneDetailsModalShow').modal('show');
+                 } else {
+                     alert('Order details not found!');
+                 }
+             },
+             error: function (error) {
+                 // Handle any errors from the AJAX request
+                 console.error('Error fetching order details:', error);
+                 alert('An error occurred while fetching order details.');
+             }
+         });
+     }
+
+     function DeliveryChallanShow(ItemId)
+     {
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/GetDeliveryChallanPath",
+             data: {
+                 ItemDetailsId: ItemId,
+             },
+             success: function (data) {
+                 var res = JSON.parse(data);
+                 var Path = res["DeliveryChallan"][0]["challan_pdf_path"]; // Ensure 'res' contains 'DeliveryChallan' and 'url'
+
+                 // Log the Path to check its structure
+                 console.log(Path);
+                 if(Path !=""){
+                    // Empty the current content of the modal attachment container
+                    $("#AttachId").empty();
+
+                    // Append the PDF directly inside the modal using an iframe
+                    $("#AttachId").append(`
+                          <div class="col-md-12">
+                            <iframe src="`+ Path + `" width="100%" height="600px" style="border: none;"></iframe>
+                          </div>
+                    `);
+
+                    // Display the modal
+                    $("#attachmentView").modal('show');
+                 }
+                 else{
+                    WarningMessage("Delivery Challan Not Generated...!!")
+                 }
+
+             },
+             error: function (response) {
+
+             }
+         });
+     }
+
+     //THIS FUNCTION IS USED FOR GET ORDER WEIGHT DATA AGAIST ORDER (ANIKET 21-02-2025)
+     function GetOrderDataforVendorReceived(orderId) {
+         $.ajax({
+             type: "POST",
+             url: "/Dashboard/GetOrderWeightData",
+             data: {
+                 SelectedDataIds: orderId
+             },
+             success: function (data) {
+                 var res = JSON.parse(data);
+
+                 var OrderData = res["OrderData"]
+
+                 var $tableBody = $("#ReceivedOrderPreviewtable_id");
+                 $tableBody.empty();
+
+                 OrderData.forEach(function (order, index) {
+                     var row = `
+                         <tr>
+                             <td>${index + 1}</td>
+                                 <td class="text-center w-20"> <input type="hidden" name="OrderItemNo[]" value="${order.order_item_id}" /> ${order.order_series_no}</td>
+                                 <td class="text-center">${parseFloat(order.gross_wt).toFixed(3)}</td>
+                             <td class="text-center">
+                                 <input type="text" class="form-control text-center gross-now" name="GrossWeightNow[]" title="Enter Weight in gm" placeholder="Enter Weight in gm" value="" required min="0.001" step="any" >
+                             </td>
+                                  <td class="text-center">${parseFloat(order.net_wt).toFixed(3)}</td>
+                             <td class="text-center">
+                                       <input type="text" class="form-control text-center net-now" title="Enter Weight in gm" name="NetWeightNow[]" placeholder="Enter Weight in gm" value="" required min="0.001" step="any">
+                             </td>
+                         </tr>
+                     `;
+                     $tableBody.append(row);
+                 });
+             },
+             error: function (response) {
+
+             }
+         });
+
+     }
+
+     //THIS FUNCTION IS USED FOR OPEN RECEIVED VENDOR MODAL (ANIKET 21-02-2025)
+     function OpenReceivedVendormodal(orderitemid) {
+         $("#ReceivedOrderPreviewModal").modal('show');
+         GetOrderDataforVendorReceived(orderitemid);
+     }
+
+     //THIS FUNCTION USED FOR DOWNLOAD JOBCARD PDF
+    function DownloadJobCardFile() {
+      $.ajax({
+        type: "POST",
+        url: "/OrderMaster/ShareJobCardDetailsDownload",
+        data: { ItemDetailsId: $("#OrderDetailsId").val() },
+        success: function (response) {
+          if (response && response.fileUrl) {
+            // ✅ Create a temporary link and click it to download the file
+            const link = document.createElement('a');
+            link.href = response.fileUrl;
+            link.download = ''; // Let browser use filename from URL
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('Could not generate the file.');
+          }
+        },
+        error: function (error) {
+          console.error('Error fetching order details:', error);
+          alert('An error occurred while fetching order details.');
+        }
+      });
+    }
+</script>

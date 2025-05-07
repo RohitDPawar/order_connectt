@@ -1,0 +1,164 @@
+<!-- PAGINATION STYLING -->
+<style>
+    /* General styles for pagination items */
+    .pagination .page-item {
+        display: inline-block;
+    }
+
+    .pagination .page-link {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #8c8894;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        margin: 0 2px;
+    }
+
+    /* Active page styles */
+    .pagination .page-item.active .page-link {
+        background-color: dimgrey; /* Highlight active page */
+        color: white;
+        border-color: dimgrey; /* Match the border color to the background */
+    }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mt-2">
+    <!-- DROPDOWN TO SELECT ROWS PER PAGE -->
+    <div class="d-flex align-items-center gap-0">
+        <select class="form-control-sm" name="ShowRow" id="ShowRowid" style="border-color: dimgrey;" onchange="onRowsChange()">
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+        </select>
+    </div>
+
+    <!-- PAGINATION CONTROLS -->
+    <nav>
+        <ul class="pagination mb-0" id="pagination-list">
+            <!-- PAGINATION ITEMS WILL BE ADDED HERE DYNAMICALLY -->
+        </ul>
+    </nav>
+</div>
+
+
+
+<script>
+
+    //THIS FUNCTION IS USE FOR GENERATE PAGINATION DIV
+    function generatePagination(totalPages, currentPage) {
+        let paginationList = document.getElementById('pagination-list');
+
+        // Clear existing pagination items before generating new ones
+        paginationList.innerHTML = '';
+
+        // Fixed number of page buttons to display
+        const fixedPagesToDisplay = 5;
+        let rowsToShow = $('#ShowRowid').val();
+        // Create 'Previous' button (fixed)
+        let prevItem = document.createElement('li');
+        prevItem.classList.add('page-item');
+        prevItem.classList.toggle('disabled', currentPage === 1);
+        let prevLink = document.createElement('a');
+        prevLink.classList.add('page-link');
+        prevLink.href = 'javascript:void(0)';
+        prevLink.innerHTML = '<i class="fa fa-chevron-left"></i>';
+        prevItem.appendChild(prevLink);
+
+        prevItem.addEventListener('click', function () {
+            if (currentPage > 1) {
+                currentPage--;
+                generatePagination(totalPages, currentPage);
+                loadPageData(currentPage, rowsToShow);  // Load data for the current page
+            }
+        });
+
+        paginationList.appendChild(prevItem);
+
+        // Determine the pages to display (centered around the current page)
+        let pagesToDisplay = [];
+
+        if (totalPages <= 7) {
+            // If total pages are less than or equal to 7, show all pages
+            for (let i = 1; i <= totalPages; i++) {
+                pagesToDisplay.push(i);
+            }
+        } else {
+            // For more than 7 pages, calculate the range to display
+            if (currentPage <= 4) {
+                pagesToDisplay.push(1, 2, 3, 4, 5, '...', totalPages);
+            } else if (currentPage >= totalPages - 3) {
+                pagesToDisplay.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+            } else {
+                pagesToDisplay.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+            }
+        }
+
+        // Ensure the first and last page numbers are always included
+        if (!pagesToDisplay.includes(1)) {
+            pagesToDisplay.unshift(1, '...');
+        }
+        if (!pagesToDisplay.includes(totalPages)) {
+            pagesToDisplay.push('...', totalPages);
+        }
+
+        // Create the page number items (with ellipses if necessary)
+        pagesToDisplay.forEach(page => {
+            let pageItem = document.createElement('li');
+            pageItem.classList.add('page-item');
+
+            if (page === '...') {
+                let ellipsis = document.createElement('span');
+                ellipsis.classList.add('page-link');
+                ellipsis.textContent = '...';
+                pageItem.appendChild(ellipsis);
+            } else {
+                let pageLink = document.createElement('a');
+                pageLink.classList.add('page-link');
+                pageLink.href = 'javascript:void(0)';
+                pageLink.textContent = page;
+
+                if (page === currentPage) {
+                    pageItem.classList.add('active');
+                }
+
+                pageLink.addEventListener('click', function () {
+                    generatePagination(totalPages, page);
+                    loadPageData(page, rowsToShow);  // Load data for the selected page
+                });
+
+                pageItem.appendChild(pageLink);
+            }
+
+            paginationList.appendChild(pageItem);
+        });
+
+        // Create 'Next' button (fixed)
+        let nextItem = document.createElement('li');
+        nextItem.classList.add('page-item');
+        nextItem.classList.toggle('disabled', currentPage === totalPages);
+        let nextLink = document.createElement('a');
+        nextLink.classList.add('page-link');
+        nextLink.href = 'javascript:void(0)';
+        nextLink.innerHTML = '<i class="fa fa-chevron-right"></i>';
+        nextItem.appendChild(nextLink);
+
+        nextItem.addEventListener('click', function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                generatePagination(totalPages, currentPage);
+                loadPageData(currentPage, rowsToShow);  // Load data for the current page
+            }
+        });
+
+        paginationList.appendChild(nextItem);
+    }
+
+    //THIS FUNCTION IS USE FOR SHOW ENTRIES AS PER USER CHOOSE
+    function onRowsChange() {
+        loadPageData(1, $('#ShowRowid').val())
+    }
+
+</script>

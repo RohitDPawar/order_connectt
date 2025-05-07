@@ -1,0 +1,273 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Title on the left -->
+                                <h4>Order Send To Preview</h4>
+
+                                <!-- Right: Buttons -->
+                                <div class="d-flex">
+                                  @*   <button class="btn btn-success btn-sm me-2" id="Btn_AcceptedId"><i class="fa fa-check me-1"></i> Accepted</button>
+                                    <button class="btn btn-danger btn-sm me-2" id="Btn_RejectedId" onclick="openModal()"> <i class="fa fa-times me-1"></i> Rejected</button> *@
+                                    <!-- Filter Button with Filter Icon, Custom Color, and Space between Icon and Label -->
+                                    <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal" >
+                                        <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                                    </button>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="OrderSendtoPreviewTableId">
+                            <thead class="table-light">
+                                <tr>
+                                        @* <th class="sort">
+                                        <input type="checkbox" class="form-check-input rowCheckbox" id="Checkbox_SelectAllOrders" />
+                                    </th> *@
+                                    <th class="sort" data-sort="Sr No">Sr No</th>
+                                        @*  <th class="sort" data-sort="Action">Action</th> *@
+                                    <th class="sort" data-sort="Status">Status</th>
+                                    <th class="sort" data-sort="Order No">Order No.</th>
+                                    <th class="sort" data-sort="Item Name">Item Name</th>
+                                    <th class="sort" data-sort="Category Name">Category Name</th>
+                                    <th class="sort" data-sort="Gross Weight">Gross Weight</th>
+                                    <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                    <th class="sort" data-sort="Purity">Purity</th>
+                                    <th class="sort" data-sort="Item Pieces">Item Pieces</th>
+                                    <th class="sort" data-sort="Product Group Name">Product Group Name</th>
+                                    <th class="sort" data-sort="">Order Date</th>
+                                    <th class="sort" data-sort="">Order Delivery Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    function loadPageData(page, rowsToShow) {
+        GetOrderDate(page, $('#ShowRowid').val());
+    }
+
+    function applyFilter() {
+
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        GetOrderData(1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        GetOrderData(1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    function GetOrderData(pageNumber, pageSize) {
+        const data = {
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/OrderSendtoPreviewFilter",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (responseData) {
+                var res = JSON.parse(responseData);
+                BindOrderTable(res);
+            },
+            error: function (response) {
+                console.error("Error fetching data:", response);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+
+        GetOrderData(1, $('#ShowRowid').val());
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+    });
+
+    function BindOrderTable(res) {
+        $("#OrderSendtoPreviewTableId tbody").empty();
+
+        var table = $("#OrderSendtoPreviewTableId");
+
+        const paginationInfo = res.PaginationInfo;
+
+        let srno;
+
+        if (res && paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        }
+
+        // Check if the response has valid data
+        if (res && res.OrderData && Array.isArray(res.OrderData)) {
+            // Loop through the order data and create rows
+            for (let i = 0; i < res.OrderData.length; i++) {
+                const orderItem = res.OrderData[i];
+
+                // Safe data retrieval
+                const orderItemId = orderItem["order_item_id"] || '';
+                const status = orderItem["STATUS"] || '';
+                const orderSeriesNo = orderItem["order_series_no"] || '';
+                const itemName = orderItem["item_name"] || '';
+                const categoryName = orderItem["category_name"] || '';
+                const grossWt = parseFloat(orderItem["gross_wt"]).toFixed(3) || '';
+                const netWt = parseFloat(orderItem["net_wt"]).toFixed(3) || '';
+                const purityName = orderItem["purity_name"] || '';
+                const pcs = orderItem["pcs"] || '';
+                const productGroupName = orderItem["product_group_name"] || '';
+                const branchName = orderItem["branch_name"] || '';
+                const vendorName = orderItem["vendor_name"] || '';
+                const orderDate = orderItem["order_date"] ? orderItem["order_date"].split('T')[0] : '';
+                const orderDeliveryDate = orderItem["order_delivery_date"] ? orderItem["order_delivery_date"].split('T')[0] : '';
+
+                // Constructing the table row dynamically
+                const rowData = `
+                        <tr id="${orderItemId}">
+                            <td>${srno}</td>
+                            <td>${status}</td>
+                            <td>${orderSeriesNo}</td>
+                            <td>${itemName}</td>
+                            <td>${categoryName}</td>
+                            <td>${grossWt}</td>
+                            <td>${netWt}</td>
+                            <td>${parseFloat(purityName).toFixed(2)}</td>
+                            <td>${pcs}</td>
+                            <td>${productGroupName}</td>
+                            <td>${orderDate}</td>
+                            <td>${orderDeliveryDate}</td>
+                        </tr>
+                    `;
+
+                // Append the row to the table body
+                $("#OrderSendtoPreviewTableId tbody").append(rowData);
+
+                // Increment the serial number counter
+                srno++;
+            }
+        } else {
+            // If no data is available, display a "No Data Available" row
+            $("#OrderSendtoPreviewTableId tbody").html(`
+                    <tr>
+                        <td colspan="12" style="text-align: center;">No Data Available</td>
+                    </tr>
+                `);
+        }
+    }
+
+</script>

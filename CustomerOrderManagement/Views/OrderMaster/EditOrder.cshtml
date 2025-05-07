@@ -1,0 +1,1549 @@
+@using (Html.BeginForm("UpdateOrderSave", "OrderMaster"))
+{
+    <input type="hidden" name="UpdateOrderHeaderId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["header_id"].ToString()" id="OrderHeaderItemId" />
+    <input type="hidden" name="UpdateOrderDetailsId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["id"].ToString()" id="OrderDetailsItemId" />
+
+    <div class="row gy-6">
+        <input type="hidden" name="OrderHeader" id="OrderHeaderId" value="0" />
+        <!-- Customer Order Form -->
+        <div class="col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 d-flex align-items-center fw-bold">
+                        <!-- Icon with Purple Color -->
+                        <i class="ri-shopping-cart-line ri-24px custom-purple me-2"></i>
+                        Edit Order
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Order Details Section -->
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #b188fe; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-0">Order Details</h5>
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Order No -->
+                            <div class="col-md-3">
+                                <label for="Txt_OrderNo" class="form-label">Order No</label>
+                                <input type="text" id="Txt_OrderNo" name="Txt_OrderNo" class="form-control" placeholder="" disabled value="@ViewBag.OrderEditData.Tables[0].Rows[0]["order_series_no"].ToString()" />
+                            </div>
+
+                            <!-- Branch -->
+                            <div class="col-md-3">
+                                <label for="Select_BranchNameId" class="form-label">Branch</label>
+                                <select class="form-select" name="BranchName" id="Select_BranchNameId" disabled>
+                                    <option value="">Please Select Branch</option>
+                                    @foreach (var item in ViewBag.BranchData)
+                                    {
+                                        if (item["id"].ToString() == ViewBag.OrderEditData.Tables[0].Rows[0]["branch_id"].ToString())
+                                        {
+                                            <option value="@item["id"]" selected>@item["branch_name"]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item["id"]">@item["branch_name"]</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+
+                            <!-- Customer Name -->
+                            <div class="col-md-3">
+                                <label for="Txt_CustomerName" class="form-label">Customer Name</label>
+                                @* <input type="text" id="Txt_CustomerName" class="form-control onlyCharacterAndDash" placeholder="Enter Customer Name"  /> *@
+                                <select id="Txt_CustomerName" class="form-select" name="CustomerNameId" disabled>
+                                    <option value="">-- Please Select Customer --</option>
+                                    @foreach (var item in ViewBag.CustomerData)
+                                    {
+                                        if (item["id"].ToString() == ViewBag.OrderEditData.Tables[0].Rows[0]["customer_id"].ToString())
+                                        {
+                                            <option value="@item["id"]" selected>@item["customer_name"]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item["id"]">@item["customer_name"]</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Order Date -->
+                            <div class="col-md-3">
+                                <label for="Txt_OrderDate" class="form-label">Order Date</label>
+                                <input type="date" id="Date_OrderDateId" class="form-control" placeholder="Select Order Date" readonly name="OrderDate" value="@DateTime.Parse(ViewBag.OrderEditData.Tables[0].Rows[0]["order_date"].ToString()).ToString("yyyy-MM-dd")" />
+                            </div>
+
+                            <!-- Order Delivery Date -->
+                            <div class="col-md-3">
+                                <label for="Txt_OrderDeliveryDate" class="form-label">Order Delivery Date<span style="color:red;font-weight:800">*</span></label>
+                                <input type="date" id="Date_OrderDeliveryDateId" class="form-control" placeholder="Select Delivery date" name="DeliveryDate" value="@DateTime.Parse(ViewBag.OrderEditData.Tables[0].Rows[0]["order_delivery_date"].ToString()).ToString("yyyy-MM-dd")" required />
+                                <span id="WarnDeliveryDateId" style="display:none"></span>
+                            </div>
+                        </div>
+
+
+                        <!-- Item Details Section -->
+
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #b188fe; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-0">Item Details</h5>
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Item Name -->
+                            <div class="col-md-3">
+                                <label for="Select_Item" class="form-label">Item Name<span style="color:red;font-weight:800">*</span></label>
+                                <select id="Select_ItemNameId" class="form-select" name="ItemName" required>
+                                    <option value="">-- Please Select Item --</option>
+                                    @foreach (var item in ViewBag.ItemsData)
+                                    {
+                                        if (item["id"].ToString() == ViewBag.OrderEditData.Tables[0].Rows[0]["item_id"].ToString())
+                                        {
+                                            <option value="@item["id"]" selected>@item["item_name"]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item["id"]">@item["item_name"]</option>
+                                        }
+
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-3" id="CategoryMasterDivId">
+                                <label for="Txt_CategoryNameId" class="form-label">Category Name<span style="color:red;font-weight:800">*</span></label>
+                                <select class="form-select" name="CategoryName" id="Select_CategoryNameId" required disabled>
+                                </select>
+                            </div>
+
+                            <!-- Product Group -->
+                            <div class="col-md-3">
+                                <label for="Txt_ProductGroup" class="form-label">Product Group</label>
+                                <input type="text" id="Txt_ProductGroup" name="Txt_ProductGroup" class="form-control" placeholder="Enter Product Group" readonly value="GOLD" required />
+                            </div>
+
+                            <!-- Purity -->
+                            <div class="col-md-3">
+                                <label for="Txt_Purity" class="form-label">Purity<span style="color:red;font-weight:800">*</span></label>
+                                <select id="Select_PurityNameId" class="form-select" name="Select_PurityNameId" required>
+                                    <option value="">-- Please Select Item --</option>
+                                    @foreach (var item in ViewBag.PurityData)
+                                    {
+                                        if (item["id"].ToString() == ViewBag.OrderEditData.Tables[0].Rows[0]["purity_id"].ToString())
+                                        {
+                                            <option value="@item["id"]" selected>@item["purity"]</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item["id"]">@item["purity"]</option>
+                                        }
+
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Net Weight(Gram) -->
+                            <div class="col-md-3">
+                                <label for="Txt_GrossWt" class="form-label">Gross Weight(Gram)</label>
+                                <input type="text" id="Txt_GrossWtId" name="Txt_GrossWt" class="form-control onlyNumberAndDot" placeholder="Enter Gross Weight" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["gross_wt"].ToString()" required readonly />
+                            </div>
+                            <!-- Net Weight(Gram) -->
+                            <div class="col-md-3">
+                                <label for="Txt_NetWt" class="form-label">Net Weight(Gram)<span style="color:red;font-weight:800">*</span></label>
+                                <input type="text" id="Txt_NetWtId" name="Txt_NetWt" class="form-control onlyNumberAndDot" placeholder="Enter Net Weight" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["net_wt"].ToString()" required />
+                            </div>
+
+                            <!-- Item Size -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemSize" class="form-label">Item Size@* <span style="color:red;font-weight:800">*</span> *@</label>
+                                <input type="text" id="Txt_ItemSizeId" name="Txt_ItemSize" class="form-control onlyNumberAndDot1" placeholder="Enter Item Size" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["size"].ToString()" required />
+                            </div>
+
+                            <!-- Item Pieces -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemPieces" class="form-label">Item Pieces<span style="color:red;font-weight:800">*</span></label>
+                                <input type="text" id="Txt_ItemPiecesId" name="Txt_ItemPieces" class="form-control onlyNumber" placeholder="Enter Item Pieces" maxlength="5" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["pcs"].ToString()" required />
+                            </div>
+
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Item Design Code -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemPieces" class="form-label">Design Code@* <span style="color:red;font-weight:800">*</span> *@</label>
+                                <input type="text" id="Txt_DesignCodeId" class="form-control" placeholder="Enter Design" maxlength="50" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["design_code"].ToString()" required />
+                            </div>
+
+                            <!-- Item Barcode Reference -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemPieces" class="form-label">Barcode Reference</label>
+                                <input type="text" id="Txt_BarcodeReferenceId" class="form-control" placeholder="Enter Barcode Reference" maxlength="50" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["reference_barcode"].ToString()" />
+                            </div>
+                            <!-- Narration -->
+                            <div class="col-md-3">
+                                <label for="Txt_Narration" class="form-label">Narration</label>
+                                <input type="text" id="Txt_NarrationId" class="form-control" placeholder="Enter Narration" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["remark"].ToString()" />
+                            </div>
+
+                            <!-- Stone Name -->
+                            <div class="col-md-3 text-center" style="margin-top: 15px">
+                                <label for="Txt_ItemPieces" class="form-label d-block">Click Here To Add Stone</label>
+                                <button type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#stoneDetailsModal"
+                                        id="StoneAddButtonId"
+                                        class="btn btn-primary w-100">
+                                    <i class="fa fa-plus me-2" aria-hidden="true"></i>Add Stones
+                                </button>
+                                <input type="hidden" name="StoneDetailsBox" id="Txt_StoneDetailAddId" />
+                            </div>
+
+                            <!-- Attachment -->
+                            <div class="col-md-3">
+                                <label for="Txt_Attachment" class="form-label">Attachment</label>
+                                <input type="text" id="Txt_AttachmentId" name="Txt_Attachment" class="form-control" placeholder="Attach Image, Doc" readonly />
+                            </div>
+
+                            <!-- Choose File and View Buttons -->
+                            <div class="col-md-3 d-flex align-items-center" style="margin-top:30px">
+                                <input type="file" id="File_ItemImg" class="form-control d-none" multiple accept=".jpg, .jpeg, .png" />
+                                <button class="btn btn-primary w-100 ms-1" type="button" id="Btn_ChooseImg">
+                                    <i class="fa fa-upload me-1"></i> Choose File
+                                </button>
+                                <button class="btn btn-primary ms-1" type="button" onclick="OpenViewModal()">
+                                    <i class="fa fa-eye me-1"></i> View
+                                </button>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mb-5">
+                    <!-- Attachment -->
+                    <div class="col-md-3">
+                    </div>
+
+                    <!-- Attachment -->
+
+                    <div class="card-header d-flex justify-content-end pe-9">
+
+                        @if (@ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "0" || @ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "1")
+                        {
+                            if (@ViewBag.RoleId == "2" || ViewBag.RoleId == "3")
+                            {
+                                <button class="btn btn-success me-2" onclick="EditingTimeOrderStatusChange('1')"><i class="fa fa-check me-2" aria-hidden="true"></i>Accept</button>
+                            }
+
+                        }
+
+                        @if (@ViewBag.RoleId == "2" || ViewBag.RoleId == "3")
+                        {
+                            <button class="btn btn-danger me-2" onclick="EditingTimeOrderStatusChange('2')"><i class="fa fa-times me-1"></i>Reject</button>
+                        }
+
+                        <button class="btn btn-primary me-2" type="button" onclick="updateOrder()"> Update Record </button>
+                        <button class="btn btn-outline-primary" type="button" onclick="RefreshPage()">Cancel</button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--/ Customer Order Form -->
+    </div>
+
+    <!-- Modal to display images -->
+    <div class="modal fade" id="attachmentView" tabindex="-1" aria-labelledby="attachmentViewLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attachmentViewLabel">View Attachments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="AttachId">
+                        <!-- Dynamically added images will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stone Details Modal -->
+    <div class="modal fade" id="stoneDetailsModal" tabindex="-1" aria-labelledby="stoneDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md">
+            <!-- Use modal-lg for larger screens; adjust as needed -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stoneDetailsModalLabel">Add Stone Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form to add stone details -->
+                    <div class="mb-3">
+                        <label for="stoneType" class="form-label">Stone Type <span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-select" name="StoneTypeName" id="Select_StoneNameId" onchange="ConvertCaratIntoStone(); GetStoneCategory()">
+                            <option value="0">Please Select Stone </option>
+                            @foreach (var item in ViewBag.StonesData)
+                            {
+                                <option value="@(@item["id"] + "~" + @item["item_name"])">@item["item_name"]</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="StoneCategoryDivId">
+                        <label for="stoneType" class="form-label">Stone Category <span style="color:red;font-weight:800">*</span></label>
+                        <select class="form-select" name="StoneCategoryTypeName" id="Select_StonecategoryNameId" required>
+                            <option value="0">Please Select Stone Category</option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="StoneInCarat" class="form-label">Stone Weight <span style="color:red;font-weight:800">*</span></label>
+                            <input type="text" class="form-control onlyNumberAndDot" id="StoneInCaratId" placeholder="Enter weight In CT" oncopy="return false" oncut="return false" onpaste="return false" onchange="ConvertCaratIntoStone()">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="stoneWeight" class="form-label">Stone In Gram</label>
+                            <input type="text" class="form-control onlyNumber" id="stoneWeight" placeholder="Stone Weight" oncopy="return false" oncut="return false" onpaste="return false" readonly style="background-color:#efefef">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="stonePieces" class="form-label">Stone Pieces <span style="color:red;font-weight:800">*</span></label>
+                        <input type="text" class="form-control onlyNumber" id="stonePieces" placeholder="Enter number of pieces" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="stoneColor" class="form-label">Stone Color</label>
+                        <select class="form-select" name="StoneColorName" id="Select_StoneColorNameId">
+                            <option value="0~NA">Please Select Stone Color</option>
+                            @foreach (var item in ViewBag.StoneColorData)
+                            {
+                                <option value="@(@item["id"] + "~" + @item["color_name"])">@item["color_name"]</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div id="DivaddStoneBtn" class="col-12">
+                            <button type="button" class="btn btn-primary" id="addStoneBtn">Add Stone</button>
+                        </div>
+                        <div id="DivUpdateStoneBtn" class="col-12">
+                            <button type="button" class="btn btn-primary" id="UpdateStoneBtn">Update Stone</button>
+                        </div>
+                    </div>
+
+                    <!-- Stone Details Table inside Modal -->
+                    <div class="table-responsive mt-4">
+                        <!-- Added table-responsive class for horizontal scrolling on small screens -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Stone Type</th>
+                                    <th>Stone Category</th>
+                                    <th>Weight</th>
+                                    <th>Pieces</th>
+                                    <th>Color</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stoneList">
+                                <!-- Stone rows will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Stone Count -->
+                    <p>Total Stones Added: <span id="stoneCount">0</span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success me-1" id="submitStonesBtn">Submit Stone Details</button>
+                    <button type="button" class="btn btn-secondary me-1" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Product -->
+    <div class="modal fade" id="SandToVendorModalViewId" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog" style="margin-top:15%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Country Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <label>Assign Vendor</label>
+                            <select class="form-select" name="VendorName" id="VendorNameId" required>
+                                <option value=""> Please Select Vendor </option>
+                                @foreach (var item in ViewBag.VendorName)
+                                {
+                                    <option value="@item["id"]">@item["vendor_name"]</option>
+                                }
+                            </select>
+                        </div>
+                        <input type="hidden" name="SelectedOrderItemId" id="Txt_BindAllItemsId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["id"].ToString()" />
+                        <div class="col">
+                            <label>Expected Delivery Date</label>
+                            <input type="date" class="form-control" name="ExpectedDeliveryDate" id="ExpectedDeliveryDate" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" onclick="OrderSendToVendor()">Send To Vendor</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function GetStoneCategory(stoneCategoryId = null, stoneCategory = null) {
+            var ItemId = $("#Select_StoneNameId").val();
+
+            if (ItemId != "0") {
+                $.ajax({
+                    type: "POST",
+                    url: "/OrderMaster/GetStoneCategory",
+                    data: { ItemId: ItemId },
+                    success: function (data) {
+                        const response = typeof data === "string" ? JSON.parse(data) : data;
+
+                        if (response["StoneCategory"].length > 0) {
+                            $("#StoneCategoryDivId").html('');
+                            var CategoryData = response["StoneCategory"];
+                            var Dropdown = '<label for="Txt_StoneCategoryNameId" class="form-label">Stone Category Name <span style="color:red;font-weight:800">*</span></label>';
+                            Dropdown += '<select id="Select_StonecategoryNameId" class="form-select"><option value="0"> Please Select Stone Category </option>';
+
+                            for (var i = 0; i < CategoryData.length; i++) {
+                                Dropdown += '<option value="' + CategoryData[i]["id"] + '~' + CategoryData[i]["category_name"] + '">' + CategoryData[i]["category_name"] + '</option>';
+                            }
+                            Dropdown += '</select>';
+                            $("#StoneCategoryDivId").append(Dropdown);
+
+                            if (stoneCategoryId && stoneCategory) {
+                                    var selectedValue = stoneCategoryId + '~' + stoneCategory;
+                                    if ($('#Select_StonecategoryNameId option[value="' + selectedValue + '"]').length > 0) {
+                                        $('#Select_StonecategoryNameId').val(selectedValue).trigger('change');
+                                    } else {
+                                        console.error("Value not found in dropdown:", selectedValue);
+                                    }
+                            }
+                        } else {
+                            $("#StoneCategoryDivId").html('');
+                            var Dropdown = '<label for="Txt_StoneCategoryNameId" class="form-label">Category Name</label>';
+                            Dropdown += '<select id="Select_StonecategoryNameId" class="form-select"><option value="0"> Please Select Stone Category </option></select>';
+                            $("#StoneCategoryDivId").append(Dropdown);
+                            ShowErrorMsg("Stone Category Not Found...!!", "1");
+                            $("#Select_StoneNameId").val("0");
+                        }
+                    },
+                    error: function (response) {
+                        console.error("Error during AJAX request:", response);
+                    }
+                });
+            } else {
+                ShowErrorMsg("Please Select Stone...!!", "1");
+                $("#StoneInCaratId").val("0");
+            }
+        }
+
+
+        function ConvertCaratIntoStone1(ItemId,StoneWt)
+              {
+
+                   $.ajax({
+                      type: "POST",
+                      url: "/OrderMaster/GetItemUOM",
+                      data: {
+                          ItemId: ItemId,
+                      },
+                      success: function (data)
+                      {
+                          // CLEAR THE TABLE BODY
+                          // PARSE THE RESPONSE IF NOT ALREADY AN OBJECT
+                          const response = typeof data === "string" ? JSON.parse(data) : data;
+
+
+                              if (response["ItemUOM"][0]["uom"] == "CT")
+                              {
+                                      var ConvertedInGram = StoneWt * 5;
+                                      $("#StoneInCaratId").val(ConvertedInGram.toFixed(3));
+                              }
+                              else{
+                                    $("#StoneInCaratId").val(StoneWt);
+                              }
+
+                      },
+                      error: function (response) {
+                          console.error("Error during AJAX request:", response);
+                      }
+                  });
+
+
+         }
+
+        //THIS FUNCTION USED FOR ENTER CARAT CONVERT INTO GRAM
+        function ConvertCaratIntoStone()
+         {
+            var ItemId =  $("#Select_StoneNameId").val();
+
+            if(ItemId != "0")
+            {
+              $.ajax({
+                 type: "POST",
+                 url: "/OrderMaster/GetItemUOM",
+                 data: {
+                     ItemId: ItemId,
+                 },
+                 success: function (data)
+                 {
+                     // CLEAR THE TABLE BODY
+                     // PARSE THE RESPONSE IF NOT ALREADY AN OBJECT
+                     const response = typeof data === "string" ? JSON.parse(data) : data;
+
+                     var EnterCarat = $("#StoneInCaratId").val();
+
+                      if(EnterCarat != ''){
+                         if (response["ItemUOM"][0]["uom"] == "CT")
+                         {
+
+                             var ConvertedInGram = EnterCarat/5;
+                             $("#stoneWeight").val(ConvertedInGram.toFixed(3));
+
+                         }
+                         else{
+                              $("#stoneWeight").val(EnterCarat);
+                         }
+                     }
+                 },
+                 error: function (response) {
+                     console.error("Error during AJAX request:", response);
+                 }
+             });
+            }
+            else{
+                  ShowErrorMsg("Please Select Stone...!!", "1");
+                  $("#StoneInCaratId").val("0");
+            }
+         }
+
+        function EditingTimeOrderStatusChange(Flag) {
+            if (Flag == "1") {
+                $.ajax({
+                    type: "POST",
+                    url: "/OrderMaster/UpdateOrderStatusInEdit",
+                    data: {
+                        itemId: $("#OrderDetailsItemId").val(),
+                        Flag: Flag
+                    },
+                    success: function (data) {
+                        window.location.href = '/Dashboard/OrdersStatus';
+                    },
+                    error: function (response) {
+                        // HANDLE ERROR HERE (OPTIONAL)
+                    }
+                });
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/OrderMaster/UpdateOrderStatusInEdit",
+                    data: {
+                        itemId: $("#OrderDetailsItemId").val(),
+                        Flag: Flag
+                    },
+                    success: function (data) {
+                        window.location.href = '/Dashboard/OrdersStatus';
+                    },
+                    error: function (response) {
+                        // HANDLE ERROR HERE (OPTIONAL)
+                    }
+                });
+            }
+        }
+
+        function RefreshPage()
+        {
+            if(@ViewBag.RoleId == "4"){
+              window.location.href = '/Dashboard/SalePersonDashboard';
+            }
+            else{
+              window.location.href = '/Dashboard/BackOfficeDashboard';
+            }
+            
+        }
+
+        var TotalStoneWt = 0;
+
+        function OrderSendToVendor() {
+            if ($("#VendorNameId").val() == "") {
+                ShowErrorMsg("Please Select Vendor...!!", "1")
+            }
+            else if ($("#ExpectedDeliveryDate").val() == "") {
+                ShowErrorMsg("Please Select Expected Delivery Date...!!", "1")
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/Dashboard/DirectOrderSendToVendor",
+                    data: {
+                        VendorId: $("#VendorNameId").val(),
+                        ExpectedDate: $("#ExpectedDeliveryDate").val(),
+                        Ids: $("#Txt_BindAllItemsId").val(),
+                    },
+                    success: function (data) {
+                        var res = JSON.parse(data);
+                        TableBindData(res)
+                    },
+                    error: function (response) {
+
+                    }
+                });
+            }
+
+        }
+
+        $(document).ready(function () {
+
+            const inputIds = ["Select_BranchNameId", "Txt_CustomerMobileId", "Txt_CustomerNameId", "Date_OrderDeliveryDateId", "Txt_ProductGroup", "Txt_GrossWtId", "Txt_NetWtId", "Txt_ItemPiecesId", "Txt_BarcodeReferenceId", "Txt_NarrationId", "Txt_AttachmentId"];
+
+            // Attach the event listener to each input field
+            inputIds.forEach((id) => {
+                const inputField = document.getElementById(id);
+                if (inputField) {
+                    inputField.addEventListener("keydown", function (event) {
+                        if (event.key === "Enter") {
+                            // Prevent default form submission
+                            event.preventDefault();
+
+                            // Check if input is empty
+                            const value = event.target.value.trim();
+                            if (value === "") {
+                                ShowErrorMsg("Please Fill Order Related Data...!!", "1")
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#Txt_GrossWtId').change(function () {
+                if (parseFloat($(this).val()) == 0) {
+                    $('#Txt_GrossWtId').val("")
+                    ShowErrorMsg("Gross Wt Must be Greater than Zero...!!", "1")
+                }
+            });
+
+            $('#Txt_NetWtId').on('change', function () {
+                let netWt = parseFloat($('#Txt_NetWtId').val());
+                let grossWt = parseFloat($('#Txt_GrossWtId').val());
+
+                if (!isNaN(netWt) && netWt <= 0) {
+                    $('#Txt_NetWtId').val("");
+                    ShowErrorMsg("Net Weight must be greater than 0...!!", "1");
+                    return;
+                }
+
+                if (!isNaN(grossWt) && grossWt <= 0) {
+                    $('#Txt_GrossWtId').val("");
+                    ShowErrorMsg("Gross Weight must be greater than 0...!!", "1");
+                    return;
+                }
+
+                if (!isNaN(netWt) && !isNaN(grossWt) && netWt > grossWt) {
+                    $('#Txt_NetWtId').val("");
+                    $('#Txt_GrossWtId').val("");
+                    ShowErrorMsg("Net Wt Greater Than Gross Wt...!!", "1");
+                } else if (!isNaN(netWt)) {
+                    $('#Txt_GrossWtId').val(TotalStoneWt + netWt);
+                } else {
+                    $('#Txt_GrossWtId').val("");
+                }
+            });
+
+            // $('#Txt_ItemSizeId').change(function () {
+            //     if ($('#Txt_ItemSizeId').val() == 0) {
+            //         $('#Txt_ItemSizeId').val("")
+            //         ShowErrorMsg("Size Must Be Greater Than Zero...!!", "1")
+            //     }
+            // });
+
+            $('#Txt_ItemPiecesId').change(function () {
+                if ($('#Txt_ItemPiecesId').val() == 0) {
+                    $('#Txt_ItemPiecesId').val("")
+                    ShowErrorMsg("Item Pcs Must Be Greater Than Zero...!!", "1")
+                }
+            });
+        });
+
+        function ValidationItems() {
+            var total_tr = $('.total_tr');
+            if (total_tr.length > 0) {
+                return true;
+            }
+            else {
+                ShowErrorMsg("Please Before Create Order Add Items...!!!", "1")
+                return false;
+            }
+        }
+
+        //THIS ARRAY USED FOR STONE DATA
+        let stonesArray = [];
+
+        //THIS IS USED FOR OPEN STONE MODAL
+        function OpenStoneModal() {
+            $("#StoneAddButtonId").click();
+        }
+
+        $(document).ready(function () {
+
+            // Set the default value of the Order Date input to today's date
+            const today = new Date().toISOString().split('T')[0];
+            $("#Date_OrderDateId").val(today);
+            // Attach onchange event to both date inputs
+            $("#Date_OrderDeliveryDateId, #Date_OrderDateId").on('change', function () {
+                // Get the values of the date inputs
+                const deliveryDate = new Date($("#Date_OrderDeliveryDateId").val());
+                const orderDate = new Date($("#Date_OrderDateId").val());
+
+                // Check if the delivery date is not less than the order date
+                if (deliveryDate >= orderDate) {
+                    $("#WarnDeliveryDateId").css({ "display": "none" });
+                }
+                else {
+                    $("#Date_OrderDeliveryDateId").val("")
+                    $("#WarnDeliveryDateId").css({ "display": "block", "color": "red" }).text("Please Select Valid Date...!!!");
+                }
+            });
+
+            document.querySelectorAll('.onlyNumber').forEach(input => {
+                input.addEventListener('input', function () {
+                    // Match only numbers (0-9)
+                    const validValue = this.value.match(/^\d*/);
+
+                    // If invalid, revert to the last valid value
+                    this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+                });
+            });
+
+            $(document).on('keypress', '.onlyCharacterAndDash', function (event) {
+                // Restrict first character to be alphabetic only
+                if (this.value.length === 0 && !/[a-zA-Z]/.test(String.fromCharCode(event.which))) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                //var regex = new RegExp("^[a-zA-Z\s\-_()]+$");
+                const regex = /^[a-zA-Z\s\-\_\(\)]+$/;
+
+                var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+                // Allow only alphabetic characters, space, underscore, dash, and parentheses
+                if (!regex.test(key)) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                var lastChar = this.value.slice(-1);
+
+                // Prevent consecutive spaces, underscores, dashes, or parentheses
+                if (
+                    ((event.which === 32 && lastChar === ' ') ||  // Prevent consecutive spaces
+                        (event.which === 45 && lastChar === '-') ||  // Prevent consecutive dashes
+                        (event.which === 95 && lastChar === '_') ||  // Prevent consecutive underscores
+                        (event.which === 40 && lastChar === '(') ||  // Prevent consecutive opening parentheses
+                        (event.which === 41 && lastChar === ')'))    // Prevent consecutive closing parentheses
+                ) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Prevent a space, underscore, dash, or parentheses directly after another space, underscore, dash, or parentheses
+                if (
+                    (event.which === 32 || event.which === 45 || event.which === 95 || event.which === 40 || event.which === 41) &&
+                    (lastChar === ' ' || lastChar === '-' || lastChar === '_' || lastChar === '(' || lastChar === ')')
+                ) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Ensure space, underscore, dash, or parentheses are allowed only after two words
+                var parts = this.value.split(/[\s\-_()]+/);
+                if (parts.length > 2 && (event.which === 32 || event.which === 45 || event.which === 95 || event.which === 40 || event.which === 41)) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            GetItemIdAllCategory(@ViewBag.OrderEditData.Tables[0].Rows[0]["item_id"].ToString(), '1');
+
+        });
+
+        //THIS IS USED FOR WEIGHT ENTER PURPOSE
+        document.querySelectorAll('.onlyNumberAndDot').forEach(input => {
+            input.addEventListener('input', function () {
+                // MATCH UP TO 10 DIGITS BEFORE THE DOT AND UP TO 3 DIGITS AFTER THE DOT
+                const validValue = this.value.match(/^\d{0,10}(\.\d{0,3})?$/);
+
+                // IF INVALID, REVERT TO THE LAST VALID VALUE
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        //THIS IS USED FOR ONLY NUMBER
+        document.querySelectorAll('.onlyNumber').forEach(input => {
+            input.addEventListener('input', function () {
+                // MATCH UP TO 10 DIGITS BEFORE THE DOT AND UP TO 3 DIGITS AFTER THE DOT
+                const validValue = this.value.match(/^\d{0,5}(\d{0,2})?$/);
+
+                // IF INVALID, REVERT TO THE LAST VALID VALUE
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        //THIS IS USED FOR DOT AND AFTER 2 PRIFIX
+        document.querySelectorAll('.onlyNumberAndDot1').forEach(input => {
+            input.addEventListener('input', function () {
+                // MATCH UP TO 10 DIGITS BEFORE THE DOT AND UP TO 3 DIGITS AFTER THE DOT
+                const validValue = this.value.match(/^\d{0,5}(\.\d{0,2})?$/);
+
+                // IF INVALID, REVERT TO THE LAST VALID VALUE
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        // EVENT LISTENER FOR ONCHANGE EVENT ON SELECT ELEMENT
+        $('#Select_ItemNameId').change(function () {
+            var selectedItemId = $(this).val();
+            GetItemIdAllCategory(selectedItemId, '0');
+        });
+
+        function GetItemIdAllCategory(selectedItemId, flag)
+        {
+            var CategoryId = @ViewBag.OrderEditData.Tables[0].Rows[0]["category_id"];
+            // alert(@ViewBag.OrderEditData.Tables[0].Rows[0]["category_id"])
+            $.ajax({
+                type: "POST",
+                url: "/OrderMaster/GetItemIdAllCategory",
+                data: {
+                    itemId: selectedItemId
+                },
+                success: function (data) {
+                    var response = JSON.parse(data);
+                    //console.log(response["CategoryData"])
+                    $("#CategoryMasterDivId").html('')
+                    var CategoryData = response["CategoryData"];
+                    var ProductName = response["ProductData"];
+                    $("#Txt_ProductGroup").val(ProductName[0]["product_group_name"])
+                    var Dropdown = '<label for="Txt_CategoryNameId" class="form-label">Category Name<span style="color:red;font-weight:800">*</span></label><select id="Select_CategoryNameId" class="form-select">'
+                    for (var i = 0; i < CategoryData.length; i++)
+                    {
+                        Dropdown += '<option value="' + CategoryData[i]["id"] + '">' + CategoryData[i]["category_name"] + '</option>'
+                    }
+                    Dropdown + '</select>';
+                    $("#CategoryMasterDivId").append(Dropdown);
+
+                    if (flag == '1')
+                    {
+                      //alert(CategoryId)
+                        $("#Select_CategoryNameId").val(CategoryId).change();
+                    }
+
+
+                },
+                error: function (response) {
+                    // Handle error here (optional)
+                }
+            });
+        }
+
+        function ConvertGramIntoCarat(StoneGram)
+        {
+          ConvertCaratIntoStone();
+          if(StoneGram > 0)
+          {
+            return StoneGram*5;
+          }
+
+        }
+
+        $(document).ready(function () {
+
+            // INITIALIZE THE STONE COUNTER GLOBALLY
+            $('#DivUpdateStoneBtn').hide();
+            let stoneCounter = 0;
+            var currentStoneID = 0;
+            // $('#add').hide();
+
+            // ARRAY TO STORE STONE DETAILS
+            $.ajax({
+                url: '@Url.Action("GetStoneData", "OrderMaster")',
+                type: 'POST',
+                data: { orderItemId: @ViewBag.OrderEditData.Tables[0].Rows[0]["id"].ToString() },
+                success: function (stoneData) {
+                    console.log(stoneData);
+                    if (stoneData && stoneData.length > 0) {
+                        stoneData.forEach(function (stone) {
+
+                            stoneCounter++;
+
+                            var stoneList = $('#stoneList');
+                            var stoneRow = $('<tr>').attr('id', 'stone-' + stoneCounter);
+
+                            stoneRow.html(`<td id="${stone.itemID}">${stone.stoneId}</td>
+                                  <td id="${stone.stone_category_id}">${stone.category_name}</td>
+                                  <td>${stone.stoneWeight}</td>
+                                  <td>${stone.pieces}</td>
+                                  <td id="${stone.colorID}">${stone.stoneColor}</td>
+                                  <td><button class="btn btn-warning btn-sm" id="EditStoneId" onclick="EditStone('stone-${stoneCounter}')">
+                                  <i class="fa fa-edit"></i> </button>
+                                  <button type="button" class="btn btn-danger btn-sm" onclick="removeStone('stone-${stoneCounter}')">
+                                  <i class="fa fa-times"></i></button></td>
+                            `);
+
+                            TotalStoneWt += parseFloat(stone.stoneWeight);
+                            // APPEND THE NEW STONE ROW TO THE TABLE
+                            stoneList.append(stoneRow);
+
+                            // STORE STONE DETAILS IN THE ARRAY
+                            stonesArray.push({
+                                id: 'stone-' + stoneCounter,
+                                type: stone.itemID + '~' + stone.stoneId,
+                                stoneCategory: stone.stone_category_id + '~' + stone.category_name,
+                                weight: stone.stoneWeight,
+                                pieces: stone.pieces,
+                                color: stone.colorID + '~' + stone.stoneColor,
+                                DataID: stone.id
+                            });
+
+                            // UPDATE THE TOTAL STONE COUNT
+                            updateStoneCount();
+                        });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Error fetching stone data: " + error);
+                }
+            });
+
+            document.getElementById('addStoneBtn').addEventListener('click', function () {
+            // GET THE TABLE ELEMENT
+            var stoneList = document.getElementById('stoneList');
+
+            // CHECK IF THE ROW LIMIT HAS BEEN REACHED
+            if (stoneList.rows.length >= 10) {
+                ShowErrorMsg("Allowed To Add Only 10 Rows Stone Details", "1")
+                return;
+            }
+            // GET THE VALUES FROM THE FORM ELEMENTS
+            var stoneType = document.getElementById('Select_StoneNameId').value;
+            var stoneCategory = document.getElementById('Select_StonecategoryNameId').value;
+            var stoneWeight = document.getElementById('stoneWeight').value;
+            var stonePieces = document.getElementById('stonePieces').value;
+            var stoneColor = document.getElementById('Select_StoneColorNameId').value;
+
+            if (stoneType == "0") {
+                ShowErrorMsg("Please Select Stone Type...!!", "1");
+                return;
+            }
+
+            if (stoneCategory == "0") {
+                ShowErrorMsg("Please Select Stone Type...!!", "1");
+                return;
+            }
+
+            if (stoneWeight == "") {
+                ShowErrorMsg("Please Enter Stone Weight...!!", "1");
+                return;
+            }
+
+            if (stonePieces == "") {
+                ShowErrorMsg("Please Enter Stone Pieces...!!", "1");
+                return;
+            }
+
+            if (stoneColor == "0") {
+                ShowErrorMsg("Please Select Stone Color...!!", "1");
+                return;
+            }
+
+            if (parseFloat(stoneWeight) <= 0) {
+                ShowErrorMsg("Stone weight must be greater than zero...!!", "1");
+                return;
+            }
+
+            if (parseInt(stonePieces) <= 0) {
+                ShowErrorMsg("Stone pieces must be greater than zero...!!", "1");
+                return;
+            }
+            stoneCounter++;
+
+            var stoneList = document.getElementById('stoneList');
+            if (!stoneList) {
+                console.error("Error: stoneList table not found!");
+                return;
+            }
+
+            var stoneRow = document.createElement('tr');
+            stoneRow.setAttribute('id', 'stone-' + stoneCounter);
+
+            // PREPARE THE STONETYPE AND STONECOLOR TO HANDLE THE `SPLIT` SAFELY
+            var stoneTypeName = stoneType.split('~')[1] || stoneType;
+            var stoneCategoryName = stoneCategory.split('~')[1] || stoneCategory;
+            var stoneColorName = stoneColor.split('~')[1] || stoneColor;
+
+            stoneRow.innerHTML = `
+                        <td id="${stoneType.split('~')[0]}">${stoneTypeName}</td>
+                        <td id="${stoneCategory.split('~')[0]}">${stoneCategoryName}</td>
+                        <td>${stoneWeight}</td>
+                        <td>${stonePieces}</td>
+                        <td id="${stoneColor.split('~')[0]}">${stoneColorName}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="EditStone('stone-${stoneCounter}')">
+                                <i class="fa fa-edit"></i> <!-- Edit icon -->
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeStone('stone-${stoneCounter}')">
+                                <i class="fa fa-times"></i> <!-- Delete icon -->
+                            </button>
+                        </td>
+                    `;
+
+            stoneList.appendChild(stoneRow);
+
+            // STORE THE STONE DETAILS IN THE ARRAY (ASSUMES STONESARRAY IS DEFINED GLOBALLY)
+            stonesArray.push({
+                id: 'stone-' + stoneCounter,
+                type: stoneType.split('~')[0] + '~' + stoneTypeName,
+                stoneCategory: stoneCategory.split('~')[0] + '~' + stoneCategoryName,
+                weight: stoneWeight,
+                pieces: stonePieces,
+                color: stoneColor.split('~')[0] + '~' + stoneColorName,
+                DataID: '0'
+            });
+
+            // UPDATE THE TOTAL STONE COUNT (ASSUMES UPDATESTONECOUNT() IS DEFINED ELSEWHERE)
+            updateStoneCount();
+
+            document.getElementById('Select_StoneNameId').value = '0';
+            document.getElementById('Select_StonecategoryNameId').value = '0';
+            document.getElementById('stoneWeight').value = '';
+            document.getElementById('stonePieces').value = '';
+            document.getElementById('StoneInCaratId').value = '';
+            document.getElementById('Select_StoneColorNameId').value = '0~NA';
+        });
+
+                   // FUNCTION TO REMOVE A STONE DETAIL ROW BY ID
+            window.removeStone = function (stoneId) {
+                document.getElementById(stoneId).remove();
+
+                // REMOVE THE STONE DETAILS FROM THE STONES ARRAY
+                stonesArray = stonesArray.filter(stone => stone.id !== stoneId);
+                if (currentStoneID == stoneId) {
+                    resetForm();
+                    $('#DivaddStoneBtn').show();
+                    $('#DivUpdateStoneBtn').hide();
+                }
+                // UPDATE THE TOTAL STONE COUNT AFTER REMOVAL
+                updateStoneCount();
+            };
+
+            window.EditStone = function (stoneId) {
+            $('#DivaddStoneBtn').hide();
+            $('#DivUpdateStoneBtn').show();
+            currentStoneID = stoneId;
+            var stoneRow = $('#' + stoneId);
+
+            if (stoneRow.length > 0) {
+                // FETCH THE VALUES FROM THE TABLE ROW FIRST
+                var stoneType = stoneRow.find('td').eq(0).text();
+                var stoneCategory = stoneRow.find('td').eq(1).text();
+                var stoneWeight = stoneRow.find('td').eq(2).text();
+                var stonePieces = stoneRow.find('td').eq(3).text();
+                var stoneColor = stoneRow.find('td').eq(4).text();
+                console.log(stoneRow.find('td').eq(4).text());
+                // SPLIT THE STONETYPE AND STONECOLOR FOR CORRECT VALUES
+                var stoneTypeId = stoneRow.find('td').eq(0).attr('id');
+                var stoneCategoryId = stoneRow.find('td').eq(1).attr('id');
+                var stoneColorId = stoneRow.find('td').eq(4).attr('id');
+                    console.log(stoneColorId);
+                // UPDATE THE DOM TO REFLECT THE NEW CHANGES
+                stoneRow.find('td').eq(0).text(stoneType.split('~')[1]);
+                stoneRow.find('td').eq(1).text(stoneCategory.split('~')[1]);
+                stoneRow.find('td').eq(2).text(stoneWeight);
+                stoneRow.find('td').eq(3).text(stonePieces);
+                stoneRow.find('td').eq(4).text(stoneColor.split('~')[1]);
+
+                // FIND THE INDEX OF THE STONE IN THE STONESARRAY AND UPDATE IT
+                var stoneIndex = stonesArray.findIndex(stone => stone.id === currentStoneID);
+                if (stoneIndex !== -1) {
+                    stonesArray[stoneIndex].type = stoneTypeId + '~' + stoneType;
+                    stonesArray[stoneIndex].stoneCategory = stoneCategoryId + '~' + stoneCategory;
+                    stonesArray[stoneIndex].weight = stoneWeight;
+                    stonesArray[stoneIndex].pieces = stonePieces;
+                    stonesArray[stoneIndex].color = stoneColorId + '~' + stoneColor;
+                }
+                TotalStoneWt += parseFloat(stoneWeight);
+
+                //$('#Select_categoryNameId').html('');
+                $('#Select_StoneNameId').val(stoneTypeId + '~' + stoneType);
+                GetStoneCategory(stoneCategoryId, stoneCategory);
+                $('#stoneWeight').val(stoneWeight);
+                $('#stonePieces').val(stonePieces);
+                $('#Select_StoneColorNameId').val(stoneColorId + '~' + stoneColor);
+                ConvertCaratIntoStone1(stoneTypeId + '~' + stoneType, stoneWeight);
+                //GetStoneCategory();
+            }
+        };
+
+
+        $('#UpdateStoneBtn').on('click', function () {
+            $('#DivUpdateStoneBtn').hide();
+            $('#DivaddStoneBtn').show();
+            var stoneType = $('#Select_StoneNameId').val();
+            var stoneCategory = $('#Select_StonecategoryNameId').val();
+            var stoneWeight = $('#stoneWeight').val();
+            var stonePieces = $('#stonePieces').val();
+            var stoneColor = $('#Select_StoneColorNameId').val();
+
+            if (stoneType == "0") {
+                ShowErrorMsg("Please Select Stone Type...!!", "1");
+                return;
+            }
+
+            if (stoneCategory == "0") {
+                ShowErrorMsg("Please Select Stone Type...!!", "1");
+                return;
+            }
+
+            if (stoneWeight == "") {
+                ShowErrorMsg("Please Enter Stone Weight...!!", "1");
+                return;
+            }
+
+            if (stonePieces == "") {
+                ShowErrorMsg("Please Enter Stone Pieces...!!", "1");
+                return;
+            }
+
+
+            if (parseFloat(stoneWeight) <= 0) {
+                ShowErrorMsg("Stone weight must be greater than zero...!!", "1");
+                return;
+            }
+
+            if (parseInt(stonePieces) <= 0) {
+                ShowErrorMsg("Stone pieces must be greater than zero...!!", "1");
+                return;
+            }
+
+            var stoneRow = $('#' + currentStoneID);
+
+            if (stoneRow.length > 0) {
+                stoneRow.find('td').eq(0).text(stoneType.split('~')[1]);
+                stoneRow.find('td').eq(1).text(stoneCategory.split('~')[1]);
+                stoneRow.find('td').eq(2).text(stoneWeight);
+                stoneRow.find('td').eq(3).text(stonePieces);
+                stoneRow.find('td').eq(4).text(stoneColor.split('~')[1]);
+                stoneRow.find('td').eq(4).attr('id', stoneColor.split('~')[0]);
+                stoneRow.find('td').eq(0).attr('id', stoneType.split('~')[0]);
+                stoneRow.find('td').eq(1).attr('id', stoneCategory.split('~')[0]);
+                var stoneIndex = stonesArray.findIndex(stone => stone.id === currentStoneID);
+                if (stoneIndex !== -1) {
+                    stonesArray[stoneIndex].type = stoneType;
+                    stonesArray[stoneIndex].stoneCategory = stoneCategory;
+                    stonesArray[stoneIndex].weight = stoneWeight;
+                    stonesArray[stoneIndex].pieces = stonePieces;
+                    stonesArray[stoneIndex].color = stoneColor;
+                }
+
+                resetForm();
+
+            } else {
+                alert("Stone not found for update.");
+            }
+        });
+
+            function resetForm()
+            {
+                $('#Select_StoneNameId').val('0');
+                $('#stoneWeight').val('');
+                $('#stonePieces').val('');
+                $('#StoneInCaratId').val('');
+                $('#Select_StoneColorNameId').val('0~NA');
+                $('#Select_StonecategoryNameId').val('0');
+            }
+
+            // FUNCTION TO UPDATE THE STONE COUNT
+            function updateStoneCount() {
+                var stoneList = document.getElementById('stoneList');
+                var totalStones = stoneList.rows.length; // Get the number of rows in the table (excluding the header)
+                document.getElementById('stoneCount').innerText = totalStones; // Update the stone count display
+            }
+
+            // SUBMIT ALL STONE DETAILS WHEN THE SUBMIT BUTTON IS CLICKED
+            document.getElementById('submitStonesBtn').addEventListener('click', function () {
+                var stoneList = document.getElementById('stoneList');
+
+                // if (stoneList.children.length === 0) {
+                //     alert('No stones added.');
+                //     return;
+                // }
+
+                let totalWeight = 0;
+                let totalStones = stoneList.rows.length; // Count all rows in the table
+
+                // Loop through the rows to calculate the total weight
+                for (let i = 0; i < stoneList.rows.length; i++) {
+                    let weightCell = stoneList.rows[i].querySelector('#TD_StoneWeight'); // Find the weight cell
+                    if (weightCell) {
+                        totalWeight += parseFloat(weightCell.getAttribute('value') || 0); // Parse and add weight
+                    }
+                }
+
+                // Set the values in hidden input fields if required
+                document.getElementById("Txt_StoneDetailAddId").value = JSON.stringify(stonesArray);
+
+                let totalWeight1 = 0;
+
+                // Loop through the stonesArray
+                for (let i = 0; i < stonesArray.length; i++) {
+                    totalWeight1 = totalWeight1 + parseFloat(stonesArray[i].weight);
+                }
+
+                let NetWt = parseFloat($("#Txt_NetWtId").val());
+                $("#Txt_GrossWtId").val(NetWt + totalWeight1);
+
+                // Optionally: Close the modal
+                var modal = bootstrap.Modal.getInstance(document.getElementById('stoneDetailsModal'));
+                modal.hide();
+                ShowErrorMsg("Stones Details Updated Successfully....!!", "0");
+            });
+
+            let fileURL2;
+            let base64Promise;
+            let promises = [];
+
+        @if (ViewBag.AttachmentEditData != null && ViewBag.AttachmentEditData.Tables.Count > 0)
+        {
+            @foreach (System.Data.DataRow row in ViewBag.AttachmentEditData.Tables[0].Rows)
+            {
+                var filePath = row["path"].ToString();
+                var fileNameWithExtension = filePath.Split('/').Last();
+                var fileName = fileNameWithExtension.Split('.')[0];
+                var fileType = fileNameWithExtension.Split('.').Last().ToLower();
+                var fileDirectory = filePath.Replace(fileNameWithExtension, "");
+
+                <text>
+
+                             fileURL2 = '@Url.Content(filePath)';
+
+                             // CONVERT THE IMAGE TO BASE64 ASYNCHRONOUSLY
+                             base64Promise = toDataURL(fileURL2)
+                                 .then(base64Data => {
+                                     Urls.push({
+                                         url: '@Url.Content(filePath)',
+                                         name: "@fileNameWithExtension",
+                                         type: "@fileType",
+                                         base64: base64Data
+                                     });
+
+                                 })
+                                 .catch(error => {
+                                     console.error("Error converting file to Base64:", error);
+                                 });
+
+                             promises.push(base64Promise);
+                             Promise.all(promises).then(() => {
+                                 updateAttachmentFilenames();
+                             }).catch(error => {
+                                 console.error("Error during file processing:", error);
+                             });
+
+                </text>
+            }
+        }
+        });
+
+        function updateOrder() {
+
+            const orderDeliveryDate = $("#Date_OrderDeliveryDateId").val();
+            const itemId = $("#Select_ItemNameId").val();
+            const categoryId = $("#Select_CategoryNameId").val();
+            const purityId = $("#Select_PurityNameId").val();
+            const grossWt = $("#Txt_GrossWtId").val();
+            const netWt = $("#Txt_NetWtId").val();
+            const size = $("#Txt_ItemSizeId").val();
+            const pieces = $("#Txt_ItemPiecesId").val();
+
+            if (!orderDeliveryDate) {
+                ShowErrorMsg("Order Delivery Date is required.", "1");
+                return false;
+            }
+            if (!itemId || itemId === "0") {
+                ShowErrorMsg("Please select an item.", "1");
+                return false;
+            }
+            if (!categoryId || categoryId === "0") {
+                ShowErrorMsg("Please select a category.", "1");
+                return false;
+            }
+            if (!purityId || purityId === "0") {
+                ShowErrorMsg("Please select a purity level.", "1");
+                return false;
+            }
+
+            if (!netWt || isNaN(netWt) || parseFloat(netWt) <= 0) {
+                ShowErrorMsg("Net Weight must be a positive number.", "1");
+                return false;
+            }
+            if (parseFloat(netWt) > parseFloat(grossWt)) {
+                ShowErrorMsg("Net Weight cannot be greater than Gross Weight.", "1");
+                return false;
+            }
+            // if (!size || isNaN(size) || parseFloat(size) < 0) {
+            //     ShowErrorMsg("Size must be a positive number.", "1");
+            //     return false;
+            // }
+            if (!pieces || isNaN(pieces) || parseInt(pieces) <= 0) {
+                ShowErrorMsg("Pieces must be a positive integer.", "1");
+                return false;
+            }
+
+            const data = {
+                OrderItemId: @ViewBag.OrderEditData.Tables[0].Rows[0]["id"].ToString(),
+                OrderHeaderId: @ViewBag.OrderEditData.Tables[0].Rows[0]["header_id"].ToString(),
+                Branch: $("#Select_BranchNameId").val(),
+                Mobile: $("#Txt_CustMobileNo").val(),
+                CustName: $("#Txt_CustomerName").val(),
+                orderDate: $("#Date_OrderDateId").val(),
+                orderDeliveryDate: $("#Date_OrderDeliveryDateId").val(),
+                ItemId: $("#Select_ItemNameId").val(),
+                CategoryId: $("#Select_CategoryNameId").val(),
+                PurityId: $("#Select_PurityNameId").val(),
+                GrossWt: $("#Txt_GrossWtId").val(),
+                NetWt: $("#Txt_NetWtId").val(),
+                Size: $("#Txt_ItemSizeId").val(),
+                pieces: $("#Txt_ItemPiecesId").val(),
+                design_code: $("#Txt_DesignCodeId").val(),
+                BarcodeReference: $("#Txt_BarcodeReferenceId").val(),
+                Remark: $("#Txt_NarrationId").val(),
+                StoneData: stonesArray,
+                AttachmentData: Array.isArray(Urls) ? Urls : []
+            };
+
+            // AJAX CALL TO SAVE THE ITEM DETAILS
+            $.ajax({
+                type: "POST",
+                url: "/OrderMaster/UpdateOrderDetails",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (res)
+                {
+                    if (res.success)
+                    {
+                       ShowErrorMsg("Item Update Successfully...!!", "0");
+
+                       if(@ViewBag.RoleId == "4")
+                       {
+                          setTimeout(() => {
+                           window.location.href = '/Dashboard/SalePersonDashboard';
+                         }, 2000); // 2000 MILLISECONDS = 2 SECONDS
+                       }
+                       else
+                       {
+                         setTimeout(() => {
+                           window.location.href = '/Dashboard/BackOfficeDashboard';
+                         }, 2000); // 2000 MILLISECONDS = 2 SECONDS
+                       }
+                       
+                    } else {
+                        ShowErrorMsg("Failed to add item. Please try again.", "1");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error while saving item details:", error);
+                    ShowErrorMsg("An error occurred while saving item details. Please try again.", "1");
+                }
+            });
+        }
+
+        // ARRAY TO HOLD SELECTED IMAGE URLS
+        var Urls = [];
+        // TRIGGER FILE SELECTION ON BUTTON CLICK
+        $('#Btn_ChooseImg').on('click', function () {
+            $('#File_ItemImg').click();
+        });
+
+        // FILE INPUT CHANGE EVENT (FOR SELECTING IMAGES)
+        $('input[type=file]').change(function (event) {
+            var fileCount = this.files.length;
+
+            // CHECK IF FILES ARE SELECTED
+            if (fileCount) {
+                if (Urls.length + fileCount > 5) { // CHECK IF THE TOTAL FILES EXCEED 5
+                    ShowErrorMsg("You can only upload a maximum of 5 files.", "1");
+                    return;
+                }
+                var promises = [];
+
+                // LOOP THROUGH ALL SELECTED FILES
+                for (var i = 0; i < fileCount; i++) {
+                    var file = event.target.files[i];
+
+                    // CHECK FILE SIZE (IN BYTES)
+                    if (file.size > 2 * 1024 * 1024) { // 3 MB SIZE LIMIT
+                        ShowErrorMsg("File size exceeds 2 MB. Please select a smaller file.", "1");
+                        return;
+                    }
+
+                    // CHECK FILE TYPE (ONLY IMAGE FILES ALLOWED)
+                    if (file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/jpg") {
+                        const fileURL = URL.createObjectURL(file);
+
+                        // GENERATE A UNIQUE NAME USING TIMESTAMP AND RANDOM NUMBER TO ENSURE UNIQUENESS
+                        //const uniqueName = `${file.name.split('.')[0]}_${Date.now()}_${Math.floor(Math.random() * 10000)}.${file.name.split('.').pop()}`;
+                        const uniqueName = file.name;
+
+                        // CONVERT THE IMAGE TO BASE64 ASYNCHRONOUSLY
+                        const base64Promise = toDataURL(fileURL)
+                            .then(base64Data => {
+                                Urls.push({
+                                    url: fileURL,
+                                    name: uniqueName,
+                                    type: file.type,
+                                    base64: base64Data
+                                });
+
+                            })
+                            .catch(error => {
+                                console.error("Error converting file to Base64:", error);
+                            });
+
+                        promises.push(base64Promise);
+                    } else {
+                        alert("Invalid file type. Please select an image (JPEG/PNG).");
+                        return;
+                    }
+                }
+
+                // WAIT FOR ALL BASE64 CONVERSION PROMISES TO RESOLVE
+                Promise.all(promises).then(() => {
+                    $('#File_ItemImg').val('');  // CLEAR THE FILE INPUT
+                    updateAttachmentFilenames();
+                    OpenViewModal();
+                }).catch(error => {
+                    console.error("Error during file processing:", error);
+                });
+            } else {
+                alert('Max Limit 5 files');
+            }
+        });
+
+        // CONVERT IMAGE URL TO BASE64
+        const toDataURL = url => fetch(url)
+            .then(response => response.blob())
+            .then(blob => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            }));
+
+        // FUNCTION TO OPEN THE ATTACHMENT VIEW MODAL AND DISPLAY THE FILES
+        function OpenViewModal() {
+            if (Urls.length === 0) {
+                $("#attachmentView").modal('hide');
+                alert("No images to display.");
+                return;
+            }
+
+            $("#attachmentView").modal('show');
+
+            $("#AttachId").empty();
+            Urls.forEach((file, index) => {
+                let fileType = file.name.split('.').pop().toLowerCase();
+
+                if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png') {
+                    // IF THE FILE IS AN IMAGE, DISPLAY IT IN THE MODAL
+                    $("#AttachId").append(`
+                      <div class="col-md-4">
+                      <button type="button" class="btn-close" onclick="removeImage(${index})" style="margin-left: 230px;"></button>
+                      <img src="${file.url}" style="height: 200px; width: 250px; cursor: pointer;" onclick="openImageZoomModal('${file.url}')" />
+                      </div>
+                    `);
+                } else {
+                    console.log("Unsupported file type:", file.url);
+                }
+            });
+        }
+
+        // FUNCTION TO REMOVE AN IMAGE FROM THE URLS ARRAY
+        function removeImage(index) {
+
+            if (index >= 0 && index < Urls.length) {
+                Urls.splice(index, 1);
+                console.log("Image removed. Updated Urls array:", Urls);
+                updateAttachmentFilenames();
+            }
+
+            // REOPEN THE MODAL TO REFLECT THE CHANGES
+            OpenViewModal();
+        }
+
+        function updateAttachmentFilenames() {
+            // GET THE FILENAMES FROM THE URLS ARRAY
+            var filenames = Urls.map(file => file.name);
+
+            // UPDATE THE TEXT BOX WITH THE FILENAMES, SEPARATED BY COMMAS
+            $('#Txt_AttachmentId').val(filenames.join(', '));
+        }
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message, flag) {
+            if (flag == "0") {
+                Swal.fire({
+                    //title: 'Good job!',
+                    text: message,
+                    icon: 'success',
+                    customClass: {
+                        confirmButton: 'btn btn-primary waves-effect waves-light'
+                    },
+                    buttonsStyling: false
+                });
+            }
+            else {
+                Swal.fire({
+                    //title: 'Good job!',
+                    text: message,
+                    icon: 'warning',
+                    customClass: {
+                        confirmButton: 'btn btn-primary waves-effect waves-light'
+                    },
+                    buttonsStyling: false
+                });
+            }
+        }
+
+        //THIS IS USED FOR WHEN BUTTON CLICK BEFORE THAT CHECK ORDER SELECTED OR NOT
+        function openModal() {
+            const myModal = new bootstrap.Modal(document.getElementById('SandToVendorModalViewId'));
+            myModal.show();
+            return true;
+        }
+
+    </script>
+}
+
+

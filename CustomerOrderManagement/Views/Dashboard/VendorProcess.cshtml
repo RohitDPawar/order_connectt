@@ -1,0 +1,638 @@
+
+
+@using (Html.BeginForm("OrderSendToPreview", "OrderMaster"))
+{
+    <input type="hidden" name="UpdateOrderHeaderId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["order_header_id"].ToString()" id="OrderHeaderItemId" />
+    <input type="hidden" name="UpdateOrderDetailsId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["order_item_id"].ToString()" id="OrderDetailsItemId" />
+
+    <div class="row gy-6">
+        <input type="hidden" name="OrderHeader" id="OrderHeaderId" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["order_item_id"].ToString()" />
+        <!-- Customer Order Form -->
+        <div class="col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0 d-flex align-items-center fw-bold">
+                        <!-- Icon with Purple Color -->
+                        <i class="ri-shopping-cart-line ri-24px custom-purple me-2"></i>
+                        Edit Order
+                    </h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- Order Details Section -->
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-0">Order Details</h5>
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Order No -->
+                            <div class="col">
+                                <label for="Txt_OrderNo" class="form-label">Order No</label>
+                                <input type="text" id="Txt_OrderNo" name="Txt_OrderNo" class="form-control" disabled value="@ViewBag.OrderEditData.Tables[0].Rows[0]["order_series_no"].ToString()" />
+                            </div>
+
+                            <!-- Branch -->
+                            <div class="col">
+                                <label for="Select_BranchNameId" class="form-label">Branch</label>
+                                <input type="text" name="Branch" id="BranchId" class="form-control" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["branch_name"].ToString()" disabled />
+                            </div>
+
+                            <!-- Order Date -->
+                            <div class="col">
+                                <label for="Txt_OrderDate" class="form-label">Order Date</label>
+                                <input type="text" name="OrderDate" id="OrderDateId" class="form-control" value="@DateTime.Parse(ViewBag.OrderEditData.Tables[0].Rows[0]["order_date"].ToString()).ToString("yyyy-MM-dd")" disabled />
+                            </div>
+
+                            <!-- Order Delivery Date -->
+                            <div class="col">
+                                <label for="Txt_OrderDeliveryDate" class="form-label">Order Delivery Date</label>
+                                <input type="date" id="Date_OrderDeliveryDateId" class="form-control" value="@DateTime.Parse(ViewBag.OrderEditData.Tables[0].Rows[0]["order_delivery_date"].ToString()).ToString("yyyy-MM-dd")" name="DeliveryDate" disabled />
+                            </div>
+                        </div>
+
+
+                        <!-- Item Details Section -->
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-2">Item Details</h5> &nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+
+                        <div class="row g-2">
+                            <!-- Item Name -->
+                            <div class="col-md-3">
+                                <label for="Select_Item" class="form-label">Item Name</label>
+                                <input type="text" name="ItemName" id="ItemNameId" class="form-control" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["item_name"].ToString()" disabled />
+
+                            </div>
+
+                            <!-- Category -->
+                            <div class="col-md-3" id="CategoryMasterDivId">
+                                <label for="Txt_CategoryNameId" class="form-label">Category Name</label>
+                                <input type="text" name="CategoryName" id="Txt_CategoryNameId" class="form-control" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["category_name"].ToString()" disabled />
+                            </div>
+
+                            <!-- Product Group -->
+                            <div class="col-md-3">
+                                <label for="Txt_ProductGroup" class="form-label">Product Group</label>
+                                <input type="text" name="ProductName" id="Txt_ProductGroup" class="form-control" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["product_group_name"].ToString()" disabled />
+                            </div>
+
+                            <!-- Purity -->
+                            <div class="col-md-3">
+                                <label for="Txt_Purity" class="form-label">Purity</label>
+                                <input type="text" name="PurityName" id="Txt_Purity" class="form-control" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["purity_name"].ToString()" disabled />
+                            </div>
+                        </div>
+
+                        <!-- Order Details Section -->
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-0">Item Details</h5>
+                        </div>
+                        <div class="row g-2">
+                            <!-- Net Weight(Gram) -->
+                            <div class="col-md-3">
+                                <label for="Txt_GrossWt" class="form-label">Gross Weight(Gram)</label>
+                                <input type="text" id="GrossWt" name="GrossWt" class="form-control onlyNumberAndDot" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["gross_wt"].ToString()" disabled />
+                            </div>
+                            <!-- Net Weight(Gram) -->
+                            <div class="col-md-3">
+                                <label for="Txt_NetWt" class="form-label">Net Weight(Gram)</label>
+                                <input type="text" id="NetWt" name="NetWt" class="form-control onlyNumberAndDot" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["net_wt"].ToString()" disabled />
+                            </div>
+
+                            <!-- Item Size -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemSize" class="form-label">Item Size</label>
+                                <input type="text" id="Size" name="Size" class="form-control onlyNumberAndDot1" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["size"].ToString()" disabled />
+                            </div>
+
+                            <!-- Item Pieces -->
+                            <div class="col-md-3">
+                                <label for="Txt_ItemPieces" class="form-label">Item Pieces</label>
+                                <input type="text" id="Pcs" name="pcs" class="form-control onlyNumber" value="@ViewBag.OrderEditData.Tables[0].Rows[0]["pcs"].ToString()" disabled />
+                            </div>
+
+                        </div>
+                        <!-- Order Details Section -->
+                        <div class="col-md-12 rounded-3 p-2" style="background-color: #dfd2fa; width: 100%; display: flex; align-items: center;">
+                            <h5 class="text-white mb-0">Actual Order Details</h5>
+                        </div>
+                        <div class="row g-2">
+                            @if (ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "6" || ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "10" || ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "7" || ViewBag.OrderEditData.Tables[0].Rows[0]["order_status"].ToString() == "14")
+                            {
+                                <!-- Net Weight(Gram) -->
+                                <div class="col-md-3">
+                                    <label for="Txt_GrossWt" class="form-label">Gross Weight(Gram)<span style="color:red;font-weight:800">*</span></label>
+                                    <input type="text" id="Txt_GrossWtId" name="Txt_GrossWt" class="form-control onlyNumberAndDot" />
+                                </div>
+                                <!-- Net Weight(Gram) -->
+                                <div class="col-md-3">
+                                    <label for="Txt_NetWt" class="form-label">Net Weight(Gram) <span style="color:red;font-weight:800">*</span></label>
+                                    <input type="text" id="Txt_NetWtId" name="Txt_NetWt" class="form-control onlyNumberAndDot"/>
+                                </div>
+                                <!-- Attachment -->
+                                <div class="col-md-3">
+                                    <label for="Txt_Attachment" class="form-label">Attachment <span style="color:red;font-weight:800">*</span></label>
+                                    <input type="text" id="Txt_AttachmentId" name="Txt_Attachment" class="form-control" placeholder="Attach Image" readonly />
+                                </div>
+
+                                <!-- Choose File and View Buttons -->
+                                <div class="col-md-3 d-flex align-items-center" style="margin-top:30px">
+                                    <input type="file" id="File_ItemImg" class="form-control d-none" multiple accept=".jpg, .jpeg, .png" />
+                                    <button class="btn btn-primary ms-1 btn-sm" type="button" id="Btn_ChooseImg">
+                                        <i class="fa fa-upload me-1"></i> Choose Image
+                                    </button>
+                                    <button class="btn btn-primary ms-1 btn-sm" type="button" onclick="OpenViewModal()">
+                                        <i class="fa fa-eye me-1"></i> View
+                                    </button>
+                                </div>
+
+
+                                <div class="row mt-4">
+                                    <div class="col-4">
+                                        <button class="btn btn-primary btn-block btn-sm d-flex w-100 mb-2" type="button" onclick="SubmitItemDetails('3')">
+                                            <i class="fa fa-plus me-2" aria-hidden="true"></i> Order Send Without Preview
+                                        </button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-primary btn-block btn-sm d-flex w-100 mb-2" type="button" onclick="SubmitItemDetails('1')">
+                                            <i class="fa fa-plus me-2" aria-hidden="true"></i> Order Send to Preview
+                                        </button>
+                                    </div>
+                                    <div class="col-4">
+                                        <button class="btn btn-primary btn-block btn-sm d-flex w-100" type="button" onclick="RefreshPage()">
+                                            <i class="fa fa-plus me-2" aria-hidden="true"></i> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+
+                            }
+                            else{
+                                <button class="btn btn-primary ms-2 btn-sm d-flex" type="button" onclick="SubmitItemDetails('2')">
+                                    <i class="fa fa-plus me-2" aria-hidden="true"></i> Order Send To HO
+                                </button>
+
+                                 <button class="btn btn-primary ms-2 btn-sm d-flex" type="button" onclick="RefreshPage()">
+                                    <i class="fa fa-plus me-2" aria-hidden="true"></i> Cancel
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <!--/ Customer Order Form -->
+    </div>
+
+    <!-- Modal to display images -->
+    <div class="modal fade" id="attachmentView" tabindex="-1" aria-labelledby="attachmentViewLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attachmentViewLabel">View Attachments</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="AttachId">
+                        <!-- Dynamically added images will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+         function RefreshPage() {
+            window.location.href = window.location.href;
+         }
+
+        $(document).ready(function ()
+        {
+            $('#Txt_GrossWtId').change(function () {
+                if (parseFloat($(this).val()) == 0) {
+                    $('#Txt_GrossWtId').val("")
+                    ShowErrorMsg("Gross Wt Must be Greater than Zero...!!", "1")
+                }
+            });
+
+            $('#Txt_NetWtId').on('change', function() {
+                let netWt = parseFloat($('#Txt_NetWtId').val());
+                let grossWt = parseFloat($('#Txt_GrossWtId').val());
+
+                if (!isNaN(netWt) && !isNaN(grossWt) && netWt > grossWt) {
+                    $('#Txt_NetWtId').val("");
+                    $('#Txt_GrossWtId').val("");
+                    ShowErrorMsg("Net Wt Greater Than Gross Wt...!!", "1");
+                }
+            });
+            
+        });
+
+        function SubmitItemDetails(Flag)
+        {
+          if(Flag == "1"){
+            // Check if any of the item-related fields have values
+            if ($("#Txt_GrossWtId").val() != "" && $("#Txt_NetWtId").val() != "" && Urls.length > 0)
+            {
+              // /console.log(Array.isArray(Urls))
+                // Create the data object
+                const data = {
+                    OrderHeaderId: $("#OrderHeaderId").val(),
+                    GrossWt: $("#Txt_GrossWtId").val(),
+                    NetWt: $("#Txt_NetWtId").val(),
+                    AttachmentData: Array.isArray(Urls) ? Urls : []
+                };
+
+                // AJAX call to save the item details
+                $.ajax({
+                    type: "POST",
+                    url: "/OrderMaster/SendToHOForPreview",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (res)
+                    {
+                       if (res.redirectUrl)
+                       {
+                          setTimeout(() => {
+                             window.location.href = '/Dashboard/VendorOrderStatus';
+                          }, 2000); // 2000 milliseconds = 2 seconds
+                       }
+                       
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error while saving item details:", error);
+                        alert("An error occurred while saving item details. Please try again.");
+                    }
+                });
+            }
+            else
+            {
+                const fileInput = document.getElementById("File_ItemImg");
+                if ($("#Txt_GrossWtId").val() == "")
+                    ShowErrorMsg("Please Enter Gross Wt...!!", "1")
+                else if ($("#Txt_NetWtId").val() == "")
+                    ShowErrorMsg("Please Enter Net Wt...!!", "1")
+                else if(!fileInput || !fileInput.files || fileInput.files.length === 0)
+                {
+                    ShowErrorMsg("Please Upload Actual Item Image...!!", "1")
+                }
+            }
+          }
+          else if(Flag == "3")
+          {
+            // Check if any of the item-related fields have values
+            if ($("#Txt_GrossWtId").val() != "" && $("#Txt_NetWtId").val() != "" && Urls.length > 0)
+            {
+              const data = {
+                    OrderHeaderId: $("#OrderHeaderId").val(),
+                    GrossWt: $("#Txt_GrossWtId").val(),
+                    NetWt: $("#Txt_NetWtId").val(),
+                    AttachmentData: Array.isArray(Urls) ? Urls : []
+                };
+                // AJAX call to save the item details
+                $.ajax({
+                    type: "POST",
+                    //url: "/OrderMaster/OrderSendWithoutPreview",
+                    url: "/OrderMaster/OrderDirectSentToBackOffice",
+                    contentType: "application/json",
+                    data: JSON.stringify(data),
+                    success: function (res)
+                    {
+                        setTimeout(() => {
+                             window.location.href = '/Dashboard/VendorOrderStatus';
+                        }, 2000); // 2000 milliseconds = 2 seconds
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error while saving item details:", error);
+                        alert("An error occurred while saving item details. Please try again.");
+                    }
+                });
+                }
+            else
+            {
+                const fileInput = document.getElementById("File_ItemImg");
+                if ($("#Txt_GrossWtId").val() == "")
+                    ShowErrorMsg("Please Enter Gross Wt...!!", "1")
+                else if ($("#Txt_NetWtId").val() == "")
+                    ShowErrorMsg("Please Enter Net Wt...!!", "1")
+                else if(!fileInput || !fileInput.files || fileInput.files.length === 0)
+                {
+                    ShowErrorMsg("Please Upload Actual Item Image...!!", "1")
+                }
+            }
+          }
+          else
+          {
+            // AJAX call to save the item details
+                $.ajax({
+                    type: "POST",
+                    url: "/OrderMaster/OrderSendToHO",
+                    data: {
+                         OrderHeaderId: $("#OrderHeaderId").val()
+                    },
+                    success: function (res)
+                    {
+                        //console.log(res.redirectUrl)
+                        //debugger;
+                       if (res.redirectUrl)
+                       {
+                            window.location.href = '/Dashboard/VendorDashboard';
+                       }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error while saving item details:", error);
+                        alert("An error occurred while saving item details. Please try again.");
+                    }
+                });
+          }
+            
+        }
+
+
+        $(document).ready(function () {
+
+            // Set the default value of the Order Date input to today's date
+            const today = new Date().toISOString().split('T')[0];
+            $("#Date_OrderDateId").val(today);
+            // Attach onchange event to both date inputs
+            $("#Date_OrderDeliveryDateId, #Date_OrderDateId").on('change', function () {
+                // Get the values of the date inputs
+                const deliveryDate = new Date($("#Date_OrderDeliveryDateId").val());
+                const orderDate = new Date($("#Date_OrderDateId").val());
+
+                // Check if the delivery date is not less than the order date
+                if (deliveryDate >= orderDate) {
+                    $("#WarnDeliveryDateId").css({ "display": "none" });
+                }
+                else {
+                    $("#Date_OrderDeliveryDateId").val("")
+                    $("#WarnDeliveryDateId").css({ "display": "block", "color": "red" }).text("Please Select Valid Date...!!!");
+                }
+            });
+
+            document.querySelectorAll('.onlyNumber').forEach(input => {
+                input.addEventListener('input', function () {
+                    // Match only numbers (0-9)
+                    const validValue = this.value.match(/^\d*/);
+
+                    // If invalid, revert to the last valid value
+                    this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+                });
+            });
+
+            $(document).on('keypress', '.onlyCharacterAndDash', function (event) {
+                // Restrict first character to be alphabetic only
+                if (this.value.length === 0 && !/[a-zA-Z]/.test(String.fromCharCode(event.which))) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                //var regex = new RegExp("^[a-zA-Z\s\-_()]+$");
+                const regex = /^[a-zA-Z\s\-\_\(\)]+$/;
+
+                var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+                // Allow only alphabetic characters, space, underscore, dash, and parentheses
+                if (!regex.test(key)) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                var lastChar = this.value.slice(-1);
+
+                // Prevent consecutive spaces, underscores, dashes, or parentheses
+                if (
+                    ((event.which === 32 && lastChar === ' ') ||  // Prevent consecutive spaces
+                        (event.which === 45 && lastChar === '-') ||  // Prevent consecutive dashes
+                        (event.which === 95 && lastChar === '_') ||  // Prevent consecutive underscores
+                        (event.which === 40 && lastChar === '(') ||  // Prevent consecutive opening parentheses
+                        (event.which === 41 && lastChar === ')'))    // Prevent consecutive closing parentheses
+                ) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Prevent a space, underscore, dash, or parentheses directly after another space, underscore, dash, or parentheses
+                if (
+                    (event.which === 32 || event.which === 45 || event.which === 95 || event.which === 40 || event.which === 41) &&
+                    (lastChar === ' ' || lastChar === '-' || lastChar === '_' || lastChar === '(' || lastChar === ')')
+                ) {
+                    event.preventDefault();
+                    return false;
+                }
+
+                // Ensure space, underscore, dash, or parentheses are allowed only after two words
+                var parts = this.value.split(/[\s\-_()]+/);
+                if (parts.length > 2 && (event.which === 32 || event.which === 45 || event.which === 95 || event.which === 40 || event.which === 41)) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        });
+
+        //THIS IS USED FOR WEIGHT ENTER PURPOSE
+        document.querySelectorAll('.onlyNumberAndDot').forEach(input => {
+            input.addEventListener('input', function () {
+                // Match up to 10 digits before the dot and up to 3 digits after the dot
+                const validValue = this.value.match(/^\d{0,10}(\.\d{0,3})?$/);
+
+                // If invalid, revert to the last valid value
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        //THIS IS USED FOR ONLY NUMBER
+        document.querySelectorAll('.onlyNumber').forEach(input => {
+            input.addEventListener('input', function () {
+                // Match up to 10 digits before the dot and up to 3 digits after the dot
+                const validValue = this.value.match(/^\d{0,5}(\d{0,2})?$/);
+
+                // If invalid, revert to the last valid value
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        //THIS IS USED FOR DOT AND AFTER 2 PRIFIX
+        document.querySelectorAll('.onlyNumberAndDot1').forEach(input => {
+            input.addEventListener('input', function () {
+                // Match up to 10 digits before the dot and up to 3 digits after the dot
+                const validValue = this.value.match(/^\d{0,5}(\.\d{0,2})?$/);
+
+                // If invalid, revert to the last valid value
+                this.value = validValue ? validValue[0] : this.value.slice(0, -1);
+            });
+        });
+
+        var Urls = [];  // ARRAY TO HOLD SELECTED IMAGE URLS
+        // TRIGGER FILE SELECTION ON BUTTON CLICK
+        $('#Btn_ChooseImg').on('click', function () {
+            $('#File_ItemImg').click();
+        });
+
+        // FILE INPUT CHANGE EVENT (FOR SELECTING IMAGES)
+        $('input[type=file]').change(function (event) {
+            var fileCount = this.files.length;
+
+            // CHECK IF FILES ARE SELECTED
+            if (fileCount) {
+                if (Urls.length + fileCount > 1) { // Check if the total files exceed 5
+                   ShowErrorMsg("You can upload only 1 File...!!","1")
+                    return; // Exit if the total files exceed the limit
+                }
+
+                var promises = [];
+
+                // LOOP THROUGH ALL SELECTED FILES
+                for (var i = 0; i < fileCount; i++) {
+                    var file = event.target.files[i];
+
+                    // CHECK FILE SIZE (IN BYTES)
+                    if (file.size > 2 * 1024 * 1024) { // 3 MB size limit
+                        ShowErrorMsg("File size exceeds 2 MB. Please select a smaller file.");
+                        return; // Exit if any file exceeds the size limit
+                    }
+
+                    // CHECK FILE TYPE (ONLY IMAGE FILES ALLOWED)
+                    if (file.type === "image/jpeg" || file.type === "image/png" || file.type === "image/jpg") {
+                        const fileURL = URL.createObjectURL(file);
+
+                        // GENERATE A UNIQUE NAME USING TIMESTAMP AND RANDOM NUMBER TO ENSURE UNIQUENESS
+                        const uniqueName = file.name;
+
+                        // CONVERT THE IMAGE TO BASE64 ASYNCHRONOUSLY
+                        const base64Promise = toDataURL(fileURL)
+                            .then(base64Data => {
+                                Urls.push({
+                                    url: fileURL,
+                                    name: uniqueName,
+                                    type: file.type,
+                                    base64: base64Data
+                                });
+                            })
+                            .catch(error => {
+                                console.error("Error converting file to Base64:", error);
+                            });
+
+                        promises.push(base64Promise);
+                    } else {
+                        alert("Invalid file type. Please select an image (JPEG/PNG).");
+                        return;
+                    }
+                }
+
+                // WAIT FOR ALL BASE64 CONVERSION PROMISES TO RESOLVE
+                Promise.all(promises).then(() => {
+                    console.log('All files processed successfully');
+                    $('#File_ItemImg').val('');  // Clear the file input
+                    updateAttachmentFilenames();
+                    OpenViewModal();
+                }).catch(error => {
+                    console.error("Error during file processing:", error);
+                });
+            } else {
+                alert('No files selected!');
+            }
+        });
+
+        // CONVERT IMAGE URL TO BASE64
+        const toDataURL = url => fetch(url)
+            .then(response => response.blob())
+            .then(blob => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            }));
+
+        // FUNCTION TO OPEN THE ATTACHMENT VIEW MODAL AND DISPLAY THE FILES
+        function OpenViewModal() {
+            if (Urls.length === 0) {
+                $("#attachmentView").modal('hide');
+                return;
+            }
+
+            $("#attachmentView").modal('show');
+
+            // CLEAR PREVIOUS CONTENT
+            $("#AttachId").empty();
+
+            // Iterate through the Urls array to display files
+            Urls.forEach((file, index) => {
+                let fileType = file.name.split('.').pop().toLowerCase(); // Get the file extension
+
+                if (fileType === 'jpg' || fileType === 'jpeg' || fileType === 'png') {
+                    // IF THE FILE IS AN IMAGE, DISPLAY IT IN THE MODAL
+                    $("#AttachId").append(`
+                        <div class="col-md-4">
+                            <button type="button" class="btn-close" onclick="removeImage(${index})" style="margin-left: 230px;"></button>
+                            <img src="${file.url}" style="height: 200px; width: 250px; cursor: pointer;" onclick="openImageZoomModal('${file.url}')" />
+                        </div>
+                    `);
+                } else {
+                    console.log("Unsupported file type:", file.url);
+                }
+            });
+        }
+
+        // FUNCTION TO REMOVE AN IMAGE FROM THE URLS ARRAY
+        function removeImage(index) {
+            if (index >= 0 && index < Urls.length) {
+                Urls.splice(index, 1);
+                console.log("Image removed. Updated Urls array:", Urls);
+                updateAttachmentFilenames();
+            }
+
+            // REOPEN THE MODAL TO REFLECT THE CHANGES
+            OpenViewModal();
+        }
+
+        function updateAttachmentFilenames() {
+            // Get the filenames from the Urls array
+            var filenames = Urls.map(file => file.name);
+
+            // Update the text box with the filenames, separated by commas
+            $('#Txt_AttachmentId').val(filenames.join(', '));
+        }
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message, flag) {
+            if (flag == "0") {
+                Swal.fire({
+                    //title: 'Good job!',
+                    text: message,
+                    icon: 'success',
+                    customClass: {
+                        confirmButton: 'btn btn-primary waves-effect waves-light'
+                    },
+                    buttonsStyling: false
+                });
+            }
+            else {
+                Swal.fire({
+                    //title: 'Good job!',
+                    text: message,
+                    icon: 'warning',
+                    customClass: {
+                        confirmButton: 'btn btn-primary waves-effect waves-light'
+                    },
+                    buttonsStyling: false
+                });
+            }
+        }
+
+            //THIS IS USED FOR WHEN BUTTON CLICK BEFORE THAT CHECK ORDER SELECTED OR NOT
+        function openModal()
+        {
+            const myModal = new bootstrap.Modal(document.getElementById('SandToVendorModalViewId'));
+              myModal.show();
+              return true;
+        }
+    </script>
+}
+
+

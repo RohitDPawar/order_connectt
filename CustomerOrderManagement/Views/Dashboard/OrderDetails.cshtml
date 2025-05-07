@@ -1,0 +1,513 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+@* ************** Third Row (Space Added) ************** *@
+
+<div class="row gy-6 mb-4">
+    <div class="col-lg-12">
+        <!-- Card for the table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-4 mb-3">
+                    <!-- First Row: Title and Buttons -->
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Title on the left -->
+                            <h4>Orders</h4>
+
+                            <!-- Right: Buttons -->
+                            <div class="d-flex">
+                                <button class="btn btn-primary btn-sm me-2" id="Btn_OrderCompleteId"><i class="fa fa-check me-1"></i> Complete Order</button>
+                                <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal">
+                                    <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap" id="OrderDetailsTableId">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sort fw-bold">
+                                    <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllOrders" />
+                                </th>
+                                <th class="sort fw-bold" data-sort="Sr No">Sr No</th>
+                              @*   @if (ViewBag.OrderEditStatus == "1")
+                                {
+                                    <th class="sort" data-sort="Action">Action</th>
+                                } *@
+                                <th class="sort fw-bold" data-sort="Status">Status</th>
+                                <th class="sort fw-bold" data-sort="Status">Stone Details</th>
+                                <th class="sort fw-bold" data-sort="tenant">Tenant Name</th>
+                                <th class="sort fw-bold" data-sort="Order No">Order No.</th>
+                                <th class="sort fw-bold" data-sort="customer">Customer Name</th>
+                                <th class="sort fw-bold" data-sort="Item Name">Item Name</th>
+                                <th class="sort fw-bold" data-sort="Category">Category</th>
+                                <th class="sort fw-bold" data-sort="grosswt">Gross Weight</th>
+                                <th class="sort fw-bold" data-sort="Net Weight">Net Weight</th>
+                                <th class="sort fw-bold" data-sort="Purity">Purity</th>
+                                <th class="sort fw-bold" data-sort="Product Group">Product Group</th>
+                                <th class="sort fw-bold" data-sort="Branch Name">Branch Name</th>
+                                <th class="sort fw-bold" data-sort="Order Date">Order Date</th>
+                                <th class="sort fw-bold" data-sort="Order Date">Order Delivery Date</th>
+                                @* <th class="sort fw-bold" data-sort="Vendor Name">Vendor Name</th> *@
+                            </tr>
+                        </thead>
+                        <tbody class="form-check-all">
+                        </tbody>
+                    </table>
+                </div>
+                @await Html.PartialAsync("Sections/Menu/_pagination")
+            </div>
+        </div>
+    </div>
+</div><!-- end row -->
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+    function loadPageData(page, rowsToShow) {
+        GetOrderDate(page, $('#ShowRowid').val());
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        // $(".Checkbox_SelectAllHeader").each(function () {
+        //     var table = $(this).closest('table');
+        //     var allEnabledChecked = table.find(".RowCheckbox:not(:disabled)").length === table.find(".RowCheckbox:not(:disabled):checked").length;
+        //     console.log(allEnabledChecked);
+        //     $(this).prop('checked', allEnabledChecked);
+        // });
+
+      $(".Checkbox_SelectAllHeader").each(function () {
+          var table = $(this).closest('table');
+          var rowCheckboxes = table.find(".RowCheckbox");
+          var enabledCheckboxes = rowCheckboxes.not(':disabled');
+
+          if (enabledCheckboxes.length === 0) {
+              // If all checkboxes are disabled, uncheck the Select All checkbox
+              $(this).prop('checked', false);
+          } else {
+              // Otherwise, check if all enabled checkboxes are checked
+              var allEnabledChecked = enabledCheckboxes.length === enabledCheckboxes.filter(':checked').length;
+              $(this).prop('checked', allEnabledChecked);
+          }
+      });
+    }
+
+    var selectedRowIds = [];
+
+    function applyFilter() {
+
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    // Select all checkboxes when 'Select All' is checked, excluding disabled checkboxes
+    $(".Checkbox_SelectAllHeader").on("change", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+        // Select or deselect all row checkboxes based on the header checkbox state
+        table.find(".RowCheckbox:not(:disabled)").prop('checked', isChecked);
+
+        // Update the selectedRowIds array based on the "Select All" checkbox
+        if (isChecked) {
+            // Add all enabled row IDs to the selectedRowIds array for the specific table
+            table.find(".RowCheckbox:not(:disabled)").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId && !selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                }
+            });
+        } else {
+            // Remove all enabled row IDs from the selectedRowIds array for the specific table
+            table.find(".RowCheckbox:not(:disabled)").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId) {
+                    selectedRowIds = selectedRowIds.filter(function (id) {
+                        return id !== rowId;
+                    });
+                }
+            });
+        }
+
+        // Log the updated selectedRowIds array for debugging purposes
+        console.log(selectedRowIds);
+    });
+
+    $(document).on("change", ".RowCheckbox", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+        var rowId = $(this).data('id');  // Get the row ID from data attribute
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+        // Add or remove the row ID from the selectedRowIds array based on checkbox state
+        if (isChecked) {
+            if (!selectedRowIds.includes(rowId)) {
+                selectedRowIds.push(rowId);
+                console.log(selectedRowIds);
+            }
+        } else {
+            var index = selectedRowIds.indexOf(rowId);
+            if (index !== -1) {
+                selectedRowIds.splice(index, 1);
+                console.log(selectedRowIds);
+            }
+        }
+
+        // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+        updateSelectAllCheckboxState();
+
+
+    });
+
+    $(document).ready(function () {
+
+        GetOrderDate(1, $('#ShowRowid').val());
+
+        // Function to format the date to YYYY-MM-DD
+        function formatDateToYYYYMMDD(date) {
+            var d = new Date(date);
+            var year = d.getFullYear();
+            var month = ("0" + (d.getMonth() + 1)).slice(-2); // Adding leading zero if needed
+            var day = ("0" + d.getDate()).slice(-2); // Adding leading zero if needed
+            return year + "-" + month + "-" + day;
+        }
+
+        // Get values of selected checkboxes
+        $("#Btn_OrderCompleteId").on("click", function () {
+            // const selectedValues = $(".rowCheckbox:checked").map(function () {
+            //     return $(this).val();
+            // }).get(); // Collect values into an array
+            //console.log(selectedValues); // Output the array to console
+            //alert("Selected Values: " + selectedValues.join(", "));
+
+            if (selectedRowIds.join(", ").length > 0) {
+                OrderStatusFromHO(selectedRowIds.join(", "))
+            }
+            else {
+                ShowErrorMsg("Before Proceed Please Select Order Line....!!!","1")
+            }
+        });
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+
+    });
+
+    function GetOrderDate(pageNumber, pageSize) {
+        const data = {
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/OrderDetailsFilter",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                var res = JSON.parse(data);
+                TableBindData(res)
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    function OrderStatusFromHO(SelectedData) {
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/OrderCompleteStatus",
+            data: {
+                SelectedDataIds: SelectedData,
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                //console.log(OrderData);
+                ShowErrorMsg("Order Complete Successfully...!!", "0");
+                // Wait for 1 second before reloading the page
+                setTimeout(function () {
+                    location.reload();
+                }, 1000);
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    // ___new function_____________________________
+    // Function to open the preview modal with order details
+    function OpenStoneDetails(orderItemId) {
+        // Make the AJAX call to fetch the order details
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/GetStoneDetails",
+            data: { itemId: orderItemId },
+            success: function (response) {
+                // Parse the response data
+                var res = JSON.parse(response);
+                var orderDetails = res["StoneDetails"];
+                console.log(orderDetails);
+
+                // Check if orderDetails are found
+                if (orderDetails.length > 0) {
+                    var detailsHtml = ""; // Initialize as empty string
+
+                    for (var i = 0; i < orderDetails.length; i++) {
+                        // Construct the HTML to display the order details in a table row
+                        detailsHtml +=
+                            '<tr>' +
+                            '<td>' + orderDetails[i]["item_name"] + '</td>' +
+                            '<td>' + orderDetails[i]["stone_category_name"] + '</td>' +
+                            '<td>' + orderDetails[i]["color_name"] + '</td>' +
+                            '<td>' + parseFloat(orderDetails[i]["stone_wt"]).toFixed(3) + '</td>' +
+                            '<td>' + orderDetails[i]["stone_pcs"] + '</td>' +
+                            '</tr>';
+                    }
+
+                    // Set the constructed rows to the table body
+                    $('#stoneDetailsBody').html(detailsHtml);
+
+                    // Show the modal
+                    $('#stoneDetailsModalShow').modal('show');
+                } else {
+                    alert('Order details not found!');
+                }
+            },
+            error: function (error) {
+                // Handle any errors from the AJAX request
+                console.error('Error fetching order details:', error);
+                alert('An error occurred while fetching order details.');
+            }
+        });
+    }
+
+    //THIS FUNCTION USED FOR EDIT ORDER DETAILS
+    function EditOrderDetailsItemId(OrderDetailsId) {
+        $.ajax({
+            type: "POST",
+            url: "/OrderMaster/EditOrder",
+            data: {
+                OrderItemId: OrderDetailsId
+            },
+            success: function (data) {
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message, flag) {
+        if (flag == "0") {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        else {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        //alert(message)
+
+    }
+
+    function TableBindData(res) {
+        $("#OrderDetailsTableId tbody").empty();
+
+        let table = $("#OrderDetailsTableId");
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+        const formatDate = (date) => {
+            return date ? new Date(date).toISOString().split('T')[0] : 'NA';
+        };
+
+        let srno = 1;
+
+        if (res && res.PaginationInfo && Array.isArray(res.PaginationInfo) && res.PaginationInfo.length > 0) {
+            const paginationInfo = res.PaginationInfo[0];
+            const totalRows = paginationInfo.TotalRows || 0;
+            const totalPages = paginationInfo.TotalPages || 1;
+            const pageNumber = paginationInfo.PageNumber || 1;
+            const pageSize = paginationInfo.PageSize || 10;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } else {
+
+        }
+        var Flag = @ViewBag.OrderEditStatus;
+
+        if (res && res["OrderData"] && Array.isArray(res["OrderData"])) {
+            res["OrderData"].forEach(order => {
+                let checkboxAttributes = '';
+                if (["3", "4", "5", "6"].includes(order["order_status"].toString())) {
+                    checkboxAttributes = 'disabled';
+                }
+
+                const idCheck = order["order_item_id"] || '';
+                const isChecked = selectedRowIds.includes(Number(idCheck));
+
+                const data =
+                    '<tr id="' + idCheck + '" class="total_tr">' +
+                    '<td><input type="checkbox" ' + checkboxAttributes + ' class="form-check-input RowCheckbox" data-id="' + order["order_item_id"] + '" name="OrderDetailsId" value="' + order["order_item_id"] + '" ' + (isChecked ? 'checked' : '') + ' /></td>' +
+                    '<td>' + srno + '</td>'
+                    // if (Flag == "1")
+                    // {
+                    //     if(order["order_status"] == "0" || order["order_status"] == "1")
+                    //     {
+                    //        data += '<td><a href="/OrderMaster/EditOrder?OrderItemId='+ order["order_item_id"] +'" class="text-primary cursor-pointer"><span id="Btn_EditCityId" class="text-primary cursor-pointer"><i class="fa fa-edit"></i></span></a></td>';
+                    //     }
+                    //     else{
+                    //       data += '<td><a href="javascript:void(0);" class="text-primary cursor-pointer"><span id="Btn_EditCityId" class="cursor-pointer" onclick="return false" style="color:gray"><i class="fa fa-edit"></i</span></a></td>';
+                    //     }
+
+                    // }
+                    +'<td>' + order["STATUS"] + '</td>' +
+                    '<td>' +
+                    (parseFloat(order["gross_wt"]) > parseFloat(order["net_wt"])
+                        ? `<a href="javascript:void(0);" class="text-primary cursor-pointer" onclick="OpenStoneDetails(${order["order_item_id"]})"><span class="text-primary cursor-pointer"><i class="fa fa-gem"></i></span></a>`
+                        : 'NA') +
+                    '</td>' +
+                    '<td>' + (order["tenant_name"] || '') + '</td>' +
+                    '<td>' + (order["order_series_no"] || '') + '</td>' +
+                    '<td>' + (order["customer_name"] || '') + '</td>' +
+                    '<td>' + (order["item_name"] || '') + '</td>' +
+                    '<td>' + (order["category_name"] || '') + '</td>' +
+                    '<td>' + (parseFloat(order["gross_wt"]).toFixed(3) || '') + '</td>' +
+                    '<td>' + (parseFloat(order["net_wt"]).toFixed(3) || '') + '</td>' +
+                    '<td>' + (parseFloat(order["purity_name"]).toFixed(2) || '') + '</td>' +
+                    '<td>' + (order["product_group_name"] || '') + '</td>' +
+                    '<td>' + (order["branch_name"] || '') + '</td>' +
+                    '<td>' + formatDate(order["order_date"]) + '</td>' +
+                    '<td>' + formatDate(order["order_delivery_date"]) + '</td>' +
+                    // '<td>' + (order["vendor_name"] || '') + '</td>' +
+                    '</tr>';
+
+                $("#OrderDetailsTableId tbody").append(data);
+                srno++;
+            });
+        } else {
+            $("#OrderDetailsTableId tbody").empty();
+            $("#OrderDetailsTableId tbody").html(`
+                            <tr>
+                                <td colspan="17" style="text-align: center;">No Data Available</td>
+                            </tr>
+                        `);
+            generatePagination(1, 1);
+        }
+
+        updateSelectAllCheckboxState();
+    }
+
+
+</script>

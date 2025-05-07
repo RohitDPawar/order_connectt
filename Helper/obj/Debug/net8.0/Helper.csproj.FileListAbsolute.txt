@@ -1,0 +1,276 @@
+E:\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+E:\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+E:\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+E:\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+E:\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+E:\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Customer Order Development\Customer Order Project\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Cutomer Order IIJS\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Cutomer Order IIJS\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\Cutomer Order IIJS\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Cutomer Order IIJS\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+C:\Users\User\Downloads\Customer Order Management_06-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\December\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\December\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\December\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\December\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+C:\Users\user\Desktop\19-12-2024\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+C:\Users\user\Desktop\08-01-2025COM\Customer Order Management_13-01-2025\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management27-01-25\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\_January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\_January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\_January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\_January 2025\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\January 2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\January 2025\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\bin\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_11-02-2025\Customer Order Management\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_12-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\COMFEB\Customer Order Management_14-02-2025\Customer Order Management_11-02-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\_February 2025\Order Connect\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\_February 2025\Order Connect\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\_February 2025\Order Connect\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\_February 2025\Order Connect\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_21-02-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\_March 2025\Oder Connect\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\_March 2025\Oder Connect\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\_March 2025\Oder Connect\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\_March 2025\Oder Connect\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_21_03_2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\_March 2025\Oder Connect\22-03-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_02_04_25\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Order_Connect_21_02_2025\COM_09_04_2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+F:\COM PROJECT\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+F:\COM PROJECT\COM\Helper\bin\Debug\net8.0\Helper.dll
+F:\COM PROJECT\COM\Helper\bin\Debug\net8.0\Helper.pdb
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.dll
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\Helper.pdb
+F:\COM PROJECT\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\Customer Order\COM_22-04-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\Customer Order\COM_22-04-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\Customer Order\COM_22-04-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\Customer Order\COM_22-04-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\bin\Debug\net8.0\Helper.deps.json
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\bin\Debug\net8.0\Helper.dll
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\bin\Debug\net8.0\Helper.pdb
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.AssemblyReference.cache
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.GeneratedMSBuildEditorConfig.editorconfig
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfoInputs.cache
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.AssemblyInfo.cs
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.csproj.CoreCompileInputs.cache
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.dll
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\refint\Helper.dll
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\Helper.pdb
+D:\_May 2025\Order Connect\02-05-2025\COM\Helper\obj\Debug\net8.0\ref\Helper.dll

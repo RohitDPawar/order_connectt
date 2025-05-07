@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DeliveryChallanDataSet" targetNamespace="http://tempuri.org/DeliveryChallanDataSet.xsd" xmlns:mstns="http://tempuri.org/DeliveryChallanDataSet.xsd" xmlns="http://tempuri.org/DeliveryChallanDataSet.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DeliveryChallanDataSet" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="DeliveryChallanDataSet" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DeliveryChallanDataSet">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="DeliveryChallanDataTable" msprop:Generator_RowEvHandlerName="DeliveryChallanDataTableRowChangeEventHandler" msprop:Generator_RowDeletedName="DeliveryChallanDataTableRowDeleted" msprop:Generator_RowDeletingName="DeliveryChallanDataTableRowDeleting" msprop:Generator_RowEvArgName="DeliveryChallanDataTableRowChangeEvent" msprop:Generator_TablePropName="DeliveryChallanDataTable" msprop:Generator_RowChangedName="DeliveryChallanDataTableRowChanged" msprop:Generator_UserTableName="DeliveryChallanDataTable" msprop:Generator_RowChangingName="DeliveryChallanDataTableRowChanging" msprop:Generator_RowClassName="DeliveryChallanDataTableRow" msprop:Generator_TableClassName="DeliveryChallanDataTableDataTable" msprop:Generator_TableVarName="tableDeliveryChallanDataTable">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="order_series_no" msprop:Generator_ColumnPropNameInTable="order_series_noColumn" msprop:Generator_ColumnPropNameInRow="order_series_no" msprop:Generator_UserColumnName="order_series_no" msprop:Generator_ColumnVarNameInTable="columnorder_series_no" type="xs:string" minOccurs="0" />
+              <xs:element name="id" msprop:Generator_ColumnPropNameInTable="idColumn" msprop:Generator_ColumnPropNameInRow="id" msprop:Generator_UserColumnName="id" msprop:Generator_ColumnVarNameInTable="columnid" type="xs:string" minOccurs="0" />
+              <xs:element name="item_name" msprop:Generator_ColumnPropNameInTable="item_nameColumn" msprop:Generator_ColumnPropNameInRow="item_name" msprop:Generator_UserColumnName="item_name" msprop:Generator_ColumnVarNameInTable="columnitem_name" type="xs:string" minOccurs="0" />
+              <xs:element name="category_name" msprop:Generator_ColumnPropNameInTable="category_nameColumn" msprop:Generator_ColumnPropNameInRow="category_name" msprop:Generator_UserColumnName="category_name" msprop:Generator_ColumnVarNameInTable="columncategory_name" type="xs:string" minOccurs="0" />
+              <xs:element name="pcs" msprop:Generator_ColumnPropNameInTable="pcsColumn" msprop:Generator_ColumnPropNameInRow="pcs" msprop:Generator_UserColumnName="pcs" msprop:Generator_ColumnVarNameInTable="columnpcs" type="xs:string" minOccurs="0" />
+              <xs:element name="net_wt" msprop:Generator_ColumnPropNameInTable="net_wtColumn" msprop:Generator_ColumnPropNameInRow="net_wt" msprop:Generator_UserColumnName="net_wt" msprop:Generator_ColumnVarNameInTable="columnnet_wt" type="xs:string" minOccurs="0" />
+              <xs:element name="gross_wt" msprop:Generator_ColumnPropNameInTable="gross_wtColumn" msprop:Generator_ColumnPropNameInRow="gross_wt" msprop:Generator_UserColumnName="gross_wt" msprop:Generator_ColumnVarNameInTable="columngross_wt" type="xs:string" minOccurs="0" />
+              <xs:element name="tenant_name" msprop:Generator_ColumnPropNameInTable="tenant_nameColumn" msprop:Generator_ColumnPropNameInRow="tenant_name" msprop:Generator_UserColumnName="tenant_name" msprop:Generator_ColumnVarNameInTable="columntenant_name" type="xs:string" minOccurs="0" />
+              <xs:element name="tenant_address" msprop:Generator_ColumnPropNameInTable="tenant_addressColumn" msprop:Generator_ColumnPropNameInRow="tenant_address" msprop:Generator_UserColumnName="tenant_address" msprop:Generator_ColumnVarNameInTable="columntenant_address" type="xs:string" minOccurs="0" />
+              <xs:element name="tenant_gst" msprop:Generator_ColumnPropNameInTable="tenant_gstColumn" msprop:Generator_ColumnPropNameInRow="tenant_gst" msprop:Generator_UserColumnName="tenant_gst" msprop:Generator_ColumnVarNameInTable="columntenant_gst" type="xs:string" minOccurs="0" />
+              <xs:element name="tenant_pan_no" msprop:Generator_ColumnPropNameInTable="tenant_pan_noColumn" msprop:Generator_ColumnPropNameInRow="tenant_pan_no" msprop:Generator_UserColumnName="tenant_pan_no" msprop:Generator_ColumnVarNameInTable="columntenant_pan_no" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_name" msprop:Generator_ColumnPropNameInTable="vendor_nameColumn" msprop:Generator_ColumnPropNameInRow="vendor_name" msprop:Generator_UserColumnName="vendor_name" msprop:Generator_ColumnVarNameInTable="columnvendor_name" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_mobile" msprop:Generator_ColumnPropNameInTable="vendor_mobileColumn" msprop:Generator_ColumnPropNameInRow="vendor_mobile" msprop:Generator_UserColumnName="vendor_mobile" msprop:Generator_ColumnVarNameInTable="columnvendor_mobile" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_address" msprop:Generator_ColumnPropNameInTable="vendor_addressColumn" msprop:Generator_ColumnPropNameInRow="vendor_address" msprop:Generator_UserColumnName="vendor_address" msprop:Generator_ColumnVarNameInTable="columnvendor_address" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_gst" msprop:Generator_ColumnPropNameInTable="vendor_gstColumn" msprop:Generator_ColumnPropNameInRow="vendor_gst" msprop:Generator_UserColumnName="vendor_gst" msprop:Generator_ColumnVarNameInTable="columnvendor_gst" type="xs:string" minOccurs="0" />
+              <xs:element name="vendor_pan_no" msprop:Generator_ColumnPropNameInTable="vendor_pan_noColumn" msprop:Generator_ColumnPropNameInRow="vendor_pan_no" msprop:Generator_UserColumnName="vendor_pan_no" msprop:Generator_ColumnVarNameInTable="columnvendor_pan_no" type="xs:string" minOccurs="0" />
+              <xs:element name="tenat_mobile_no" msprop:Generator_UserColumnName="tenat_mobile_no" msprop:Generator_ColumnPropNameInTable="tenat_mobile_noColumn" msprop:Generator_ColumnPropNameInRow="tenat_mobile_no" msprop:Generator_ColumnVarNameInTable="columntenat_mobile_no" type="xs:string" minOccurs="0" />
+              <xs:element name="challan_no" msprop:Generator_ColumnPropNameInRow="challan_no" msprop:Generator_ColumnPropNameInTable="challan_noColumn" msprop:Generator_ColumnVarNameInTable="columnchallan_no" msprop:Generator_UserColumnName="challan_no" type="xs:string" minOccurs="0" />
+              <xs:element name="actual_item_gross_wt" msprop:Generator_ColumnPropNameInRow="actual_item_gross_wt" msprop:Generator_ColumnPropNameInTable="actual_item_gross_wtColumn" msprop:Generator_ColumnVarNameInTable="columnactual_item_gross_wt" msprop:Generator_UserColumnName="actual_item_gross_wt" type="xs:string" minOccurs="0" />
+              <xs:element name="actual_item_net_wt" msprop:Generator_ColumnPropNameInRow="actual_item_net_wt" msprop:Generator_ColumnPropNameInTable="actual_item_net_wtColumn" msprop:Generator_ColumnVarNameInTable="columnactual_item_net_wt" msprop:Generator_UserColumnName="actual_item_net_wt" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,195 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+@* ************** First Row of Cards ************** *@
+<div class="row gy-6 mb-4">
+    <!-- New Order Card -->
+    <div class="col-md-12 col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-2 fw-bold">2</h3>
+                <h5 class="card-title mb-2">New Orders</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Order Card -->
+    <div class="col-md-12 col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-2 fw-bold">5</h3>
+                <h5 class="card-title mb-2">Pending Orders</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejected by Karagir Card -->
+    <div class="col-md-12 col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h3 class="mb-2 fw-bold">5</h3>
+                <h5 class="card-title mb-2">Rejected by Karagir</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ************** Second Row of Cards ************** *@
+<div class="row gy-6 mb-4">
+    <!-- Received Order by Karagir Card -->
+    <div class="col-md-12 col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title mb-2">Received Order By Karagir</h5>
+                <h4 class="mb-2">8</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Completed Orders Card -->
+    <div class="col-md-12 col-lg-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title mb-2">Completed Orders</h5>
+                <h4 class="mb-2">5</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* ************** Third Row (Space Added) ************** *@
+<div class="row gy-6 mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <!-- Title on the left -->
+                <h5 class="card-title mb-0">Orders<small></small></h5>
+
+                <!-- Three-dot icon on the right -->
+                <span class="text-primary cursor-pointer">
+                    <i class="fa fa-ellipsis-v"></i> <!-- Three-dot icon -->
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row gy-6 mb-4">
+    <div class="col-lg-12">
+        <!-- Card for the table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive table-card mt-3 mb-1">
+                    <table class="table align-middle table-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="sort">
+                                    <input type="checkbox" class="form-check-input rowCheckbox" id="Checkbox_SelectAllOrders" />
+                                </th>
+                                <th class="sort" data-sort="Sr No">Sr No</th>
+                                <th class="sort" data-sort="Action">Action</th>
+                                <th class="sort" data-sort="Status">Status</th>
+                                <th class="sort" data-sort="Order No">Order No.</th>
+                                <th class="sort" data-sort="Item Name">Item Name</th>
+                                <th class="sort" data-sort="Category">Category</th>
+                                <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                <th class="sort" data-sort="Purity">Purity</th>
+                                <th class="sort" data-sort="Item Pieces">Item Pieces</th>
+                                <th class="sort" data-sort="Product Group">Product Group</th>
+                                <th class="sort" data-sort="Branch Name">Branch Name</th>
+                                <th class="sort" data-sort="Order Date">Order Date</th>
+                                <th class="sort" data-sort="Order Delivery Date">Order Delivery Date</th>
+                                <th class="sort" data-sort="Assigned To Karagir">Assigned To Vendor</th>
+                                <th class="sort" data-sort="Assigned To Sub-Karagir">Assigned To Sub Vendor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="barcode_data_tbody_id" name="barcode_data_tbody_nm">
+                            @{
+                                int count = 1;
+                            }
+                            @if (ViewBag.OrderData.Tables.Count > 0 && ViewBag.OrderData.Tables[0].Rows.Count > 0)
+                            {
+                                foreach (System.Data.DataRow dr in ViewBag.OrderData.Tables[0].Rows)
+                                {
+                                    <tr>
+                                        <td><input type="checkbox" class="form-check-input rowCheckbox" name="name" value="" /></td>
+                                        <td>@count</td>
+                                        <td>@dr["STATUS"]</td>
+                                        <td>@dr["order_no"]</td>
+                                        <td>@dr["item_name"]</td>
+                                        <td>@dr["category_name"]</td>
+                                        <td>@dr["net_wt"]</td>
+                                        <td>@dr["purity_name"]</td>
+                                        <td>@dr["product_group_name"]</td>
+                                        <td>@dr["pcs"]</td>
+                                        <td>PUNE</td>
+                                        <td>@dr["order_date"]</td>
+                                        <td>@dr["order_delivery_date"]</td>
+                                        <td>@dr["vendor_name"]</td>
+                                        <td>@dr["sub_vendor_name"]</td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- end row -->
+
+<script>
+    // When the 'Select All' checkbox is clicked
+    document.getElementById('Checkbox_SelectAllOrders').addEventListener('change', function() {
+        // Get all checkboxes with the class 'rowCheckbox'
+        let checkboxes = document.querySelectorAll('.rowCheckbox');
+
+        // Loop through each checkbox and set its checked status based on the 'Select All' checkbox
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = document.getElementById('Checkbox_SelectAllOrders').checked; // Set each checkbox to match the 'Select All' checkbox
+        });
+    });
+
+
+    function EditOrderDetailsItemId(orderNo,OrderDetailsId)
+    {
+      alert("Order No : "+orderNo+" Count "+OrderDetailsId)
+    }
+
+
+    function OrderItemAction(Flag)
+    {
+      if(Flag=='1')
+      {
+        alert("Order rohit Accept")
+      }
+      else if(Flag=='2')
+      {
+        alert("Order rohit Accept")
+      }
+      else if(Flag=='3')
+      {
+        alert("Orderrohit Accept")
+      }
+      else{
+        alert("Order rohit History")
+      }
+    }
+</script>
+

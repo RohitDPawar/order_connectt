@@ -1,0 +1,565 @@
+@{
+    ViewData["Title"] = "Dashboard - Analytics";
+}
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/apex-charts/apexcharts.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap JS (for dropdowns) -->
+}
+
+@section PageScripts {
+    <script src="~/js/dashboards-analytics.js"></script>
+}
+
+@if (TempData["HoReject"] != null)
+{
+    <script>
+        // Safely pass TempData["Message"] to JavaScript
+        ShowErrorMsg('@TempData["HoReject"]');
+
+        // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+        function ShowErrorMsg(message) {
+            //alert(message)
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+    </script>
+    TempData["HoReject"] = null;
+}
+<div class="col-12">
+    <div class="d-flex justify-content-between align-items-center">
+        <!-- Title and Filter Dropdown -->
+
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="listjs-table" id="customerList">
+                    <div class="row g-4 mb-3">
+                        <!-- First Row: Title and Buttons -->
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Title on the left -->
+                                <h4>New Orders</h4>
+
+                                <!-- Right: Buttons -->
+                                <div class="d-flex">
+                                    <button class="btn btn-success btn-sm me-2" id="Btn_AcceptedId"><i class="fa fa-check me-1"></i>Accept</button>
+                                    <button class="btn btn-danger btn-sm me-2" id="Btn_RejectedId" onclick="openModal()"> <i class="fa fa-times me-1"></i> Reject</button>
+                                    <!-- Filter Button with Filter Icon, Custom Color, and Space between Icon and Label -->
+                                    <button class="btn btn-primary" id="Btn_FilterCityId" data-bs-toggle="modal" data-bs-target="#filterModal" >
+                                        <img src="~/svg/icons/filtercheck.svg" id="filtercheck" class="me-2 d-none" /><img src="~/svg/icons/filtercross.svg" id="filtercross" class="me-2" /> Filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive table-card mt-3 mb-1">
+                        <table class="table align-middle table-nowrap" id="NewOrderBackOfficeTableId">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="sort">
+                                        <input type="checkbox" class="form-check-input Checkbox_SelectAllHeader" id="Checkbox_SelectAllOrders" />
+                                    </th>
+                                    <th class="sort" data-sort="Sr No">Sr No</th>
+                                    <th class="sort" data-sort="Action">Action</th>
+                                    <th class="sort" data-sort="Status">Status</th>
+                                    <th class="sort" data-sort="Order No">Order No.</th>
+                                    <th class="sort" data-sort="Item Name">Item Name</th>
+                                    <th class="sort" data-sort="Category">Category Name</th>
+                                    <th class="sort" data-sort="Net Weight">Gross Weight</th>
+                                    <th class="sort" data-sort="Net Weight">Net Weight</th>
+                                    <th class="sort" data-sort="Purity">Purity</th>
+                                    <th class="sort" data-sort="Item Pieces">Item Pieces</th>
+                                    <th class="sort" data-sort="Product Group">Product Group</th>
+                                    <th class="sort" data-sort="">Branch Name</th>
+                                    <th class="sort" data-sort="">Order Date</th>
+                                    <th class="sort" data-sort="">Order Delivery Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="form-check-all">
+                            </tbody>
+                        </table>
+                    </div>
+                    @await Html.PartialAsync("Sections/Menu/_pagination")
+                </div>
+            </div><!-- end card -->
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end col -->
+</div>
+
+@* ############################################################ REJECTED RESOAN MODAL ################################################## *@
+<div class="modal fade" id="RejectedOrderHOId" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    @using (Html.BeginForm("BackOfficeOrderReject", "Dashboard"))
+    {
+        <div class="modal-dialog" style="margin-top:15%">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Rejected Remark</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="hidden" name="SelectedOrderItemId" id="OrderItemIdRejectedId" />
+                        <div class="col">
+                            <label>Rejected Remark</label>
+                            <input type="text" class="form-control" name="RejectedRemark" id="RejectedRemarkId" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    function loadPageData(page, rowsToShow) {
+        GetOrderDate(page, $('#ShowRowid').val());
+    }
+
+    // Function to update the Select All checkbox state based on individual checkbox selections
+    function updateSelectAllCheckboxState() {
+        var table = $("#NewOrderBackOfficeTableId");
+        var allChecked = table.find(".RowCheckbox").length === table.find(".RowCheckbox:checked").length;
+        table.find(".Checkbox_SelectAllHeader").prop('checked', allChecked);
+    }
+
+    var selectedRowIds = [];
+
+    function applyFilter()
+    {
+        var orderDateFrom = $("#filterOrderDateFrom").val();
+        var orderDateTo = $("#filterOrderDateTo").val();
+        var deliveryDateFrom = $("#filterDeliveryDateFrom").val();
+        var deliveryDateTo = $("#filterDeliveryDateTo").val();
+
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+
+        var valid = true;
+
+        if (orderDateFrom || orderDateTo) {
+            if (!orderDateFrom) {
+                $("#WarnfilterOrderDateFrom").show();
+                valid = false;
+            }
+            if (!orderDateTo) {
+                $("#WarnfilterOrderDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (deliveryDateFrom || deliveryDateTo) {
+            if (!deliveryDateFrom) {
+                $("#WarnfilterDeliveryDateFrom").show();
+                valid = false;
+            }
+            if (!deliveryDateTo) {
+                $("#WarnfilterDeliveryDateTo").show();
+                valid = false;
+            }
+        }
+
+        if (!valid) {
+            return;
+        }
+
+        $('#filtercheck').removeClass('d-none');
+        $('#filtercross').addClass('d-none');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filterModal').modal('hide');
+    }
+
+    function ClearFilter() {
+        $("#WarnfilterOrderDateFrom, #WarnfilterOrderDateTo").hide();
+        $("#WarnfilterDeliveryDateFrom, #WarnfilterDeliveryDateTo").hide();
+        $('#filterCustomerMobile').val('');
+        $('#filterItemName').val("")
+        $('#filterCategory').val('')
+        $('#filterVendorName').val('');
+        $('#filterOrderDateFrom').val('');
+        $('#filterCustomerName').val('');
+        $('#filterBranchName').val('');
+        $('#filterOrderNo').val('');
+        $('#filterOrderDateTo').val('');
+        $('#filterDeliveryDateFrom').val('');
+        $('#filterDeliveryDateTo').val('');
+        GetOrderDate(1, $('#ShowRowid').val());
+        $('#filtercheck').addClass('d-none');
+        $('#filtercross').removeClass('d-none');
+    };
+
+    //Get Order Data
+    function GetOrderDate(pageNumber, pageSize) {
+        const data = {
+            CustomerMobile: $('#filterCustomerMobile').val() || '',
+            ItemName: $('#filterItemName').val() || '',
+            Category: $('#filterCategory').val() || '',
+            VendorName: $('#filterVendorName').val() || '',
+            CustomerName: $('#filterCustomerName').val() || '',
+            BranchName: $('#filterBranchName').val() || '',
+            OrderDateFrom: $('#filterOrderDateFrom').val() || '',
+            OrderNo: $('#filterOrderNo').val() || '',
+            OrderDateTo: $('#filterOrderDateTo').val() || '',
+            DeliveryDateFrom: $('#filterDeliveryDateFrom').val() || '',
+            DeliveryDateTo: $('#filterDeliveryDateTo').val() || '',
+            PageNumber: pageNumber,
+            PageSize: pageSize
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/NewOrderBackOfficeFilter",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (data) {
+                var res = JSON.parse(data);
+                TableBindData(res)
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    //THIS IS USED FOR WHEN BUTTON CLICK BEFORE THAT CHECK ORDER SELECTED OR NOT
+    function openModal() {
+        // const selectedValues = $(".rowCheckbox:checked").map(function () {
+        //     return $(this).val();
+        // }).get(); // Collect values into an array
+
+        if (selectedRowIds.join(", ").length > 0) {
+            $("#OrderItemIdRejectedId").val(selectedRowIds.join(", "))
+            // // Use Bootstrap's modal object to show the modal
+            const myModal = new bootstrap.Modal(document.getElementById('RejectedOrderHOId'));
+            myModal.show();
+            return true;
+        }
+        else {
+            ShowErrorMsg("Before Proceed Please Select Order Line....!!!", "1")
+        }
+    }
+
+    $(".Checkbox_SelectAllHeader").on("change", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the header checkbox
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+
+        // Select or deselect all row checkboxes based on the header checkbox state
+        table.find(".RowCheckbox").prop('checked', isChecked);
+
+        // Update the selectedRowIds array based on the "Select All" checkbox
+        if (isChecked) {
+            // Add all row IDs to the selectedRowIds array for the specific table
+            table.find(".RowCheckbox").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId && !selectedRowIds.includes(rowId)) {
+                    selectedRowIds.push(rowId);
+                    console.log(selectedRowIds);
+                }
+            });
+        } else {
+
+            table.find(".RowCheckbox").each(function () {
+                var rowId = $(this).data('id');
+                if (rowId) {
+                    // Only remove the rowId from the selectedRowIds array if the checkbox is unchecked
+                    selectedRowIds = selectedRowIds.filter(function (id) {
+                        return id !== rowId;
+                    });
+                }
+            });
+        }
+    });
+
+    $(document).on("change", ".RowCheckbox", function () {
+        var isChecked = $(this).prop('checked');  // Get the checked state of the checkbox
+        var rowId = $(this).data('id');  // Get the row ID from data attribute
+        var table = $(this).closest('table');  // Find the closest table to the clicked checkbox
+        // Add or remove the row ID from the selectedRowIds array based on checkbox state
+        if (isChecked) {
+            if (!selectedRowIds.includes(rowId)) {
+                selectedRowIds.push(rowId);
+                console.log(selectedRowIds);
+            }
+        } else {
+            var index = selectedRowIds.indexOf(rowId);
+            if (index !== -1) {
+                selectedRowIds.splice(index, 1);
+                console.log(selectedRowIds);
+            }
+        }
+
+        // Update the "Select All" checkbox state based on whether all checkboxes in the current table are checked
+        updateSelectAllCheckboxState();
+
+
+    });
+
+    $(document).ready(function () {
+
+        GetOrderDate(1, $('#ShowRowid').val());
+        // Get values of selected checkboxes
+
+        $("#Btn_AcceptedId").on("click", function () {
+            // const selectedValues = $(".rowCheckbox:checked").map(function () {
+            //     return $(this).val();
+            // }).get(); // Collect values into an array
+            // console.log(selectedRowIds); // Output the array to console
+            //alert("Selected Values: " + selectedValues.join(", ").length);
+            if (selectedRowIds.join(", ").length > 0) {
+                OrderStatusFromHO(selectedRowIds.join(", "), "2")
+            }
+            else {
+                ShowErrorMsg("Please Selected Order lines...!!!", "1")
+            }
+        });
+
+        $('#applyFiltersButton').on('click', function () {
+
+            applyFilter();
+
+        });
+
+        $("#ClearFiltersButton").click(function () {
+
+            ClearFilter();
+
+        });
+    });
+
+    function OrderStatusFromHO(SelectedData, Status) {
+        $.ajax({
+            type: "POST",
+            url: "/Dashboard/OrderUpdatedsStatusFromOrders",
+            data: {
+                SelectedDataIds: SelectedData,
+                Status: Status
+            },
+            success: function (data) {
+                var res = JSON.parse(data);
+                //ShowErrorMsg("Order Accepted Successfully...")
+                location.reload()
+            },
+            error: function (response) {
+
+            }
+        });
+    }
+
+    // THIS FUNCTION IS USED TO SHOW ERROR MESSAGE
+    function ShowErrorMsg(message, flag) {
+        if (flag == "0") {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'success',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        else {
+            Swal.fire({
+                //title: 'Good job!',
+                text: message,
+                icon: 'warning',
+                customClass: {
+                    confirmButton: 'btn btn-primary waves-effect waves-light'
+                },
+                buttonsStyling: false
+            });
+        }
+        //alert(message)
+
+    }
+
+    function TableBindData(res) {
+        
+        // Clear the table body (the tbody element)
+        $("#NewOrderBackOfficeTableId tbody").empty();
+
+        var table = $("#NewOrderBackOfficeTableId");
+
+        table.find(".Checkbox_SelectAllHeader").prop('checked', false);
+
+        const paginationInfo = res.PaginationInfo;
+
+        let srno;
+
+        if (res && paginationInfo && paginationInfo.length > 0) {
+            const totalRows = paginationInfo[0].TotalRows;
+            const totalPages = paginationInfo[0].TotalPages;
+            const pageNumber = paginationInfo[0].PageNumber;
+            const pageSize = paginationInfo[0].PageSize;
+            srno = (pageNumber - 1) * pageSize + 1;
+
+            generatePagination(totalPages, pageNumber);
+        } 
+
+        if (res && res["OrderData"] && Array.isArray(res["OrderData"])) {
+            // Loop through the response data
+            for (let i = 0; i < res["OrderData"].length; i++) {
+                // Extract the current order data
+                let orderItemId = res["OrderData"][i]["order_item_id"] || ' ';
+                let orderStatus = res["OrderData"][i]["order_status"] || ' ';
+                let orderDate = res["OrderData"][i]["order_date"] ? res["OrderData"][i]["order_date"].split('T')[0] : ' ';
+                let orderDeliveryDate = res["OrderData"][i]["order_delivery_date"] ? res["OrderData"][i]["order_delivery_date"].split('T')[0] : ' ';
+
+                // Define the edit button logic based on order status
+                let LinkData = "";
+                if (orderStatus === 2) {
+                    LinkData = `<a href="/OrderMaster/EditOrder?OrderItemId=${orderItemId}" class="text-primary cursor-pointer">
+                                        <span id="Btn_EditCityId" class="text-primary cursor-pointer">
+                                            <i class="fa fa-edit"></i>
+                                        </span>
+                                    </a>`;
+                } else {
+                    LinkData = `<a href="javascript:void(0);" class="text-primary cursor-pointer">
+                                        <span id="Btn_EditCityId" class="cursor-pointer" onclick="return false" style="color:gray">
+                                            <i class="fa fa-edit"></i>
+                                        </span>
+                                    </a>`;
+                }
+
+                // StoneHideShow logic
+                let StoneHideShow = "";
+                if (res["OrderData"][i]["gross_wt"] > res["OrderData"][i]["net_wt"]) {
+                    StoneHideShow = `<a href="javascript:void(0);" class="text-primary cursor-pointer" onclick="ShowStoneDetails(${res["OrderData"][i]["order_item_id"]})">
+                                            <span class="text-primary cursor-pointer"><i class="fa fa-gem"></i></span>
+                                         </a>`;
+                } else {
+                    StoneHideShow = '-';
+                }
+
+                // Safely retrieve values for each column
+                let orderSeriesNo = res["OrderData"][i]["order_series_no"] || '';
+                let itemName = res["OrderData"][i]["item_name"] || '';
+                let categoryName = res["OrderData"][i]["category_name"] || '';
+                let grossWt = parseFloat(res["OrderData"][i]["gross_wt"]).toFixed(3) || '';
+                let netWt = parseFloat(res["OrderData"][i]["net_wt"]).toFixed(3) || '';
+                let purityName = parseFloat(res["OrderData"][i]["purity_name"]).toFixed(2) || '';
+                let branchName = res["OrderData"][i]["branch_name"] || '';
+                let pcs = res["OrderData"][i]["pcs"] || '';
+                let productGroupName = res["OrderData"][i]["product_group_name"] || '';
+                let status = res["OrderData"][i]["STATUS"] || '';
+                const idCheck = res["OrderData"][i]["order_item_id"] || '';
+                const isChecked = selectedRowIds.includes(Number(idCheck));
+
+                // Construct the table row HTML
+                const data = `
+                            <tr id="${idCheck}">
+                                                <td>
+                                                    <div class="form-check">
+                                                                                        <input class="form-check-input RowCheckbox" type="checkbox" data-id="${orderItemId}" name="OrderDetailsId" value="${orderItemId}" id="CityRowCheckBoxId_${idCheck}" ${isChecked ? 'checked' : ''}>
+                                                    </div>
+                                                </td>
+                                <td>${srno}</td>
+                            <td class="sort">
+                                <div class="d-flex gap-3">
+                                    ${LinkData}
+                                    ${StoneHideShow}
+                                    <div class="dropdown">
+                                        <span id="Btn_MoreOptionsCityId" class="text-primary cursor-pointer" data-bs-toggle="dropdown">
+                                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                        </span>
+                                        <ul class="dropdown-menu dropdown-menu-end p-0 small">
+                                            <li>
+                                                <a class="dropdown-item py-1" href="javascript:void(0);" onclick="ShowJobCardDetails('${orderItemId}')">
+                                                    <i class="fa fa-id-card me-2"></i>Job Card
+                                                </a><hr class="m-0" />
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-1" href="javascript:void(0);" onclick="ShowHistoryPage('${orderItemId}')">
+                                                    <i class="fa fa-history me-2"></i>History
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${status}</td>
+                            <td>${orderSeriesNo}</td>
+                            <td>${itemName}</td>
+                            <td>${categoryName}</td>
+                            <td>${grossWt}</td>
+                            <td>${netWt}</td>
+                            <td>${purityName}</td>
+                            <td>${pcs}</td>
+                            <td>${productGroupName}</td>
+                            <td>${branchName}</td>
+                            <td>${orderDate}</td>
+                            <td>${orderDeliveryDate}</td>
+                        </tr>`;
+
+                // Append the row to the table body
+                $("#NewOrderBackOfficeTableId tbody").append(data);
+                srno++;
+            }
+        } else {
+            $("#NewOrderBackOfficeTableId tbody").empty();
+            $("#NewOrderBackOfficeTableId tbody").html(`
+                                <tr>
+                                    <td colspan="13" style="text-align: center;">No Data Available</td>
+                                </tr>
+                            `);
+            generatePagination(1, 1);
+        }
+        updateSelectAllCheckboxState();
+    }
+
+    //THIS FUNCTION USED FOR DOWNLOAD JOBCARD PDF
+    function DownloadJobCardFile() {
+      $.ajax({
+        type: "POST",
+        url: "/OrderMaster/ShareJobCardDetailsDownload",
+        data: { ItemDetailsId: $("#OrderDetailsId").val() },
+        success: function (response) {
+          if (response && response.fileUrl) {
+            // ✅ Create a temporary link and click it to download the file
+            const link = document.createElement('a');
+            link.href = response.fileUrl;
+            link.download = ''; // Let browser use filename from URL
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          } else {
+            alert('Could not generate the file.');
+          }
+        },
+        error: function (error) {
+          console.error('Error fetching order details:', error);
+          alert('An error occurred while fetching order details.');
+        }
+      });
+    }
+</script>
+
+
+
